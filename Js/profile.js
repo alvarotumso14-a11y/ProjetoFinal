@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Create an edit modal (reusable)
+    // Create an edit modal (reusable) - styled like dashboard modal
     function ensureModal() {
         if (document.getElementById('profileEditModal')) return;
         const modal = document.createElement('div');
@@ -103,19 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="modal-box">
                 <div class="modal-topo">
                     <h2>Editar Perfil</h2>
-                    <button class="close" id="profileEditClose">&times;</button>
+                    <span class="close" aria-hidden="true">&times;</span>
                 </div>
                 <div class="modal-corpo">
-                    <div class="edit-form">
-                        <label>Nome<br><input type="text" id="editNome" /></label>
-                        <label>Tipo de Diabetes<br><input type="text" id="editTipo" /></label>
-                        <label>Idade<br><input type="text" id="editIdade" /></label>
-                        <label>Email<br><input type="email" id="editEmail" /></label>
-                        <label>Celular<br><input type="text" id="editCelular" /></label>
-                        <label>Foto do Perfil<br><input type="file" id="editPhoto" accept="image/*" /></label>
-                        <div style="display:flex;gap:10px;margin-top:14px;">
-                            <button id="saveProfileBtn">Salvar</button>
-                            <button id="cancelProfileBtn" type="button">Cancelar</button>
+                    <div class="edit-form" style="width:100%;max-width:640px;">
+                        <div class="step active">
+                            <label>Nome<br><input type="text" id="editNome" /></label>
+                            <label>Tipo de Diabetes<br><input type="text" id="editTipo" /></label>
+                            <label>Idade<br><input type="text" id="editIdade" /></label>
+                            <label>Email<br><input type="email" id="editEmail" /></label>
+                            <label>Celular<br><input type="text" id="editCelular" /></label>
+                            <label>Foto do Perfil<br><input type="file" id="editPhoto" accept="image/*" /></label>
+
+                            <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px;">
+                                <button id="saveProfileBtn">Salvar</button>
+                                <button id="cancelProfileBtn" type="button" class="excluir">Cancelar</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -123,9 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(modal);
 
         // wire buttons
-        document.getElementById('profileEditClose').onclick = closeModal;
-        document.getElementById('cancelProfileBtn').onclick = closeModal;
-        document.getElementById('saveProfileBtn').onclick = saveFromModal;
+        const closeEl = modal.querySelector('.close');
+        if (closeEl) closeEl.onclick = closeModal;
+        const cancelBtn = document.getElementById('cancelProfileBtn');
+        if (cancelBtn) cancelBtn.onclick = closeModal;
+        const saveBtn = document.getElementById('saveProfileBtn');
+        if (saveBtn) saveBtn.onclick = saveFromModal;
     }
 
     function openModal() {
