@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon: arquivo PNG da logo -->
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@latest/font/lucide.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Dashboard</title>
+</head>
+<body>
+    <div class="topbar">
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+
+        <div class="user-top">
+            <div class="foto">
+                <img src=""  onclick="goToProfile()" alt="Foto do usuário">
+            </div>
+            <div class="user-info">
+                <p>Nome do Usuário</p>
+                <p>Tipo de Diabetes</p>
+            </div>
+            <div>            
+                <div>
+                    <h1>Olá, Usuário</h1>
+                    <p>Bem-vindo ao GlicHelp</p>
+                </div></div>
+        </div>
+    </div>
+
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">✕</button>
+
+            <nav class="navigation" aria-label="Menu principal">
+                <ul>
+                    <li><a class="ativo" href="dashboard.html">Dashboard</a></li>
+                    <li><a href="historico.html">Histórico</a></li>
+                    <li><a href="glicbot.html">GlicBot</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo">
+            <header>
+                <div>
+                    <h1>Olá, Usuário</h1>
+                    <p>Bem-vindo ao GlicHelp</p>
+                </div>
+                <button class="registrar" onclick="abrirModal()">Novo Registro</button>
+            </header>
+
+            <section class="cards">
+                <div class="card">
+                    <h3>Última Glicemia</h3>
+                    <h1 id="ultimaGlicemia">120 mg/dL</h1>
+                    <span class="status">Normal</span>
+                </div>
+
+                <div class="card">
+                    <h3>Última Aplicação</h3>
+                    <h1 id="ultimaDose">6 U</h1>
+                    <span id="ultimaHora">12:30</span>
+                </div>
+            </section>
+
+            <section class="graficos">
+                <div class="titulo">
+                    <h2>Curva Glicêmica</h2>
+                    <p>Últimos registros</p>
+                </div>
+
+                <div class="grafico-box">
+                    <canvas id="graficoGlicemia"></canvas>
+                </div>
+            </section>
+
+            <section class="historico">
+                <div class="titulo">
+                    <h2>Últimos Registros</h2>
+                </div>
+
+                <div class="registro">
+                    <div>🩸 Glicemia</div>
+                    <span id="ultimaGlicemiaResumo">120 mg/dL</span>
+                </div>
+
+                <div class="registro">
+                    <div>🍽️ Refeição</div>
+                    <span id="ultimaRefeicao">Café da Manhã</span>
+                </div>
+
+                <div class="registro">
+                    <div>💉 Insulina</div>
+                    <span id="ultimaInsulina">6 U</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modalRegistro" class="modal">
+        <div class="modal-box">
+            <div class="modal-topo">
+                <h2>Novo Registro</h2>
+                <span class="close" onclick="fecharModal()">&times;</span>
+            </div>
+
+            <div class="modal-corpo">
+                <div class="step active">
+                    <h3>Que horas você mediu sua glicemia?</h3>
+                    <input type="time" id="inputHora">
+                    <button onclick="proximoPasso()">Continuar</button>
+                </div>
+
+                <div class="step">
+                    <h3>Qual foi o valor da sua glicemia?</h3>
+                    <input type="number" id="inputGlicemia" placeholder="Valor em mg/dL">
+                    <button onclick="proximoPasso()">Continuar</button>
+                </div>
+
+                <div class="step">
+                    <h3>Dose de Insulina</h3>
+                    <input type="number" id="inputDose" placeholder="Quantidade em unidades">
+                    <button onclick="salvarRegistro()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="Js/menu.js"></script>
+    <script src="Js/dashboard.js"></script>
+</body>
+</html>

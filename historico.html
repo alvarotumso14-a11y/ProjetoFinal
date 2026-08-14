@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon: arquivo PNG da logo -->
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <title>Histórico</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="topbar">
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+
+        <div class="user-top">
+            <div class="foto">
+                <img src="" alt="Foto do usuário">
+            </div>
+            <div class="user-info">
+                <p>Nome do Usuário</p>
+                <p>Tipo de Diabetes</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">✕</button>
+
+            <nav class="navigation" aria-label="Menu principal">
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a class="ativo" href="historico.html">Histórico</a></li>
+                    <li><a href="relatorios.html">Relatórios</a></li>
+                    <li><a href="glicbot.html">GlicBot</a></li>
+                    <li><a href="perfil.html">Perfil</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo">
+            <header>
+                <div>
+                    <h1>Histórico</h1>
+                    <p>Todos os registros realizados.</p>
+                </div>
+            </header>
+
+            <div class="pesquisa">
+                <input
+                    type="text"
+                    id="pesquisa"
+                    placeholder="Pesquisar por data..."
+                >
+            </div>
+
+            <section class="historico">
+                <div class="titulo">
+                    <h2>Últimos Registros</h2>
+                </div>
+
+                <div id="historicoLista"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="Js/menu.js"></script>
+    <script src="Js/historico.js"></script>
+</body>
+</html>
