@@ -1,14 +1,66 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="Logos/Favicon.png"> 
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
     <link rel="stylesheet" href="style.css">
-    <script src="Js/Profile.js" defer></script>
     <title>Perfil</title>
 </head>
 <body>
-    
+    <div class="topbar">
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+
+        <div class="user-top">
+            <div class="foto">
+                <img src="" alt="Foto do usuário">
+            </div>
+            <div class="user-info">
+                <p>Nome do Usuário</p>
+                <p>Tipo de Diabetes</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">✕</button>
+
+            <nav class="navigation" aria-label="Menu principal">
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="historico.html">Histórico</a></li>
+                    <li><a href="relatorios.html">Relatórios</a></li>
+                    <li><a href="glicbot.html">GlicBot</a></li>
+                    <li><a class="ativo" href="Profile.html">Perfil</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo">
+            <header>
+                <div>
+                    <h1>Perfil</h1>
+                    <p>Informações do usuário</p>
+                </div>
+            </header>
+
+            <section class="perfil">
+                <div class="foto-grande">
+                    <img src="" alt="Foto do usuário">
+                </div>
+                <div class="dados-perfil">
+                    <p><strong>Nome:</strong> Nome do Usuário</p>
+                    <p><strong>Tipo de Diabetes:</strong> Tipo de Diabetes</p>
+                    <p><strong>Idade:</strong> —</p>
+                    <button onclick="editarPerfil()">Editar Perfil</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="Js/menu.js"></script>
 </body>
 </html>
