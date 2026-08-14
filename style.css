@@ -342,6 +342,109 @@ header button:hover {
     background: #c0392b;
 }
 
+/* Profile */
+.perfil {
+    margin-top: 20px;
+}
+
+.perfil-box {
+    background: #fff;
+    padding: 28px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.foto-grande {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 36px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    flex: 0 0 auto;
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1 1 auto;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px;
+}
+
+.badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    color: #c0392b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex: 0 0 44px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.info .key {
+    font-size: 13px;
+    color: #777;
+}
+
+.info .value {
+    font-size: 18px;
+    color: #111;
+    margin-top: 4px;
+}
+
+.botao-alt {
+    background: transparent;
+    border: 2px dashed #c0392b;
+    color: #c0392b;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: auto;
+    flex: 0 0 auto;
+}
+
+.botao-alt:hover {
+    background: rgba(192,57,43,0.06);
+}
+
+/* Ajuste para celular: manter igual mas empilhar */
+@media (max-width: 768px) {
+    .perfil-box {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 18px;
+    }
+
+    .botao-alt {
+        margin-left: 0;
+    }
+
+    .info-row {
+        justify-content: center;
+    }
+}
+
 /* Modal */
 .modal {
     position: fixed;

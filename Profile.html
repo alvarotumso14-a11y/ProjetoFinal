@@ -48,14 +48,52 @@
             </header>
 
             <section class="perfil">
-                <div class="foto-grande">
-                    <img src="" alt="Foto do usuário">
-                </div>
-                <div class="dados-perfil">
-                    <p><strong>Nome:</strong> Nome do Usuário</p>
-                    <p><strong>Tipo de Diabetes:</strong> Tipo de Diabetes</p>
-                    <p><strong>Idade:</strong> —</p>
-                    <button onclick="editarPerfil()">Editar Perfil</button>
+                <div class="perfil-box">
+                    <div class="foto-grande" role="img" aria-label="Foto do usuário">FT</div>
+
+                    <div class="info-list">
+                        <div class="info-row">
+                            <span class="badge">N</span>
+                            <div class="info">
+                                <div class="key">Nome</div>
+                                <div class="value" id="nome">Nome do Usuário</div>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="badge">T</span>
+                            <div class="info">
+                                <div class="key">Tipo de Diabetes</div>
+                                <div class="value" id="tipo">Tipo de Diabetes</div>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="badge">i</span>
+                            <div class="info">
+                                <div class="key">Idade</div>
+                                <div class="value" id="idade">—</div>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="badge">@</span>
+                            <div class="info">
+                                <div class="key">Email</div>
+                                <div class="value" id="email">usuario@exemplo.com</div>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="badge">C</span>
+                            <div class="info">
+                                <div class="key">Celular</div>
+                                <div class="value" id="celular">(00) 00000-0000</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="botao-alt" onclick="editarPerfil()" aria-label="Alterar informações">ALT</button>
                 </div>
             </section>
         </main>
