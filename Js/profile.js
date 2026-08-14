@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // LOCAL STORAGE: estrutura padrão para o perfil. O objeto é usado como fallback quando
+    // não há dados gravados em localStorage. A chave utilizada é 'profile' e o valor
+    // é armazenado em JSON via saveProfile/getProfile.
     const defaultProfile = {
         nome: 'Usuário',
         tipo: 'Tipo de Diabetes',
@@ -93,7 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Create an edit modal (reusable) - styled like dashboard modal
+    // CONTROLE DO MODAL: cria um modal reutilizável para editar o perfil.
+    // A estrutura segue o padrão .modal/.modal-box do projeto para consistência visual.
+    // A função só cria o elemento uma vez (id 'profileEditModal') e wire os botões de ação.
     function ensureModal() {
         if (document.getElementById('profileEditModal')) return;
         const modal = document.createElement('div');
@@ -152,6 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) modal.style.display = 'none';
     }
 
+    // SALVAR DO MODAL: coleta os valores do formulário, converte a imagem (se houver)
+    // para dataURL usando FileReader e persiste tudo em localStorage via saveProfile().
+    // Fecha o modal após salvar.
     function saveFromModal() {
         const profile = getProfile();
         profile.nome = document.getElementById('editNome').value || '';
@@ -160,18 +168,19 @@ document.addEventListener('DOMContentLoaded', () => {
         profile.email = document.getElementById('editEmail').value || '';
         profile.celular = document.getElementById('editCelular').value || '';
 
+        // Se o usuário escolheu uma imagem, lê como data URL para salvar no localStorage.
         const fileInput = document.getElementById('editPhoto');
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const file = fileInput.files[0];
             const reader = new FileReader();
             reader.onload = function (e) {
-                profile.photo = e.target.result;
+                profile.photo = e.target.result; // data:image/... base64
                 saveProfile(profile);
                 closeModal();
             };
             reader.readAsDataURL(file);
         } else {
-            // no photo chosen: keep existing
+            // sem nova foto: mantém a existente
             saveProfile(profile);
             closeModal();
         }

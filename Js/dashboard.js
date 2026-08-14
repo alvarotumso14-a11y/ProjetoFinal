@@ -1,14 +1,23 @@
 ﻿// Estado da aplicação
+// LOCAL STORAGE: registros é carregado do localStorage para persistir os registros entre sessões.
+// Ao salvar, os registros são gravados em localStorage (JSON) para que persistam após reload/fechar o navegador.
 let registros = JSON.parse(localStorage.getItem("registros")) || [];
+
+// indiceEdicao guarda o índice do registro que está sendo editado. Valor -1 indica que não estamos editando.
 let indiceEdicao = -1;
+
+// Referência ao objeto Chart (gráfico) para que possamos destruir e recriar quando os dados mudarem.
 let grafico = null;
+
+// etapa controla a etapa atual do modal de registro (uso em navegação entre etapas do formulário)
 let etapa = 0;
 
 // Elementos do DOM
 const modal = document.getElementById("modalRegistro");
 const passos = document.querySelectorAll(".step");
 
-// Funções do modal
+// CONTROLE DO MODAL: as funções abaixo (abrirModal, fecharModal, proximoPasso, atualizarPassos)
+// cuidam da abertura/fechamento do modal e da navegação entre as etapas do formulário.
 function abrirModal() {
     modal.style.display = "flex";
     etapa = 0;
@@ -36,24 +45,28 @@ function atualizarPassos() {
     passos[etapa].classList.add("active");
 }
 
-// Regras de refeição
+// CLASSIFICAÇÃO DE REFEIÇÕES
+// Determina a categoria da refeição com base no horário (HH:MM).
+// A função converte a hora em minutos desde meia-noite e aplica faixas para identificar
+// Café da Manhã, Almoço, Lanche ou Janta. Isso é usado ao salvar um registro para
+// exibir o tipo de refeição no histórico e no dashboard.
 function obterRefeicao(hora) {
     const [horas, minutos] = hora.split(":").map(Number);
     const horario = horas * 60 + minutos;
 
     if (horario <= 660) {
-        return "☕ Café da Manhã";
+        return "☕ Café da Manhã"; // até 11:00 (660min)
     }
 
     if (horario <= 840) {
-        return "🍛 Almoço";
+        return "🍛 Almoço"; // até 14:00 (840min)
     }
 
     if (horario <= 1080) {
-        return "🥪 Lanche";
+        return "🥪 Lanche"; // até 18:00 (1080min)
     }
 
-    return "🍽️ Janta";
+    return "🍽️ Janta"; // após 18:00
 }
 
 // Atualização do resumo do dashboard
@@ -96,18 +109,22 @@ function atualizarResumoDashboard() {
     }
 }
 
-// Salvar e exibir registro
+// SALVAR REGISTRO
+// Lê valores do formulário, valida, e cria ou atualiza um registro.
+// Depois persiste em localStorage e atualiza a UI (resumo e gráfico).
 function salvarRegistro() {
     const glicemia = document.getElementById("inputGlicemia").value;
     const dose = document.getElementById("inputDose").value;
     const hora = document.getElementById("inputHora").value;
     const refeicao = obterRefeicao(hora);
 
+    // Validação simples: exige que os campos não estejam vazios.
     if (glicemia === "" || dose === "" || hora === "") {
         alert("Preencha todos os campos!");
         return;
     }
 
+    // Se estivermos editando um registro existente, atualiza o objeto.
     if (indiceEdicao >= 0) {
         registros[indiceEdicao].glicemia = glicemia;
         registros[indiceEdicao].dose = dose;
@@ -115,6 +132,7 @@ function salvarRegistro() {
         registros[indiceEdicao].refeicao = refeicao;
         indiceEdicao = -1;
     } else {
+        // Senão, adiciona novo registro no início do array (mais recente primeiro).
         registros.unshift({
             glicemia,
             dose,
@@ -124,24 +142,32 @@ function salvarRegistro() {
         });
     }
 
+    // Persiste os registros em localStorage (chave: 'registros') em formato JSON.
     localStorage.setItem("registros", JSON.stringify(registros));
+
+    // Atualiza a interface: resumo, fecha modal e recria o gráfico com os novos dados.
     atualizarResumoDashboard();
     fecharModal();
     criarGrafico();
 }
 
-// Gráfico
+// GRÁFICO GLICÊMICO
+// Cria ou atualiza o gráfico de glicemia usando Chart.js com os últimos registros.
+// - Seleciona até 7 registros mais recentes
+// - Constrói labels (horários) e dataset (valores numéricos)
+// - Mantém a responsividade e destrói o gráfico anterior se existir
 function criarGrafico() {
     const ctx = document.getElementById("graficoGlicemia");
 
     if (!ctx) {
-        return;
+        return; // página pode não ter canvas; nada a fazer
     }
 
     if (grafico) {
-        grafico.destroy();
+        grafico.destroy(); // remove instância anterior para evitar sobreposição
     }
 
+    // Pega os últimos 7 registros (ou menos) e inverte para ordem cronológica no gráfico
     const ultimos = [...registros].slice(0, 7).reverse();
 
     grafico = new Chart(ctx, {
@@ -169,8 +195,11 @@ function criarGrafico() {
     });
 }
 
-// Inicialização
+// CARREGAMENTO DO DASHBOARD
+// Quando a página carrega, inicializamos o resumo e o gráfico usando os dados em localStorage.
 window.addEventListener("load", () => {
+    // Atualiza os elementos do resumo (última glicemia, dose, hora, etc.)
     atualizarResumoDashboard();
+    // Gera o gráfico inicial com os dados disponíveis
     criarGrafico();
 });
