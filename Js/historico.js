@@ -1,7 +1,11 @@
 ﻿// Estado do histórico
+// LOCAL STORAGE: carrega os registros salvos (persistidos pelo dashboard) para exibir o histórico.
+// Se não existir chave, inicializa com array vazio.
 let registros = JSON.parse(localStorage.getItem("registros")) || [];
 
-// Funções de exibição
+// HISTÓRICO DE MEDIÇÕES
+// atualiza a lista de registros exibida na página de histórico.
+// Constrói os elementos HTML a partir do array `registros` carregado do localStorage.
 function atualizarHistorico() {
     const lista = document.getElementById("historicoLista");
 
@@ -44,6 +48,9 @@ function atualizarHistorico() {
     });
 }
 
+// EDIÇÃO DE REGISTROS
+// Permite alterar um registro existente usando prompts simples (implementação atual).
+// Atualiza o array `registros` e persiste em localStorage, depois atualiza a lista exibida.
 function editarRegistro(index) {
     const novaGlicemia = prompt("Nova glicemia:", registros[index].glicemia);
     if (novaGlicemia == null) {
@@ -64,6 +71,7 @@ function editarRegistro(index) {
     registros[index].dose = novaDose;
     registros[index].hora = novaHora;
 
+    // Persiste e atualiza a interface
     localStorage.setItem("registros", JSON.stringify(registros));
     atualizarHistorico();
 }
