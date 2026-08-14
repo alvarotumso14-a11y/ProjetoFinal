@@ -8,6 +8,10 @@
     <title>Perfil</title>
 </head>
 <body>
+    <!-- Página: Perfil
+         Esta página mostra as informações do usuário (nome, tipo de diabetes, idade, email, celular)
+         A foto no topo é clicável e leva à esta página. O script Js/profile.js carrega/salva os dados em localStorage
+         Estrutura principal: topbar compartilhado, sidebar e área de conteúdo (.conteudo). -->
     <div class="topbar">
         <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
 
@@ -48,52 +52,37 @@
             </header>
 
             <section class="perfil">
-                <div class="perfil-box">
-                    <div class="foto-grande" role="img" aria-label="Foto do usuário">FT</div>
-
-                    <div class="info-list">
-                        <div class="info-row">
-                            <span class="badge">N</span>
-                            <div class="info">
-                                <div class="key">Nome</div>
-                                <div class="value" id="nome">Nome do Usuário</div>
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="badge">T</span>
-                            <div class="info">
-                                <div class="key">Tipo de Diabetes</div>
-                                <div class="value" id="tipo">Tipo de Diabetes</div>
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="badge">i</span>
-                            <div class="info">
-                                <div class="key">Idade</div>
-                                <div class="value" id="idade">—</div>
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="badge">@</span>
-                            <div class="info">
-                                <div class="key">Email</div>
-                                <div class="value" id="email">usuario@exemplo.com</div>
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="badge">C</span>
-                            <div class="info">
-                                <div class="key">Celular</div>
-                                <div class="value" id="celular">(00) 00000-0000</div>
-                            </div>
-                        </div>
+                <!-- Novo layout em cartões: foto à esquerda e cartões com cada campo à direita -->
+                <div class="perfil-cards">
+                    <div class="perfil-card foto-card">
+                        <div class="foto-grande" role="img" aria-label="Foto do usuário">FT</div>
+                        <button class="botao-alt" onclick="editarPerfil()" aria-label="Alterar informações">ALT</button>
                     </div>
 
-                    <button class="botao-alt" onclick="editarPerfil()" aria-label="Alterar informações">ALT</button>
+                    <div class="perfil-card">
+                        <div class="card-key">Nome</div>
+                        <div class="card-value" id="nome">Nome do Usuário</div>
+                    </div>
+
+                    <div class="perfil-card">
+                        <div class="card-key">Tipo de Diabetes</div>
+                        <div class="card-value" id="tipo">Tipo de Diabetes</div>
+                    </div>
+
+                    <div class="perfil-card">
+                        <div class="card-key">Idade</div>
+                        <div class="card-value" id="idade">—</div>
+                    </div>
+
+                    <div class="perfil-card">
+                        <div class="card-key">Email</div>
+                        <div class="card-value" id="email">usuario@exemplo.com</div>
+                    </div>
+
+                    <div class="perfil-card">
+                        <div class="card-key">Celular</div>
+                        <div class="card-value" id="celular">(00) 00000-0000</div>
+                    </div>
                 </div>
             </section>
         </main>

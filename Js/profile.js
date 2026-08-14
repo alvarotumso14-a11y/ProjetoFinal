@@ -76,6 +76,29 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
 
+        // Atualiza a foto grande na página de perfil (se existir) para usar a mesma imagem selecionada
+        const fotoGrandes = document.querySelectorAll('.foto-grande');
+        fotoGrandes.forEach((el) => {
+            el.innerHTML = '';
+            if (profile.photo) {
+                const img = document.createElement('img');
+                img.src = profile.photo;
+                img.alt = profile.nome || 'Foto do usuário';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '50%';
+                el.appendChild(img);
+            } else {
+                const initials = (profile.nome || 'FT').split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase() || 'FT';
+                el.textContent = initials;
+                el.style.display = 'flex';
+                el.style.alignItems = 'center';
+                el.style.justifyContent = 'center';
+                el.style.fontWeight = '700';
+            }
+        });
+
         updateGreeting(profile);
     }
 
