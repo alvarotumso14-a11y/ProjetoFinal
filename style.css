@@ -547,6 +547,23 @@ header button:hover {
 
 /* Responsividade */
 @media (max-width: 768px) {
+    /* Header responsiveness: stack greeting and action on small screens */
+    header {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    header h1 {
+        text-align: center;
+        width: 100%;
+        margin-bottom: 6px;
+    }
+
+    header button {
+        width: auto;
+        align-self: center;
+    }
     .topbar {
         padding: 16px 20px;
     }
