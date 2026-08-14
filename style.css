@@ -357,6 +357,40 @@ header button:hover {
     gap: 28px;
 }
 
+/* Novo: layout em cartões para a página de perfil */
+.perfil-cards {
+    display: grid;
+    grid-template-columns: 220px repeat(2, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.perfil-card {
+    background: #fff;
+    padding: 18px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.foto-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-key {
+    font-size: 13px;
+    color: #777;
+}
+
+.card-value {
+    font-size: 18px;
+    color: #111;
+    margin-top: 6px;
+}
+
+
 .foto-grande {
     width: 140px;
     height: 140px;
