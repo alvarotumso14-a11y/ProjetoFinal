@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>TiaBete — Seu acompanhamento de glicemia</title>
+</head>
+<body class="landing-body">
+
+    <!-- ── NAV ─────────────────────────────────────────────── -->
+    <nav class="landing-nav" role="navigation" aria-label="Navegação principal">
+        <a class="landing-logo" href="index.html" aria-label="TiaBete — Início">
+            <img src="Logos/TiaBete.png" alt="TiaBete" class="landing-logo-img">
+            <span class="landing-logo-wordmark">TiaBete</span>
+        </a>
+        <div class="landing-nav-actions">
+            <a class="landing-nav-link" href="login.html">Entrar</a>
+            <a class="btn-verde" href="cadastro.html">Criar conta</a>
+        </div>
+    </nav>
+
+    <!-- ── HERO (fundo branco) ───────────────────────────────── -->
+    <section class="landing-hero" aria-labelledby="hero-titulo">
+        <div class="landing-hero-content">
+            <h1 class="landing-hero-title" id="hero-titulo">
+                Cuide da sua glicemia<br>com carinho e clareza
+            </h1>
+            <p class="landing-hero-subtitle">
+                O TiaBete é seu companheiro diário no controle do diabetes:
+                registre medições, acompanhe tendências e tire dúvidas com
+                o GlicBot — tudo em um só lugar, sem complicação.
+            </p>
+            <div class="landing-hero-ctas">
+                <a class="btn-verde btn-grande" href="cadastro.html">Começar gratuitamente</a>
+                <a class="landing-nav-link" href="login.html">Já tenho conta</a>
+            </div>
+        </div>
+
+        <div class="landing-hero-visual" aria-hidden="true">
+            <div class="landing-mockup">
+                <div class="mockup-card">
+                    <span class="mockup-label">Última Glicemia</span>
+                    <span class="mockup-value">
+                        120 <span class="mockup-unit">mg/dL</span>
+                    </span>
+                    <span class="mockup-status status">Normal</span>
+                </div>
+                <div class="mockup-card mockup-card--sm" style="display:flex;flex-direction:row;justify-content:space-between;align-items:center;">
+                    <div>
+                        <span class="mockup-label">Insulina</span>
+                        <span class="mockup-value" style="font-size:28px;">6 <span class="mockup-unit">U</span></span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span class="mockup-label">HbA1c</span>
+                        <span class="mockup-value" style="font-size:28px;color:#0d9e6e;">6,5<span class="mockup-unit">%</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FAIXA DE RECURSOS (fundo cinza) ───────────────────── -->
+    <section class="features-section" aria-label="Funcionalidades do TiaBete">
+        <p class="features-title">Tudo o que você precisa</p>
+
+        <div class="features-marquee">
+            <div class="features-track" role="list">
+
+                <!-- Conjunto A -->
+                <div class="feature-item" role="listitem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>Dashboard</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    <span>Curva Glicêmica</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Histórico</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
+                    <span>Calculadora HbA1c</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>GlicBot</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
+                    <span>Controle de Insulina</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <span>Saúde em Foco</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4"/><path d="M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0z"/></svg>
+                    <span>Registros Diários</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+
+                <!-- Conjunto B (cópia para loop contínuo) -->
+                <div class="feature-item" role="listitem" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>Dashboard</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    <span>Curva Glicêmica</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Histórico</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
+                    <span>Calculadora HbA1c</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>GlicBot</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
+                    <span>Controle de Insulina</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    <span>Saúde em Foco</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+                <div class="feature-item" role="listitem" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0z"/></svg>
+                    <span>Registros Diários</span>
+                </div>
+                <div class="feature-separator" aria-hidden="true"></div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ── SOBRE (fundo branco) ──────────────────────────────── -->
+    <section class="landing-sobre" aria-labelledby="sobre-titulo">
+        <div class="landing-section-inner">
+            <div class="sobre-texto">
+                <h2 id="sobre-titulo">Desenvolvido para quem vive com diabetes</h2>
+                <p>
+                    O TiaBete nasceu de uma necessidade real: ter um lugar simples e confiável
+                    para acompanhar a glicemia no dia a dia, sem precisar de planilhas complicadas
+                    ou cadernos de papel.
+                </p>
+                <p>
+                    Com ele você registra suas medições, visualiza a curva glicêmica, calcula
+                    a HbA1c estimada e ainda conta com o GlicBot para tirar dúvidas rápidas —
+                    tudo pensado para Tipo 1, Tipo 2, Gestacional e outras formas de diabetes.
+                </p>
+                <p>
+                    Por enquanto seus dados ficam somente no seu dispositivo. Em breve,
+                    a sincronização em nuvem e o histórico compartilhado com seu médico
+                    serão integrados.
+                </p>
+            </div>
+
+            <div class="sobre-visual" aria-hidden="true">
+                <div class="sobre-card">
+                    <div class="sobre-card-icone">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <div class="sobre-card-texto">
+                        <strong>Curva glicêmica visual</strong>
+                        <span>Veja seus registros em gráfico e identifique padrões rapidamente.</span>
+                    </div>
+                </div>
+                <div class="sobre-card">
+                    <div class="sobre-card-icone">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
+                    </div>
+                    <div class="sobre-card-texto">
+                        <strong>Calculadora de HbA1c</strong>
+                        <span>Estime sua hemoglobina glicada a partir das suas medições recentes.</span>
+                    </div>
+                </div>
+                <div class="sobre-card">
+                    <div class="sobre-card-icone">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <div class="sobre-card-texto">
+                        <strong>GlicBot sempre disponível</strong>
+                        <span>Assistente de dúvidas sobre diabetes, disponível na palma da mão.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FAQ (fundo cinza) ─────────────────────────────────── -->
+    <section class="landing-faq" aria-labelledby="faq-titulo">
+        <div class="landing-section-inner">
+            <div class="faq-cabecalho">
+                <h2 id="faq-titulo">Perguntas frequentes</h2>
+                <p>Respondemos as dúvidas mais comuns sobre o TiaBete.</p>
+            </div>
+
+            <div class="faq-lista">
+
+                <div class="faq-item">
+                    <button class="faq-pergunta" aria-expanded="false" aria-controls="faq-resp-1">
+                        O TiaBete é gratuito?
+                        <span class="faq-icone" aria-hidden="true">+</span>
+                    </button>
+                    <div class="faq-resposta" id="faq-resp-1" role="region" hidden>
+                        Sim, o TiaBete é completamente gratuito. Não há planos pagos, mensalidades
+                        nem recursos escondidos por trás de paywall.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-pergunta" aria-expanded="false" aria-controls="faq-resp-2">
+                        Meus dados ficam salvos onde?
+                        <span class="faq-icone" aria-hidden="true">+</span>
+                    </button>
+                    <div class="faq-resposta" id="faq-resp-2" role="region" hidden>
+                        Por enquanto, todos os seus dados (registros de glicemia, insulina e perfil)
+                        ficam salvos apenas no seu dispositivo, através do armazenamento local do
+                        navegador (localStorage). Nada é enviado para servidores externos nesta fase.
+                        A sincronização em nuvem está planejada para versões futuras.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-pergunta" aria-expanded="false" aria-controls="faq-resp-3">
+                        O TiaBete funciona para qualquer tipo de diabetes?
+                        <span class="faq-icone" aria-hidden="true">+</span>
+                    </button>
+                    <div class="faq-resposta" id="faq-resp-3" role="region" hidden>
+                        Sim! O app foi desenvolvido pensando em Tipo 1, Tipo 2, Gestacional e outras
+                        formas de diabetes. Ao criar sua conta você informa o seu tipo e o app
+                        adapta as informações apresentadas.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-pergunta" aria-expanded="false" aria-controls="faq-resp-4">
+                        O TiaBete substitui o acompanhamento médico?
+                        <span class="faq-icone" aria-hidden="true">+</span>
+                    </button>
+                    <div class="faq-resposta" id="faq-resp-4" role="region" hidden>
+                        Não. O TiaBete é uma ferramenta de apoio ao controle pessoal e não substitui
+                        a orientação de médicos, nutricionistas ou educadores em diabetes. Sempre
+                        consulte sua equipe de saúde antes de tomar decisões clínicas.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-pergunta" aria-expanded="false" aria-controls="faq-resp-5">
+                        Funciona no celular?
+                        <span class="faq-icone" aria-hidden="true">+</span>
+                    </button>
+                    <div class="faq-resposta" id="faq-resp-5" role="region" hidden>
+                        Sim, o TiaBete foi desenvolvido com design responsivo e funciona bem em
+                        smartphones e tablets modernos. Basta acessar pelo navegador do seu celular —
+                        sem precisar instalar nenhum aplicativo.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CTA FINAL (fundo branco, com mascote) ─────────────── -->
+    <section class="landing-cta-final" aria-labelledby="cta-titulo">
+        <img src="Logos/TiaBete.png" alt="" class="cta-mascote" aria-hidden="true">
+        <h2 id="cta-titulo">Pronto para cuidar melhor de você?</h2>
+        <p>Criar sua conta é rápido e gratuito. Comece hoje mesmo.</p>
+        <a class="btn-verde btn-grande" href="cadastro.html">Criar conta agora</a>
+    </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────────── -->
+    <footer class="landing-footer">
+        <p>© 2025 TiaBete. Feito com cuidado para pessoas com diabetes.</p>
+    </footer>
+
+    <!-- Acordeão FAQ -->
+    <script>
+        document.querySelectorAll('.faq-pergunta').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var estaAberto = btn.getAttribute('aria-expanded') === 'true';
+                var item = btn.closest('.faq-item');
+
+                // Fecha todos
+                document.querySelectorAll('.faq-item').forEach(function (el) {
+                    el.classList.remove('aberto');
+                    el.querySelector('.faq-pergunta').setAttribute('aria-expanded', 'false');
+                    el.querySelector('.faq-resposta').hidden = true;
+                    el.querySelector('.faq-icone').textContent = '+';
+                });
+
+                // Abre o clicado (se estava fechado)
+                if (!estaAberto) {
+                    item.classList.add('aberto');
+                    btn.setAttribute('aria-expanded', 'true');
+                    item.querySelector('.faq-resposta').hidden = false;
+                    item.querySelector('.faq-icone').textContent = '+'; // CSS rotate cuida do visual
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

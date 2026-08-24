@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>TiaBete — Criar conta</title>
+</head>
+<body class="auth-body">
+
+    <div class="auth-page">
+        <div class="auth-card">
+
+            <!-- Logo / marca -->
+            <a href="index.html" class="auth-brand" aria-label="Voltar para a página inicial do TiaBete">
+                <!-- TODO: substituir pelo arquivo real da logo em Logos/ se ainda não estiver disponível -->
+                <img src="Logos/TiaBete.png" alt="TiaBete" class="auth-logo-img">
+                <span class="auth-brand-name">TiaBete</span>
+            </a>
+
+            <h1 class="auth-title">Criar conta</h1>
+            <p class="auth-subtitle">É rápido, gratuito e sem complicação!</p>
+
+            <!-- Mensagem de erro (exibida via JS; oculta por padrão) -->
+            <div id="erroCadastro" class="auth-error" role="alert" aria-live="polite" style="display:none;"></div>
+
+            <form id="formCadastro" class="auth-form" novalidate>
+
+                <div class="auth-field">
+                    <label for="nome">Nome completo</label>
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        autocomplete="name"
+                        placeholder="Seu nome completo"
+                        required
+                        aria-required="true"
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label for="email">E-mail</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        autocomplete="email"
+                        placeholder="seu@email.com"
+                        required
+                        aria-required="true"
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label for="tipoDiabetes">Tipo de Diabetes</label>
+                    <select
+                        id="tipoDiabetes"
+                        name="tipoDiabetes"
+                        required
+                        aria-required="true"
+                    >
+                        <option value="">Selecione...</option>
+                        <option value="Tipo 1">Tipo 1</option>
+                        <option value="Tipo 2">Tipo 2</option>
+                        <option value="Gestacional">Gestacional</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+
+                <div class="auth-field">
+                    <label for="senha">Senha</label>
+                    <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        autocomplete="new-password"
+                        placeholder="Mínimo 8 caracteres"
+                        required
+                        aria-required="true"
+                        minlength="8"
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label for="confirmarSenha">Confirmar senha</label>
+                    <input
+                        type="password"
+                        id="confirmarSenha"
+                        name="confirmarSenha"
+                        autocomplete="new-password"
+                        placeholder="Repita a senha"
+                        required
+                        aria-required="true"
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-checkbox">
+                        <input
+                            type="checkbox"
+                            id="aceitouTermos"
+                            name="aceitouTermos"
+                            required
+                            aria-required="true"
+                        >
+                        Li e aceito os
+                        <!-- Stub — página de termos a ser criada futuramente -->
+                        <a href="#" class="auth-link">Termos de Uso</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-verde auth-submit">Criar conta</button>
+
+            </form>
+
+            <p class="auth-footer-text">
+                Já tem conta? <a href="login.html" class="auth-link">Entrar</a>
+            </p>
+
+        </div>
+    </div>
+
+    <script src="Js/utils.js"></script>
+    <script src="Js/cadastro.js"></script>
+</body>
+</html>

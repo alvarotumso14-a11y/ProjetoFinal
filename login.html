@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>TiaBete — Entrar</title>
+</head>
+<body class="auth-body">
+
+    <div class="auth-page">
+        <div class="auth-card">
+
+            <!-- Logo / marca -->
+            <a href="index.html" class="auth-brand" aria-label="Voltar para a página inicial do TiaBete">
+                <!-- TODO: substituir pelo arquivo real da logo em Logos/ se ainda não estiver disponível -->
+                <img src="Logos/TiaBete.png" alt="TiaBete" class="auth-logo-img">
+                <span class="auth-brand-name">TiaBete</span>
+            </a>
+
+            <h1 class="auth-title">Entrar na sua conta</h1>
+            <p class="auth-subtitle">Bem-vindo de volta!</p>
+
+            <!-- Mensagem de erro (exibida via JS; oculta por padrão) -->
+            <!-- Nota: o erro exibido é sempre genérico — nunca revela se o e-mail existe -->
+            <div id="erroLogin" class="auth-error" role="alert" aria-live="polite" style="display:none;"></div>
+
+            <form id="formLogin" class="auth-form" novalidate>
+
+                <div class="auth-field">
+                    <label for="email">E-mail</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        autocomplete="email"
+                        placeholder="seu@email.com"
+                        required
+                        aria-required="true"
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label for="senha">Senha</label>
+                    <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        autocomplete="current-password"
+                        placeholder="••••••••"
+                        required
+                        aria-required="true"
+                    >
+                </div>
+
+                <div class="auth-row">
+                    <label class="auth-checkbox">
+                        <input type="checkbox" id="lembrarMe" name="lembrarMe">
+                        Lembrar-me
+                    </label>
+                    <!-- Stub sem funcionalidade real — recuperação real requer back-end -->
+                    <a href="#" class="auth-link-small" aria-label="Recuperar senha (em breve)">Esqueci minha senha</a>
+                </div>
+
+                <button type="submit" class="btn-verde auth-submit">Entrar</button>
+
+            </form>
+
+            <p class="auth-footer-text">
+                Não tem conta? <a href="cadastro.html" class="auth-link">Criar conta</a>
+            </p>
+
+        </div>
+    </div>
+
+    <script src="Js/utils.js"></script>
+    <script src="Js/login.js"></script>
+</body>
+</html>
