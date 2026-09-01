@@ -195,11 +195,61 @@ function criarGrafico() {
     });
 }
 
+// Calculadora integrada via HGT — usa configurações salvas no cadastro (localStorage 'usuario')
+function calcularComHGT() {
+    const input = document.getElementById("inputHGT");
+    const resultadoEl = document.getElementById("resultadoInsulina");
+    if (!input || !resultadoEl) return;
+    const hgt = parseFloat(input.value);
+    if (isNaN(hgt) || hgt <= 0) {
+        resultadoEl.innerText = "Insira HGT válido";
+        resultadoEl.style.color = "red";
+        // Remove valor salvo se inválido
+        localStorage.removeItem('ultimoHGT');
+        return;
+    }
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario || usuario.fatorSensibilidade == null || usuario.qtdGramas == null) {
+        resultadoEl.innerText = "Configure fator e gramas no cadastro";
+        resultadoEl.style.color = "orange";
+        return;
+    }
+    const fator = Number(usuario.fatorSensibilidade);
+    const qnt = Number(usuario.qtdGramas);
+    if (qnt === 0) {
+        resultadoEl.innerText = "Quantidade de gramas inválida";
+        resultadoEl.style.color = "red";
+        return;
+    }
+    // Armazena último HGT para referência em outras páginas
+    localStorage.setItem('ultimoHGT', String(hgt));
+
+    // Fórmula: (hgt - fator) / quantidade_de_gramas
+    const insulina = (hgt - fator) / qnt;
+    const insulinaFmt = insulina <= 0 ? 0 : Number(insulina.toFixed(1));
+    resultadoEl.innerText = `Insulina estimada: ${insulinaFmt} U`;
+    resultadoEl.style.color = "#0d9e6e";
+
+    // Salva estimativa e, se o modal de registro estiver aberto/visível, preenche o campo de dose
+    localStorage.setItem('ultimoInsulinaEstimada', String(insulinaFmt));
+    const inputDoseModal = document.getElementById('inputDose');
+    if (inputDoseModal) {
+        inputDoseModal.value = insulinaFmt;
+    }
+}
+
 // CARREGAMENTO DO DASHBOARD
-// Quando a página carrega, inicializamos o resumo e o gráfico usando os dados em localStorage.
+// Quando a página carrega, inicializamos o resumo, o gráfico e o campo de HGT usando os dados em localStorage.
 window.addEventListener("load", () => {
     // Atualiza os elementos do resumo (última glicemia, dose, hora, etc.)
     atualizarResumoDashboard();
     // Gera o gráfico inicial com os dados disponíveis
     criarGrafico();
+
+    const inputHGT = document.getElementById("inputHGT");
+    if (inputHGT) {
+        inputHGT.addEventListener("input", calcularComHGT);
+        // Se já houver valor, calcula imediatamente
+        calcularComHGT();
+    }
 });
