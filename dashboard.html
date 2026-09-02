@@ -15,6 +15,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h18M3 12h18M3 17h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
 
+        <a class="dashboard-logo-botao topbar-logo" href="dashboard.html" aria-label="Ir para o Dashboard">
+            <img src="Logos/high-resolution-color-logo.png" alt="Dashboard">
+        </a>
+
         <div class="user-top">
             <div class="foto">
                 <img src=""  onclick="goToProfile()" alt="Foto do usuário">
@@ -32,14 +36,20 @@
 
     <div class="container">
         <aside class="sidebar">
-            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
+            <div class="sidebar-header">
+                <a class="dashboard-logo-botao sidebar-logo" href="dashboard.html" aria-label="Ir para o Dashboard">
+                    <img src="Logos/high-resolution-color-logo.png" alt="Dashboard">
+                </a>
+                <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+            </div>
 
             <nav class="navigation" aria-label="Menu principal">
                 <ul>
                     <li><a class="ativo" href="dashboard.html">Dashboard</a></li>
                     <li><a href="historico.html">Histórico</a></li>
+                    <li><a href="Calculadora.html">Calculadora</a></li>
                     <li><a href="glicbot.html">GlicBot</a></li>
                     
                 </ul>
@@ -62,6 +72,32 @@
                     <span class="status">Normal</span>
                 </div>
 
+            </section>
+
+            <section class="atalhos" aria-labelledby="atalhosTitulo">
+                <div class="titulo">
+                    <h2 id="atalhosTitulo">Acessos rápidos</h2>
+                    <p>Encontre as ferramentas do GlicHelp</p>
+                </div>
+
+                <div class="atalhos-grid">
+                    <a class="atalho atalho-glicbot" href="glicbot.html" aria-label="Abrir GlicBot">
+                        <img src="Logos/high-resolution-color-logo.png" alt="GlicBot">
+                        <span class="atalho-conteudo">
+                            <strong>GlicBot</strong>
+                            <span>Receba dicas e alertas para o seu dia a dia</span>
+                        </span>
+                    </a>
+
+                    <a class="atalho atalho-calculadora" href="Calculadora.html">
+                        <span class="atalho-icone" aria-hidden="true">∑</span>
+                        <span class="atalho-conteudo">
+                            <strong>Calculadora</strong>
+                            <span>Calcule sua dose de correção</span>
+                        </span>
+                        <span class="atalho-seta" aria-hidden="true">→</span>
+                    </a>
+                </div>
             </section>
 
             <section class="graficos">
