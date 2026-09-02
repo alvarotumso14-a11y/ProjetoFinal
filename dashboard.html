@@ -11,7 +11,9 @@
 </head>
 <body>
     <div class="topbar">
-        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h18M3 12h18M3 17h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
 
         <div class="user-top">
             <div class="foto">
@@ -33,7 +35,9 @@
 
     <div class="container">
         <aside class="sidebar">
-            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">✕</button>
+            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
 
             <nav class="navigation" aria-label="Menu principal">
                 <ul>
@@ -61,17 +65,6 @@
                     <span class="status">Normal</span>
                 </div>
 
-                <div class="card">
-                    <h3>Última Aplicação</h3>
-                    <h1 id="ultimaDose">6 U</h1>
-                    <span id="ultimaHora">12:30</span>
-                </div>
-
-                <div class="card">
-                    <h3>Calculadora (HGT)</h3>
-                    <input type="number" id="inputHGT" placeholder="HGT (mg/dL)">
-                    <div id="resultadoInsulina" style="margin-top:8px; font-weight:600;">—</div>
-                </div>
             </section>
 
             <section class="graficos">
@@ -91,17 +84,26 @@
                 </div>
 
                 <div class="registro">
-                    <div>🩸 Glicemia</div>
+                    <div class="registro-label">
+                        <span class="metric-pill metric-glicemia">G</span>
+                        <span>Glicemia</span>
+                    </div>
                     <span id="ultimaGlicemiaResumo">120 mg/dL</span>
                 </div>
 
                 <div class="registro">
-                    <div>🍽️ Refeição</div>
+                    <div class="registro-label">
+                        <span class="metric-pill metric-refeicao">R</span>
+                        <span>Refeição</span>
+                    </div>
                     <span id="ultimaRefeicao">Café da Manhã</span>
                 </div>
 
                 <div class="registro">
-                    <div>💉 Insulina</div>
+                    <div class="registro-label">
+                        <span class="metric-pill metric-medicao">M</span>
+                        <span>Medição</span>
+                    </div>
                     <span id="ultimaInsulina">6 U</span>
                 </div>
             </section>

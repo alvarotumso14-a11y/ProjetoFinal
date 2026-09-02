@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="Logos/Favicon.png">
     <link rel="stylesheet" href="style.css">
-    <title>Calculadora de HbA1c</title>
+    <title>Calculadora de dose de correção</title>
 </head>
 <body>
     <div class="topbar">
-        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h18M3 12h18M3 17h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
 
         <div class="user-top">
             <div class="foto">
@@ -26,7 +28,9 @@
 
     <div class="container">
         <aside class="sidebar">
-            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">✕</button>
+            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
 
             <nav class="navigation" aria-label="Menu principal">
                 <ul>
@@ -41,37 +45,29 @@
         <main class="conteudo">
             <header>
                 <div>
-                    <h1>Calculadora de HbA1c</h1>
-                    <p>Estimativa a partir da glicemia média</p>
+                    <h1>Calculadora de dose de correção</h1>
+                    <p>Fórmula: (HGT atual - HGT alvo) / fator de sensibilidade</p>
                 </div>
             </header>
 
             <section class="calculadora">
                 <div class="card-calc">
-                    <label class="calc-label" for="inputGlicemiaMedia">Glicemia média (70–400 mg/dL)</label>
-                    <input class="calc-input" type="number" id="inputGlicemiaMedia" placeholder="Ex: 154" min="70" max="400">
+                    <label class="calc-label" for="inputHgtAtual">HGT atual (mg/dL)</label>
+                    <input class="calc-input" type="number" id="inputHgtAtual" placeholder="Ex: 180">
+
+                    <p class="calc-perfil" id="configPerfil">Alvo e fator do perfil: configurar no perfil.</p>
+
                     <p class="calc-erro" id="calcErro"></p>
 
-                    <button class="calc-btn" id="btnCalcular">Calcular</button>
+                    <button class="calc-btn" id="btnCalcular">Calcular dose</button>
 
-                    <div class="calc-resultado" id="calcResultado">
-                        <div class="calc-resultado-label">HbA1c estimada</div>
-                        <div class="valor" id="calcValor">0,0%</div>
+                    <div class="calc-resultado mostrar" id="calcResultado">
+                        <div class="calc-resultado-label">Dose de correção recomendada</div>
+                        <div class="valor" id="calcValor">0,0 U</div>
                         <span class="classificacao" id="calcClassificacao">—</span>
                     </div>
 
-                    <table class="calc-tabela">
-                        <thead>
-                            <tr><th>Faixa de HbA1c</th><th>Classificação</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Abaixo de 5,7%</td><td>Normal</td></tr>
-                            <tr><td>5,7% a 6,4%</td><td>Pré-diabetes</td></tr>
-                            <tr><td>6,5% ou mais</td><td>Indicativo de diabetes</td></tr>
-                        </tbody>
-                    </table>
-
-                    <p class="calc-aviso">Este resultado é apenas uma estimativa educacional baseada na fórmula ADAG e não substitui um exame laboratorial. Converse sempre com seu profissional de saúde antes de tomar qualquer decisão sobre seu tratamento.</p>
+                    <p class="calc-aviso">Use este cálculo como orientação para a correção da glicemia. Ajuste conforme orientação médica e sempre valide o valor no seu plano individual.</p>
                 </div>
             </section>
         </main>
@@ -79,6 +75,6 @@
 
     <script src="Js/profile.js"></script>
     <script src="Js/menu.js"></script>
-    <script src="Js/calculadora.js"></script>
+    <script src="Js/Calculadora.js"></script>
 </body>
 </html>
