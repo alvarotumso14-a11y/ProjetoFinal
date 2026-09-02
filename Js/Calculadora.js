@@ -7,29 +7,32 @@ function calcularInsulina() {
     const hgt = parseFloat(el.value);
 
     if (isNaN(hgt) || hgt <= 0) {
-        resultado.textContent = "Por favor, insira um valor válido para o HGT.";
-        resultado.style.color = "red";
+        resultado.textContent = 'Por favor, insira um valor válido para o HGT.';
+        resultado.style.color = 'red';
         return;
     }
 
-    // Fórmula exemplo (mantida por compatibilidade)
-    let insulina = 0;
-    if (hgt > 180) {
-        insulina = (hgt - 100) / 30; // Exemplo de cálculo antigo
-    } else {
-        insulina = 0; // Não é necessário insulina
+    const config = JSON.parse(localStorage.getItem('profile') || localStorage.getItem('usuario') || '{}');
+    const fator = Number(config.fatorSensibilidade ?? 0);
+    const hgtAlvo = Number(config.hgtAlvo ?? 0);
+    if (!fator || !hgtAlvo) {
+        resultado.textContent = 'Configure fator e HGT alvo no cadastro/perfil.';
+        resultado.style.color = 'orange';
+        return;
     }
 
-    resultado.style.color = "#0d9e6e"; // Verde para resultado positivo
-    resultado.textContent = `A quantidade de insulina recomendada é: ${insulina.toFixed(1)} unidades.`;
+    const dose = (hgt - hgtAlvo) / fator;
+    const doseFinal = dose <= 0 ? 0 : Number(dose.toFixed(1));
+
+    resultado.style.color = '#0d9e6e';
+    resultado.textContent = `Dose de correção estimada: ${doseFinal} unidades.`;
 }
 
 // Integração com dashboard: usa último HGT salvo em localStorage e as configurações do usuário
 function mostrarEstimativaDaDashboard() {
-    const container = document.getElementById('calcResultado'); // bloco principal de resultado na Calculadora.html
+    const container = document.getElementById('calcResultado');
     if (!container) return;
 
-    // Cria elemento para mostrar estimativa de insulina com base no HGT do dashboard
     let elEstimativa = document.getElementById('estimativaInsulinaDashboard');
     if (!elEstimativa) {
         elEstimativa = document.createElement('div');
@@ -40,7 +43,7 @@ function mostrarEstimativaDaDashboard() {
     }
 
     const ultimoHGT = localStorage.getItem('ultimoHGT');
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const config = JSON.parse(localStorage.getItem('profile') || localStorage.getItem('usuario') || '{}');
 
     if (!ultimoHGT) {
         elEstimativa.innerText = 'Nenhum HGT recente encontrado. Use o campo no Dashboard.';
@@ -48,39 +51,23 @@ function mostrarEstimativaDaDashboard() {
         return;
     }
 
-    if (!usuario || usuario.fatorSensibilidade == null || usuario.qtdGramas == null) {
-        elEstimativa.innerText = 'Configurações de fator/gramas não encontradas. Atualize no cadastro.';
+    if (!config.fatorSensibilidade || !config.hgtAlvo) {
+        elEstimativa.innerText = 'Fator e HGT alvo não encontrados. Atualize no cadastro/perfil.';
         elEstimativa.style.color = 'orange';
         return;
     }
 
     const hgt = Number(ultimoHGT);
-    const fator = Number(usuario.fatorSensibilidade);
-    const qnt = Number(usuario.qtdGramas);
-    if (!qnt) {
-        elEstimativa.innerText = 'Quantidade de gramas inválida nas configurações.';
-        elEstimativa.style.color = 'red';
-        return;
-    }
+    const fator = Number(config.fatorSensibilidade);
+    const alvo = Number(config.hgtAlvo);
+    const dose = (hgt - alvo) / fator;
+    const doseFinal = dose <= 0 ? 0 : Number(dose.toFixed(1));
 
-    const insulina = (hgt - fator) / qnt;
-    const insulinaFmt = insulina <= 0 ? 0 : Number(insulina.toFixed(1));
-    elEstimativa.innerText = `Estimativa a partir do último HGT (${hgt} mg/dL): ${insulinaFmt} U`;
+    elEstimativa.innerText = `Estimativa a partir do último HGT (${hgt} mg/dL): ${doseFinal} U`;
     elEstimativa.style.color = '#0d9e6e';
 }
 
 // Executa ao carregar a página da calculadora
 window.addEventListener('load', () => {
-    // Exibe a estimativa com base no dashboard, se disponível
     mostrarEstimativaDaDashboard();
-
-    // Se houver botão de calcular do formulário de HbA1c, conecta o evento
-    const btn = document.getElementById('btnCalcular');
-    if (btn) {
-        btn.addEventListener('click', () => {
-            // A página original fazia cálculo de HbA1c; manter comportamento original se necessário
-            // Caso queira usar o campo de glicemia média para outra lógica, adaptar aqui.
-            // Nenhuma alteração adicional feita para o cálculo de HbA1c neste commit.
-        });
-    }
 });

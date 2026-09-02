@@ -195,46 +195,46 @@ function criarGrafico() {
     });
 }
 
-// Calculadora integrada via HGT — usa configurações salvas no cadastro (localStorage 'usuario')
-function calcularComHGT() {
+// Calculadora de dose de correção: (hgt atual - hgt alvo) / fator de sensibilidade
+function calcularDoseCorrecao() {
     const input = document.getElementById("inputHGT");
     const resultadoEl = document.getElementById("resultadoInsulina");
     if (!input || !resultadoEl) return;
-    const hgt = parseFloat(input.value);
-    if (isNaN(hgt) || hgt <= 0) {
+
+    const hgtAtual = parseFloat(input.value);
+    if (isNaN(hgtAtual) || hgtAtual <= 0) {
         resultadoEl.innerText = "Insira HGT válido";
         resultadoEl.style.color = "red";
-        // Remove valor salvo se inválido
         localStorage.removeItem('ultimoHGT');
         return;
     }
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario || usuario.fatorSensibilidade == null || usuario.qtdGramas == null) {
-        resultadoEl.innerText = "Configure fator e gramas no cadastro";
+
+    const profile = JSON.parse(localStorage.getItem("profile") || "null");
+    const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+    const config = profile || usuario || {};
+    const fator = Number(config.fatorSensibilidade ?? 0);
+    const hgtAlvo = Number(config.hgtAlvo ?? 0);
+
+    if (!fator || !hgtAlvo) {
+        resultadoEl.innerText = "Configure fator e HGT alvo no cadastro/perfil";
         resultadoEl.style.color = "orange";
         return;
     }
-    const fator = Number(usuario.fatorSensibilidade);
-    const qnt = Number(usuario.qtdGramas);
-    if (qnt === 0) {
-        resultadoEl.innerText = "Quantidade de gramas inválida";
-        resultadoEl.style.color = "red";
-        return;
-    }
-    // Armazena último HGT para referência em outras páginas
-    localStorage.setItem('ultimoHGT', String(hgt));
 
-    // Fórmula: (hgt - fator) / quantidade_de_gramas
-    const insulina = (hgt - fator) / qnt;
-    const insulinaFmt = insulina <= 0 ? 0 : Number(insulina.toFixed(1));
-    resultadoEl.innerText = `Insulina estimada: ${insulinaFmt} U`;
+    // Armazena último HGT para referência em outras páginas
+    localStorage.setItem('ultimoHGT', String(hgtAtual));
+
+    const dose = (hgtAtual - hgtAlvo) / fator;
+    const doseFinal = dose <= 0 ? 0 : Number(dose.toFixed(1));
+
+    resultadoEl.innerText = `Dose de correção: ${doseFinal} U`;
     resultadoEl.style.color = "#0d9e6e";
 
     // Salva estimativa e, se o modal de registro estiver aberto/visível, preenche o campo de dose
-    localStorage.setItem('ultimoInsulinaEstimada', String(insulinaFmt));
+    localStorage.setItem('ultimoInsulinaEstimada', String(doseFinal));
     const inputDoseModal = document.getElementById('inputDose');
     if (inputDoseModal) {
-        inputDoseModal.value = insulinaFmt;
+        inputDoseModal.value = doseFinal;
     }
 }
 
@@ -248,8 +248,8 @@ window.addEventListener("load", () => {
 
     const inputHGT = document.getElementById("inputHGT");
     if (inputHGT) {
-        inputHGT.addEventListener("input", calcularComHGT);
+        inputHGT.addEventListener("input", calcularDoseCorrecao);
         // Se já houver valor, calcula imediatamente
-        calcularComHGT();
+        calcularDoseCorrecao();
     }
 });

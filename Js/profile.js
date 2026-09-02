@@ -8,7 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
         idade: '',
         email: '',
         celular: '',
-        photo: ''
+        photo: '',
+        fatorSensibilidade: '',
+        hgtAlvo: ''
     };
 
     function getProfile() {
@@ -32,11 +34,25 @@ document.addEventListener('DOMContentLoaded', () => {
             tipo: '#tipo',
             idade: '#idade',
             email: '#email',
-            celular: '#celular'
+            celular: '#celular',
+            fatorSensibilidade: '#fator',
+            hgtAlvo: '#hgtAlvo'
         };
         Object.keys(map).forEach((k) => {
             const el = document.querySelector(map[k]);
-            if (el) el.textContent = profile[k] || (k === 'nome' ? 'Nome do Usuário' : '—');
+            if (!el) return;
+
+            if (k === 'fatorSensibilidade') {
+                el.textContent = profile[k] !== undefined && profile[k] !== '' ? `${profile[k]} mg/dL` : '—';
+                return;
+            }
+
+            if (k === 'hgtAlvo') {
+                el.textContent = profile[k] !== undefined && profile[k] !== '' ? `${profile[k]} mg/dL` : '—';
+                return;
+            }
+
+            el.textContent = profile[k] || (k === 'nome' ? 'Nome do Usuário' : '—');
         });
 
         // Topbar user-info (first and second p)
@@ -141,6 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <label>Idade<br><input type="text" id="editIdade" /></label>
                             <label>Email<br><input type="email" id="editEmail" /></label>
                             <label>Celular<br><input type="text" id="editCelular" /></label>
+                            <label>Fator de Sensibilidade<br><input type="number" id="editFatorSensibilidade" step="0.1" /></label>
+                            <label>HGT Alvo<br><input type="number" id="editHgtAlvo" step="0.1" /></label>
                             <label>Foto do Perfil<br><input type="file" id="editPhoto" accept="image/*" /></label>
 
                             <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px;">
@@ -170,6 +188,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('editIdade').value = profile.idade || '';
         document.getElementById('editEmail').value = profile.email || '';
         document.getElementById('editCelular').value = profile.celular || '';
+        document.getElementById('editFatorSensibilidade').value = profile.fatorSensibilidade || '';
+        document.getElementById('editHgtAlvo').value = profile.hgtAlvo || '';
         document.getElementById('editPhoto').value = '';
         const modal = document.getElementById('profileEditModal');
         modal.style.display = 'flex';
@@ -190,6 +210,16 @@ document.addEventListener('DOMContentLoaded', () => {
         profile.idade = document.getElementById('editIdade').value || '';
         profile.email = document.getElementById('editEmail').value || '';
         profile.celular = document.getElementById('editCelular').value || '';
+        profile.fatorSensibilidade = document.getElementById('editFatorSensibilidade').value || '';
+        profile.hgtAlvo = document.getElementById('editHgtAlvo').value || '';
+
+        // Salva também na estrutura de usuário para compatibilidade com o dashboard e o cadastro
+        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+        if (usuario) {
+            usuario.fatorSensibilidade = profile.fatorSensibilidade;
+            usuario.hgtAlvo = profile.hgtAlvo;
+            localStorage.setItem('usuario', JSON.stringify(usuario));
+        }
 
         // Se o usuário escolheu uma imagem, lê como data URL para salvar no localStorage.
         const fileInput = document.getElementById('editPhoto');
