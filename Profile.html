@@ -13,7 +13,9 @@
          A foto no topo é clicável e leva à esta página. O script Js/profile.js carrega/salva os dados em localStorage
          Estrutura principal: topbar compartilhado, sidebar e área de conteúdo (.conteudo). -->
     <div class="topbar">
-        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h18M3 12h18M3 17h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
 
         <div class="user-top">
             <div class="foto">
@@ -30,7 +32,9 @@
 
     <div class="container">
         <aside class="sidebar">
-            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">✕</button>
+            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
 
             <nav class="navigation" aria-label="Menu principal">
                 <ul>
@@ -55,7 +59,12 @@
                 <div class="perfil-cards">
                     <div class="perfil-card foto-card">
                         <div class="foto-grande" role="img" aria-label="Foto do usuário">FT</div>
-                        <button class="botao-alt" onclick="editarPerfil()" aria-label="Alterar informações">ALT</button>
+                        <button class="botao-alt" onclick="editarPerfil()" aria-label="Editar informações">
+                            <span class="button-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+                            </span>
+                            Editar perfil
+                        </button>
                     </div>
 
                     <div class="perfil-card">
@@ -82,6 +91,7 @@
                         <div class="card-key">Celular</div>
                         <div class="card-value" id="celular">(00) 00000-0000</div>
                     </div>
+
                     <div class="perfil-card">
                         <div class="card-key">Fator de sensibilidade</div>
                         <div class="card-value" id="fator">-</div>
@@ -91,6 +101,7 @@
                         <div class="card-key">HGT alvo</div>
                         <div class="card-value" id="hgtAlvo">-</div>
                     </div>
+                </div>
             </section>
         </main>
     </div>

@@ -10,7 +10,9 @@
 </head>
 <body>
     <div class="topbar">
-        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+        <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 7h18M3 12h18M3 17h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
 
         <div class="user-top">
             <div class="foto">
@@ -27,7 +29,9 @@
 
     <div class="container">
         <aside class="sidebar">
-            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">✕</button>
+            <button class="menu-toggle sidebar-close" type="button" aria-label="Fechar menu" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
 
             <nav class="navigation" aria-label="Menu principal">
                 <ul>
@@ -45,7 +49,7 @@
                 <div>
                     <h1>Histórico</h1>
                     <p>Todos os registros realizados.</p>
-                    <button = id="BaixarPdf"> Baixar PDF</button>
+                    <button class="pdf-button" id="BaixarPdf" type="button">Baixar PDF</button>
                 </div>
             </header>
 

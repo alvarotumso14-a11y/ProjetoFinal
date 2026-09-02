@@ -26,12 +26,30 @@ function atualizarHistorico() {
 
     registros.forEach((registro, index) => {
         lista.innerHTML += `
-            <div class="registro">
-                <div class="infoRegistro">
-                    <h3>🩸 ${registro.glicemia} mg/dL</h3>
-                    <p>💉 ${registro.dose} U</p>
-                    <p>🕒 ${registro.hora}</p>
-                    <p>📅 ${registro.data}</p>
+            <div class="registro-item">
+                <div class="registro-main">
+                    <div class="registro-header">
+                        <span class="metric-pill metric-glicemia">G</span>
+                        <div>
+                            <p class="registro-label">Glicemia</p>
+                            <h3>${registro.glicemia} mg/dL</h3>
+                        </div>
+                    </div>
+
+                    <div class="registro-meta">
+                        <div>
+                            <span class="meta-label">Dose</span>
+                            <strong>${registro.dose} U</strong>
+                        </div>
+                        <div>
+                            <span class="meta-label">Hora</span>
+                            <strong>${registro.hora}</strong>
+                        </div>
+                        <div>
+                            <span class="meta-label">Data</span>
+                            <strong>${registro.data}</strong>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="botoesRegistro">
@@ -40,7 +58,7 @@ function atualizarHistorico() {
                     </button>
 
                     <button class="excluir" onclick="excluirRegistro(${index})">
-                        🗑️ Excluir
+                        Excluir
                     </button>
                 </div>
             </div>
