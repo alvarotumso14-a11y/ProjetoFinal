@@ -131,7 +131,7 @@ img {
 }
 
 .sidebar-header {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: space-between;
     min-height: 58px;
@@ -1225,6 +1225,7 @@ header button:hover {
     }
 
     .sidebar-header {
+        display: flex;
         margin-bottom: 8px;
     }
 
