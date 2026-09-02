@@ -31,7 +31,7 @@ function renderizarResultadoDose(dose) {
         valor.textContent = '0,0 U';
         classificacao.textContent = '—';
         classificacao.className = 'classificacao';
-        if (erro) erro.textContent = 'Preencha HGT atual, HGT alvo e fator de sensibilidade.';
+        if (erro) erro.textContent = 'Configure o HGT alvo e o fator de sensibilidade no perfil.';
         return;
     }
 
@@ -41,14 +41,25 @@ function renderizarResultadoDose(dose) {
     if (erro) erro.textContent = '';
 }
 
+function atualizarConfiguracaoPerfilNaTela() {
+    const perfilEl = document.getElementById('configPerfil');
+    if (!perfilEl) return;
+
+    const config = getConfiguracaoDose();
+    const alvo = config.hgtAlvo ? `${config.hgtAlvo} mg/dL` : 'não definido';
+    const fator = config.fatorSensibilidade ? `${config.fatorSensibilidade}` : 'não definido';
+
+    perfilEl.textContent = `Alvo: ${alvo} | Fator de sensibilidade: ${fator}`;
+}
+
 function calcularDoseCorrecaPagina() {
     const inputHgtAtual = document.getElementById('inputHgtAtual');
-    const inputHgtAlvo = document.getElementById('inputHgtAlvo');
-    const inputFatorSensibilidade = document.getElementById('inputFatorSensibilidade');
-
     const hgtAtual = parseFloat(inputHgtAtual?.value || '0');
-    const hgtAlvo = parseFloat(inputHgtAlvo?.value || '0');
-    const fatorSensibilidade = parseFloat(inputFatorSensibilidade?.value || '0');
+    const config = getConfiguracaoDose();
+    const hgtAlvo = config.hgtAlvo;
+    const fatorSensibilidade = config.fatorSensibilidade;
+
+    atualizarConfiguracaoPerfilNaTela();
 
     if (!hgtAtual || !hgtAlvo || !fatorSensibilidade) {
         renderizarResultadoDose(null);
@@ -93,24 +104,19 @@ function mostrarEstimativaDaDashboard() {
 window.addEventListener('load', () => {
     const config = getConfiguracaoDose();
     const inputHgtAtual = document.getElementById('inputHgtAtual');
-    const inputHgtAlvo = document.getElementById('inputHgtAlvo');
-    const inputFatorSensibilidade = document.getElementById('inputFatorSensibilidade');
 
     if (inputHgtAtual && config.hgtAtual) inputHgtAtual.value = config.hgtAtual;
-    if (inputHgtAlvo && config.hgtAlvo) inputHgtAlvo.value = config.hgtAlvo;
-    if (inputFatorSensibilidade && config.fatorSensibilidade) inputFatorSensibilidade.value = config.fatorSensibilidade;
 
     const btn = document.getElementById('btnCalcular');
     if (btn) {
         btn.addEventListener('click', calcularDoseCorrecaPagina);
     }
 
-    if (inputHgtAtual || inputHgtAlvo || inputFatorSensibilidade) {
-        [inputHgtAtual, inputHgtAlvo, inputFatorSensibilidade].forEach((el) => {
-            if (el) el.addEventListener('input', calcularDoseCorrecaPagina);
-        });
+    if (inputHgtAtual) {
+        inputHgtAtual.addEventListener('input', calcularDoseCorrecaPagina);
     }
 
+    atualizarConfiguracaoPerfilNaTela();
     calcularDoseCorrecaPagina();
     mostrarEstimativaDaDashboard();
 });

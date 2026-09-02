@@ -96,7 +96,7 @@ function atualizarResumoDashboard() {
     }
 
     if (ultimaDose) {
-        ultimaDose.innerText = `${ultimoRegistro.dose} U`;
+        ultimaDose.innerText = `${ultimoRegistro.glicemia} mg/dL`;
     }
 
     if (ultimaHora) {
@@ -112,7 +112,7 @@ function atualizarResumoDashboard() {
     }
 
     if (ultimaInsulina) {
-        ultimaInsulina.innerText = `${ultimoRegistro.dose} U`;
+        ultimaInsulina.innerText = `${ultimoRegistro.glicemia} mg/dL`;
     }
 }
 
