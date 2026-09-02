@@ -41,37 +41,33 @@
         <main class="conteudo">
             <header>
                 <div>
-                    <h1>Calculadora de HbA1c</h1>
-                    <p>Estimativa a partir da glicemia média</p>
+                    <h1>Calculadora de dose de correção</h1>
+                    <p>Fórmula: (HGT atual - HGT alvo) / fator de sensibilidade</p>
                 </div>
             </header>
 
             <section class="calculadora">
                 <div class="card-calc">
-                    <label class="calc-label" for="inputGlicemiaMedia">Glicemia média (70–400 mg/dL)</label>
-                    <input class="calc-input" type="number" id="inputGlicemiaMedia" placeholder="Ex: 154" min="70" max="400">
+                    <label class="calc-label" for="inputHgtAtual">HGT atual (mg/dL)</label>
+                    <input class="calc-input" type="number" id="inputHgtAtual" placeholder="Ex: 180">
+
+                    <label class="calc-label" for="inputHgtAlvo">HGT alvo (mg/dL)</label>
+                    <input class="calc-input" type="number" id="inputHgtAlvo" placeholder="Ex: 110">
+
+                    <label class="calc-label" for="inputFatorSensibilidade">Fator de sensibilidade</label>
+                    <input class="calc-input" type="number" id="inputFatorSensibilidade" placeholder="Ex: 30" step="0.1">
+
                     <p class="calc-erro" id="calcErro"></p>
 
-                    <button class="calc-btn" id="btnCalcular">Calcular</button>
+                    <button class="calc-btn" id="btnCalcular">Calcular dose</button>
 
-                    <div class="calc-resultado" id="calcResultado">
-                        <div class="calc-resultado-label">HbA1c estimada</div>
-                        <div class="valor" id="calcValor">0,0%</div>
+                    <div class="calc-resultado mostrar" id="calcResultado">
+                        <div class="calc-resultado-label">Dose de correção recomendada</div>
+                        <div class="valor" id="calcValor">0,0 U</div>
                         <span class="classificacao" id="calcClassificacao">—</span>
                     </div>
 
-                    <table class="calc-tabela">
-                        <thead>
-                            <tr><th>Faixa de HbA1c</th><th>Classificação</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Abaixo de 5,7%</td><td>Normal</td></tr>
-                            <tr><td>5,7% a 6,4%</td><td>Pré-diabetes</td></tr>
-                            <tr><td>6,5% ou mais</td><td>Indicativo de diabetes</td></tr>
-                        </tbody>
-                    </table>
-
-                    <p class="calc-aviso">Este resultado é apenas uma estimativa educacional baseada na fórmula ADAG e não substitui um exame laboratorial. Converse sempre com seu profissional de saúde antes de tomar qualquer decisão sobre seu tratamento.</p>
+                    <p class="calc-aviso">Use este cálculo como orientação para a correção da glicemia. Ajuste conforme orientação médica e sempre valide o valor no seu plano individual.</p>
                 </div>
             </section>
         </main>
@@ -79,6 +75,6 @@
 
     <script src="Js/profile.js"></script>
     <script src="Js/menu.js"></script>
-    <script src="Js/calculadora.js"></script>
+    <script src="Js/Calculadora.js"></script>
 </body>
 </html>

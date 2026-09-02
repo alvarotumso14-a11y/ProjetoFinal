@@ -30,12 +30,19 @@ function fecharModal() {
 
     document.getElementById("inputHora").value = "";
     document.getElementById("inputGlicemia").value = "";
-    document.getElementById("inputDose").value = "";
+    const inputDose = document.getElementById("inputDose");
+    if (inputDose) {
+        inputDose.value = "";
+        inputDose.dataset.manual = "false";
+    }
 }
 
 function proximoPasso() {
     if (etapa < passos.length - 1) {
         etapa++;
+        if (etapa === 2) {
+            preencherDoseSugerida();
+        }
         atualizarPassos();
     }
 }
@@ -195,46 +202,62 @@ function criarGrafico() {
     });
 }
 
-// Calculadora de dose de correção: (hgt atual - hgt alvo) / fator de sensibilidade
-function calcularDoseCorrecao() {
-    const input = document.getElementById("inputHGT");
-    const resultadoEl = document.getElementById("resultadoInsulina");
-    if (!input || !resultadoEl) return;
-
-    const hgtAtual = parseFloat(input.value);
-    if (isNaN(hgtAtual) || hgtAtual <= 0) {
-        resultadoEl.innerText = "Insira HGT válido";
-        resultadoEl.style.color = "red";
-        localStorage.removeItem('ultimoHGT');
-        return;
-    }
-
+function obterConfiguracaoDose() {
     const profile = JSON.parse(localStorage.getItem("profile") || "null");
     const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
     const config = profile || usuario || {};
-    const fator = Number(config.fatorSensibilidade ?? 0);
-    const hgtAlvo = Number(config.hgtAlvo ?? 0);
 
-    if (!fator || !hgtAlvo) {
-        resultadoEl.innerText = "Configure fator e HGT alvo no cadastro/perfil";
-        resultadoEl.style.color = "orange";
-        return;
+    return {
+        fatorSensibilidade: Number(config.fatorSensibilidade ?? 0),
+        hgtAlvo: Number(config.hgtAlvo ?? 0)
+    };
+}
+
+function calcularDoseCorrecao(hgtAtual = null) {
+    const input = document.getElementById("inputHGT");
+    const resultadoEl = document.getElementById("resultadoInsulina");
+    const valorHgt = hgtAtual !== null ? Number(hgtAtual) : parseFloat(input?.value || localStorage.getItem("ultimoHGT") || "0");
+
+    if (!resultadoEl) return null;
+
+    if (isNaN(valorHgt) || valorHgt <= 0) {
+        resultadoEl.innerText = "Insira HGT válido";
+        resultadoEl.style.color = "red";
+        localStorage.removeItem('ultimoHGT');
+        return null;
     }
 
-    // Armazena último HGT para referência em outras páginas
-    localStorage.setItem('ultimoHGT', String(hgtAtual));
+    const { fatorSensibilidade, hgtAlvo } = obterConfiguracaoDose();
+    if (!fatorSensibilidade || !hgtAlvo) {
+        resultadoEl.innerText = "Configure fator e HGT alvo no cadastro/perfil";
+        resultadoEl.style.color = "orange";
+        return null;
+    }
 
-    const dose = (hgtAtual - hgtAlvo) / fator;
+    localStorage.setItem('ultimoHGT', String(valorHgt));
+
+    const dose = (valorHgt - hgtAlvo) / fatorSensibilidade;
     const doseFinal = dose <= 0 ? 0 : Number(dose.toFixed(1));
 
     resultadoEl.innerText = `Dose de correção: ${doseFinal} U`;
     resultadoEl.style.color = "#0d9e6e";
 
-    // Salva estimativa e, se o modal de registro estiver aberto/visível, preenche o campo de dose
     localStorage.setItem('ultimoInsulinaEstimada', String(doseFinal));
+    return doseFinal;
+}
+
+function preencherDoseSugerida() {
     const inputDoseModal = document.getElementById('inputDose');
-    if (inputDoseModal) {
-        inputDoseModal.value = doseFinal;
+    if (!inputDoseModal) return;
+
+    const doseSugerida = calcularDoseCorrecao();
+    if (doseSugerida === null) {
+        inputDoseModal.value = '';
+        return;
+    }
+
+    if (inputDoseModal.dataset.manual !== 'true') {
+        inputDoseModal.value = String(doseSugerida);
     }
 }
 
@@ -249,7 +272,13 @@ window.addEventListener("load", () => {
     const inputHGT = document.getElementById("inputHGT");
     if (inputHGT) {
         inputHGT.addEventListener("input", calcularDoseCorrecao);
-        // Se já houver valor, calcula imediatamente
         calcularDoseCorrecao();
+    }
+
+    const inputDoseModal = document.getElementById('inputDose');
+    if (inputDoseModal) {
+        inputDoseModal.addEventListener('input', function () {
+            inputDoseModal.dataset.manual = 'true';
+        });
     }
 });
