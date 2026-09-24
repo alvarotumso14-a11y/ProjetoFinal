@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="style.css">
+    <title>GlicHelp — Vamos começar</title>
+</head>
+<body class="auth-body onboarding-body">
+    <main class="auth-page">
+        <section class="auth-card onboarding-card">
+            <a href="index.html" class="auth-brand" aria-label="Voltar para a página inicial do GlicHelp">
+                <img src="Logos/Favicon.png" alt="GlicHelp" class="auth-logo-img">
+                <span class="auth-brand-name">GlicHelp</span>
+            </a>
+
+            <div id="boasVindas" class="onboarding-step">
+                <span class="onboarding-icon" aria-hidden="true">♡</span>
+                <h1 class="auth-title">Olá, <span id="nomeBoasVindas">seja bem-vindo</span>!</h1>
+                <p class="auth-subtitle">Vamos configurar seu perfil para deixar o GlicHelp mais útil para você.</p>
+                <button id="iniciarConfiguracao" type="button" class="btn-verde auth-submit">Continuar</button>
+            </div>
+
+            <div id="configuracao" class="onboarding-step" hidden>
+                <h1 class="auth-title">Conheça seu perfil</h1>
+                <p class="auth-subtitle">Essas informações ajudam nos cálculos e recomendações do aplicativo.</p>
+                <div id="erroConfiguracao" class="auth-error" role="alert" aria-live="polite" hidden></div>
+
+                <form id="formConfiguracao" class="auth-form" novalidate>
+                    <div class="auth-field">
+                        <label for="idadeInicial">Idade</label>
+                        <input type="number" id="idadeInicial" min="1" max="120" placeholder="Sua idade" required>
+                    </div>
+
+                    <div class="auth-field">
+                        <label for="tipoDiabetesInicial">Tipo de diabetes</label>
+                        <select id="tipoDiabetesInicial" required>
+                            <option value="">Selecione...</option>
+                            <option value="Tipo 1">Tipo 1</option>
+                            <option value="Tipo 2">Tipo 2</option>
+                            <option value="Gestacional">Gestacional</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="auth-field">
+                        <label for="fatorSensibilidadeInicial">Fator de sensibilidade</label>
+                        <input type="number" id="fatorSensibilidadeInicial" min="0.1" step="0.1" placeholder="Ex.: 30" required>
+                    </div>
+
+                    <div class="auth-field">
+                        <label for="hgtAlvoInicial">HGT alvo (mg/dL)</label>
+                        <input type="number" id="hgtAlvoInicial" min="1" step="0.1" placeholder="Ex.: 110" required>
+                    </div>
+
+                    <button type="submit" class="btn-verde auth-submit">Salvar e entrar</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <script src="Js/configuracao-inicial.js"></script>
+</body>
+</html>

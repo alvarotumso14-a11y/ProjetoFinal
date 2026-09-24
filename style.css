@@ -1783,6 +1783,52 @@ header button:hover {
     max-width: 440px;
 }
 
+.onboarding-body {
+    background:
+        radial-gradient(circle at 15% 10%, rgba(215, 38, 56, .10), transparent 32%),
+        var(--cinza-fundo);
+}
+
+.onboarding-card {
+    width: min(100%, 560px);
+}
+
+.onboarding-step {
+    animation: onboarding-enter .25s ease-out;
+}
+
+.onboarding-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    background: var(--vermelho-claro);
+    color: var(--vermelho);
+    font-size: 28px;
+}
+
+.onboarding-step .auth-title {
+    margin-bottom: 12px;
+}
+
+.onboarding-step .auth-submit {
+    margin-top: 12px;
+}
+
+@keyframes onboarding-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .auth-brand {
     display: flex;
     align-items: center;

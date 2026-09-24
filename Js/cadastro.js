@@ -10,14 +10,11 @@ if (form) {
 
         const nome = document.getElementById('nome').value.trim();
         const email = document.getElementById('email').value.trim();
-        const tipoDiabetes = document.getElementById('tipoDiabetes').value;
         const senha = document.getElementById('senha').value;
         const confirmarSenha = document.getElementById('confirmarSenha').value;
-        const fatorSensibilidade = document.getElementById('fatorSensibilidade').value;
-        const hgtAlvo = document.getElementById('hgtAlvo').value;
 
         // Validações básicas
-        if (!nome || !email || !tipoDiabetes || !senha || !confirmarSenha || !fatorSensibilidade || !hgtAlvo) {
+        if (!nome || !email || !senha || !confirmarSenha) {
             erroCadastro.innerText = 'Preencha todos os campos.';
             erroCadastro.style.display = 'block';
             return;
@@ -39,31 +36,33 @@ if (form) {
         const usuario = {
             nome,
             email,
-            tipoDiabetes,
+            tipoDiabetes: '',
+            idade: '',
             // Atenção: em produção, não armazenar senha em texto limpo.
             senha,
-            fatorSensibilidade: Number(fatorSensibilidade),
-            hgtAlvo: Number(hgtAlvo),
+            fatorSensibilidade: '',
+            hgtAlvo: '',
+            onboardingConcluido: false,
             criadoEm: new Date().toISOString()
         };
 
         const profile = {
             nome,
-            tipo: tipoDiabetes,
+            tipo: '',
             idade: '',
             email,
             celular: '',
             photo: '',
-            fatorSensibilidade: Number(fatorSensibilidade),
-            hgtAlvo: Number(hgtAlvo)
+            fatorSensibilidade: '',
+            hgtAlvo: ''
         };
 
         // Salva como usuário atual e também no perfil para reutilização em todas as telas
         localStorage.setItem('usuario', JSON.stringify(usuario));
         localStorage.setItem('profile', JSON.stringify(profile));
 
-        // Redireciona para o dashboard
-        window.location.href = 'dashboard.html';
+        // A configuração de saúde acontece na primeira tela após o cadastro.
+        window.location.href = 'configuracao-inicial.html';
     });
 } else {
     // Form não encontrado — nada a fazer
