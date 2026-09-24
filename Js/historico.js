@@ -2,6 +2,16 @@
 // LOCAL STORAGE: carrega os registros salvos (persistidos pelo dashboard) para exibir o histórico.
 // Se não existir chave, inicializa com array vazio.
 let registros = JSON.parse(localStorage.getItem("registros")) || [];
+let indiceRegistroEdicao = -1;
+
+function escaparHtml(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 // HISTÓRICO DE MEDIÇÕES
 // atualiza a lista de registros exibida na página de histórico.
@@ -32,33 +42,30 @@ function atualizarHistorico() {
                         <span class="metric-pill metric-glicemia">G</span>
                         <div>
                             <p class="registro-label">Glicemia</p>
-                            <h3>${registro.glicemia} mg/dL</h3>
+                            <h3>${escaparHtml(registro.glicemia)} mg/dL</h3>
                         </div>
                     </div>
 
                     <div class="registro-meta">
                         <div>
                             <span class="meta-label">Dose</span>
-                            <strong>${registro.dose} U</strong>
+                            <strong>${escaparHtml(registro.dose)} U</strong>
                         </div>
                         <div>
                             <span class="meta-label">Hora</span>
-                            <strong>${registro.hora}</strong>
+                            <strong>${escaparHtml(registro.hora)}</strong>
                         </div>
                         <div>
                             <span class="meta-label">Data</span>
-                            <strong>${registro.data}</strong>
+                            <strong>${escaparHtml(registro.data)}</strong>
                         </div>
                     </div>
+                    ${registro.observacao ? `<p class="registro-observacao"><span>Observação</span>${escaparHtml(registro.observacao)}</p>` : ""}
                 </div>
 
                 <div class="botoesRegistro">
                     <button class="editar" onclick="editarRegistro(${index})">
                         Alterar
-                    </button>
-
-                    <button class="excluir" onclick="excluirRegistro(${index})">
-                        Excluir
                     </button>
                 </div>
             </div>
@@ -67,51 +74,58 @@ function atualizarHistorico() {
 }
 
 // EDIÇÃO DE REGISTROS
-// Permite alterar um registro existente usando prompts simples (implementação atual).
-// Atualiza o array `registros` e persiste em localStorage, depois atualiza a lista exibida.
 function editarRegistro(index) {
-    const novaGlicemia = prompt("Nova glicemia:", registros[index].glicemia);
-    if (novaGlicemia == null) {
-        return;
-    }
-
-    const novaDose = prompt("Nova dose:", registros[index].dose);
-    if (novaDose == null) {
-        return;
-    }
-
-    const novaHora = prompt("Novo horário:", registros[index].hora);
-    if (novaHora == null) {
-        return;
-    }
-
-    registros[index].glicemia = novaGlicemia;
-    registros[index].dose = novaDose;
-    registros[index].hora = novaHora;
-
-    // Persiste e atualiza a interface
-    localStorage.setItem("registros", JSON.stringify(registros));
-    atualizarHistorico();
+    const registro = registros[index];
+    if (!registro) return;
+    indiceRegistroEdicao = index;
+    document.getElementById("editRegistroGlicemia").value = registro.glicemia || "";
+    document.getElementById("editRegistroDose").value = registro.dose || "";
+    document.getElementById("editRegistroHora").value = registro.hora || "";
+    document.getElementById("editRegistroObservacao").value = registro.observacao || "";
+    const modal = document.getElementById("modalEdicaoRegistro");
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
 }
 
-function excluirRegistro(index) {
-    const confirmar = confirm("Deseja realmente excluir este registro?");
-    if (!confirmar) {
-        return;
+function fecharModalEdicao() {
+    const modal = document.getElementById("modalEdicaoRegistro");
+    if (modal) {
+        modal.style.display = "none";
+        modal.setAttribute("aria-hidden", "true");
     }
+    indiceRegistroEdicao = -1;
+}
 
-    registros.splice(index, 1);
+function salvarEdicaoRegistro(event) {
+    event.preventDefault();
+    if (indiceRegistroEdicao < 0) return;
+    const registro = registros[indiceRegistroEdicao];
+    registro.glicemia = document.getElementById("editRegistroGlicemia").value;
+    registro.dose = document.getElementById("editRegistroDose").value;
+    registro.hora = document.getElementById("editRegistroHora").value;
+    registro.observacao = document.getElementById("editRegistroObservacao").value.trim();
+    registro.refeicao = obterRefeicao(registro.hora);
     localStorage.setItem("registros", JSON.stringify(registros));
     atualizarHistorico();
+    fecharModalEdicao();
+}
+
+function obterRefeicao(hora) {
+    const [horas, minutos] = hora.split(":").map(Number);
+    const horario = horas * 60 + minutos;
+    if (horario <= 660) return "☕ Café da Manhã";
+    if (horario <= 840) return "🍛 Almoço";
+    if (horario <= 1080) return "🥪 Lanche";
+    return "🍽️ Janta";
 }
 
 // Filtro de pesquisa
 const pesquisa = document.getElementById("pesquisa");
 
 if (pesquisa) {
-    pesquisa.addEventListener("keyup", function () {
+    pesquisa.addEventListener("input", function () {
         const texto = pesquisa.value.toLowerCase();
-        const cards = document.querySelectorAll(".registro");
+        const cards = document.querySelectorAll(".registro-item");
 
         cards.forEach((card) => {
             if (card.innerText.toLowerCase().includes(texto)) {
@@ -125,3 +139,4 @@ if (pesquisa) {
 
 // Inicialização
 window.addEventListener("load", atualizarHistorico);
+document.getElementById("formEdicaoRegistro")?.addEventListener("submit", salvarEdicaoRegistro);

@@ -9,19 +9,17 @@ let indiceEdicao = -1;
 // Referência ao objeto Chart (gráfico) para que possamos destruir e recriar quando os dados mudarem.
 let grafico = null;
 
-// etapa controla a etapa atual do modal de registro (uso em navegação entre etapas do formulário)
-let etapa = 0;
-
 // Elementos do DOM
 const modal = document.getElementById("modalRegistro");
-const passos = document.querySelectorAll(".step");
 
-// CONTROLE DO MODAL: as funções abaixo (abrirModal, fecharModal, proximoPasso, atualizarPassos)
-// cuidam da abertura/fechamento do modal e da navegação entre as etapas do formulário.
+// CONTROLE DO MODAL: cuida da abertura e fechamento do formulário de registro.
 function abrirModal() {
     modal.style.display = "flex";
-    etapa = 0;
-    atualizarPassos();
+    const hora = document.getElementById("inputHora");
+    if (hora && !hora.value) {
+        hora.value = new Date().toTimeString().slice(0, 5);
+    }
+    setTimeout(() => document.getElementById("inputHora")?.focus(), 0);
 }
 
 function fecharModal() {
@@ -35,21 +33,6 @@ function fecharModal() {
         inputDose.value = "";
         inputDose.dataset.manual = "false";
     }
-}
-
-function proximoPasso() {
-    if (etapa < passos.length - 1) {
-        etapa++;
-        if (etapa === 2) {
-            preencherDoseSugerida();
-        }
-        atualizarPassos();
-    }
-}
-
-function atualizarPassos() {
-    passos.forEach((passo) => passo.classList.remove("active"));
-    passos[etapa].classList.add("active");
 }
 
 // CLASSIFICAÇÃO DE REFEIÇÕES
@@ -123,13 +106,12 @@ function salvarRegistro() {
     const glicemia = document.getElementById("inputGlicemia").value;
     const dose = document.getElementById("inputDose").value;
     const hora = document.getElementById("inputHora").value;
-    const refeicao = obterRefeicao(hora);
-
     // Validação simples: exige que os campos não estejam vazios.
     if (glicemia === "" || dose === "" || hora === "") {
         alert("Preencha todos os campos!");
         return;
     }
+    const refeicao = obterRefeicao(hora);
 
     // Se estivermos editando um registro existente, atualiza o objeto.
     if (indiceEdicao >= 0) {

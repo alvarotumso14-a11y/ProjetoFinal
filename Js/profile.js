@@ -54,6 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             el.textContent = profile[k] || (k === 'nome' ? 'Nome do Usuário' : '—');
         });
+        const nomeResumo = document.querySelector('#nomeResumo');
+        if (nomeResumo) nomeResumo.textContent = profile.nome || 'Nome do Usuário';
 
         // Topbar user-info (first and second p)
         const userInfoPs = document.querySelectorAll('.user-top .user-info p');
@@ -147,24 +149,24 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="modal-box">
                 <div class="modal-topo">
                     <h2>Editar Perfil</h2>
-                    <span class="close" aria-hidden="true">&times;</span>
+                    <button class="close" type="button" aria-label="Fechar">&times;</button>
                 </div>
                 <div class="modal-corpo">
-                    <div class="edit-form" style="width:100%;max-width:640px;">
-                        <div class="step active">
-                            <label>Nome<br><input type="text" id="editNome" /></label>
-                            <label>Tipo de Diabetes<br><input type="text" id="editTipo" /></label>
-                            <label>Idade<br><input type="text" id="editIdade" /></label>
-                            <label>Email<br><input type="email" id="editEmail" /></label>
-                            <label>Celular<br><input type="text" id="editCelular" /></label>
-                            <label>Fator de Sensibilidade<br><input type="number" id="editFatorSensibilidade" step="0.1" /></label>
-                            <label>HGT Alvo<br><input type="number" id="editHgtAlvo" step="0.1" /></label>
-                            <label>Foto do Perfil<br><input type="file" id="editPhoto" accept="image/*" /></label>
-
-                            <div style="margin-top:18px;display:flex;flex-direction:column;gap:10px;">
-                                <button id="saveProfileBtn">Salvar</button>
-                                <button id="cancelProfileBtn" type="button" class="excluir">Cancelar</button>
-                            </div>
+                    <div class="edit-form">
+                        <p class="form-intro">Atualize suas informações para personalizar sua experiência.</p>
+                        <div class="form-grid">
+                            <label for="editNome">Nome completo<input type="text" id="editNome" /></label>
+                            <label for="editTipo">Tipo de diabetes<input type="text" id="editTipo" /></label>
+                            <label for="editIdade">Idade<input type="number" id="editIdade" min="1" /></label>
+                            <label for="editEmail">E-mail<input type="email" id="editEmail" /></label>
+                            <label for="editCelular">Celular<input type="tel" id="editCelular" /></label>
+                            <label for="editFatorSensibilidade">Fator de sensibilidade<input type="number" id="editFatorSensibilidade" step="0.1" /></label>
+                            <label for="editHgtAlvo">HGT alvo (mg/dL)<input type="number" id="editHgtAlvo" step="0.1" /></label>
+                            <label class="full-width" for="editPhoto">Foto do perfil<input type="file" id="editPhoto" accept="image/*" /></label>
+                        </div>
+                        <div class="modal-actions">
+                            <button id="cancelProfileBtn" type="button" class="button-secondary">Cancelar</button>
+                            <button id="saveProfileBtn" type="button">Salvar alterações</button>
                         </div>
                     </div>
                 </div>

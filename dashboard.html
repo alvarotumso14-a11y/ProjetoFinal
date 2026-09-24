@@ -146,26 +146,24 @@
         <div class="modal-box">
             <div class="modal-topo">
                 <h2>Novo Registro</h2>
-                <span class="close" onclick="fecharModal()">&times;</span>
+                <button class="close" type="button" aria-label="Fechar" onclick="fecharModal()">&times;</button>
             </div>
 
             <div class="modal-corpo">
-                <div class="step active">
-                    <h3>Que horas você mediu sua glicemia?</h3>
-                    <input type="time" id="inputHora">
-                    <button onclick="proximoPasso()">Continuar</button>
-                </div>
-
-                <div class="step">
-                    <h3>Qual foi o valor da sua glicemia?</h3>
-                    <input type="number" id="inputGlicemia" placeholder="Valor em mg/dL">
-                    <button onclick="proximoPasso()">Continuar</button>
-                </div>
-
-                <div class="step">
-                    <h3>Dose de Insulina</h3>
-                    <input type="number" id="inputDose" placeholder="Quantidade em unidades">
-                    <button onclick="salvarRegistro()">Salvar</button>
+                <div class="registro-form">
+                    <p class="form-intro">Preencha os dados da medição para acompanhar sua glicemia.</p>
+                    <div class="form-grid">
+                        <label for="inputHora">Horário da medição
+                            <input type="time" id="inputHora">
+                        </label>
+                        <label for="inputGlicemia">Glicemia (mg/dL)
+                            <input type="number" id="inputGlicemia" min="1" placeholder="Ex.: 120">
+                        </label>
+                        <label for="inputDose">Dose de insulina (U)
+                            <input type="number" id="inputDose" min="0" step="0.1" placeholder="Ex.: 6">
+                        </label>
+                    </div>
+                    <button class="form-submit" onclick="salvarRegistro()">Salvar registro</button>
                 </div>
             </div>
         </div>

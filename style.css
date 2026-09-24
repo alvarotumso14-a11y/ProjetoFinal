@@ -481,6 +481,26 @@ header button:hover {
     min-width: 0;
 }
 
+.registro-observacao {
+    margin: 0;
+    padding: 12px 14px;
+    border-left: 3px solid var(--vermelho);
+    border-radius: 8px;
+    background: #fff7f7;
+    color: var(--cinza-texto);
+    line-height: 1.5;
+}
+
+.registro-observacao span {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--vermelho-escuro);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
 .registro-header {
     display: flex;
     align-items: center;
@@ -631,7 +651,7 @@ header button:hover {
 /* Novo: layout em cartões para a página de perfil */
 .perfil-cards {
     display: grid;
-    grid-template-columns: 220px repeat(2, 1fr);
+    grid-template-columns: minmax(220px, .8fr) repeat(2, minmax(0, 1fr));
     gap: 20px;
     align-items: start;
 }
@@ -649,6 +669,28 @@ header button:hover {
     flex-direction: column;
     align-items: center;
     gap: 12px;
+}
+
+.foto-card h2 {
+    font-size: 20px;
+    text-align: center;
+}
+
+.perfil-section-label,
+.modal-kicker {
+    align-self: flex-start;
+    color: var(--vermelho);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.perfil-subtitle {
+    color: var(--cinza-suave);
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
 }
 
 .card-key {
@@ -792,6 +834,30 @@ header button:hover {
     .registro-meta {
         grid-template-columns: 1fr;
     }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full-width {
+        grid-column: auto;
+    }
+
+    .modal-corpo {
+        padding: 22px 18px;
+    }
+
+    .modal-topo {
+        padding: 20px 18px;
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .modal-actions button {
+        width: 100%;
+    }
 }
 
 /* Modal */
@@ -810,7 +876,8 @@ header button:hover {
 .modal-box {
     width: 700px;
     max-width: 90%;
-    min-height: 600px;
+    max-height: 90vh;
+    min-height: 0;
     background: var(--branco);
     border-radius: 20px;
     display: flex;
@@ -823,20 +890,22 @@ header button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: 24px 28px;
     border-bottom: 1px solid #eee;
 }
 
-.modal-topo button {
+.modal-topo .close {
     background: none;
     border: none;
-    font-size: 20px;
+    color: var(--cinza-suave);
+    font-size: 30px;
+    line-height: 1;
     cursor: pointer;
 }
 
 .modal-corpo {
     flex: 1;
-    padding: 40px;
+    padding: 28px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -871,6 +940,86 @@ header button:hover {
     color: var(--branco);
     font-size: 18px;
     cursor: pointer;
+}
+
+.registro-form,
+.edit-form {
+    width: 100%;
+}
+
+.form-intro {
+    margin-bottom: 22px;
+    color: var(--cinza-suave);
+    line-height: 1.5;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.form-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--cinza-texto);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.form-grid input,
+.form-grid textarea {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--preto);
+    font: inherit;
+    font-weight: 400;
+}
+
+.form-grid input:focus,
+.form-grid textarea:focus {
+    outline: 2px solid rgba(215, 38, 56, .18);
+    border-color: var(--vermelho);
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-submit,
+.modal-actions button {
+    border: 0;
+    border-radius: 10px;
+    padding: 13px 18px;
+    background: linear-gradient(135deg, var(--vermelho), var(--vermelho-escuro));
+    color: var(--branco);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.form-submit {
+    width: 100%;
+    margin-top: 24px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.modal-actions .button-secondary {
+    background: var(--cinza-fundo);
+    color: var(--cinza-texto);
+}
+
+.modal-box-small {
+    width: 620px;
 }
 
 /* Histórico */
