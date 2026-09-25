@@ -1495,12 +1495,15 @@ header button:hover {
 .landing-nav {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 16px 48px;
-    background: var(--branco)fff;
+    min-height: 73px;
+    background: var(--branco);
     border-bottom: 1px solid var(--cinza-borda);
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 900;
 }
 
@@ -1509,6 +1512,8 @@ header button:hover {
     align-items: center;
     gap: 10px;
     text-decoration: none;
+    position: absolute;
+    left: 48px;
 }
 
 .landing-logo-img {
@@ -1529,6 +1534,14 @@ header button:hover {
     display: flex;
     align-items: center;
     gap: 16px;
+}
+
+.landing-menu-toggle {
+    display: none;
+}
+
+.landing-body {
+    padding-top: 73px;
 }
 
 .landing-nav-link {
@@ -1765,6 +1778,33 @@ header button:hover {
     font-size: 14px;
 }
 
+.landing-footer-inner {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+    display: flex;
+    justify-content: space-between;
+    gap: 32px;
+    text-align: left;
+}
+
+.landing-footer-inner strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--branco);
+    font-size: 16px;
+}
+
+.landing-footer-inner p {
+    margin: 0;
+}
+
+.landing-footer-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
 .landing-footer a {
     color: #aaa;
     text-decoration: none;
@@ -1778,6 +1818,10 @@ header button:hover {
 @media (max-width: 900px) {
     .landing-nav {
         padding: 16px 24px;
+    }
+
+    .landing-logo {
+        left: 24px;
     }
 
     .landing-hero {
@@ -1812,6 +1856,78 @@ header button:hover {
 
     .landing-cta-final h2 {
         font-size: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .landing-nav {
+        justify-content: flex-end;
+    }
+
+    .landing-menu-toggle {
+        display: flex;
+        width: 44px;
+        height: 44px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        border: 1px solid var(--cinza-borda);
+        border-radius: 10px;
+        background: var(--branco);
+        color: var(--vermelho-escuro);
+        cursor: pointer;
+    }
+
+    .landing-menu-toggle span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        border-radius: 2px;
+        background: currentColor;
+        transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .landing-nav.menu-open .landing-menu-toggle span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    .landing-nav.menu-open .landing-menu-toggle span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .landing-nav.menu-open .landing-menu-toggle span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .landing-nav-actions {
+        display: none;
+        position: absolute;
+        top: calc(100% + 1px);
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 12px 24px 20px;
+        background: var(--branco);
+        border-bottom: 1px solid var(--cinza-borda);
+        box-shadow: 0 12px 24px rgba(17, 17, 17, 0.08);
+    }
+
+    .landing-nav.menu-open .landing-nav-actions {
+        display: flex;
+    }
+
+    .landing-nav-actions .landing-nav-link,
+    .landing-nav-actions .btn-verde {
+        width: 100%;
+        padding: 13px 8px;
+        text-align: center;
+    }
+
+    .landing-nav-actions .landing-nav-link {
+        border-bottom: 1px solid #f0f0f0;
     }
 }
 
@@ -2244,6 +2360,103 @@ header button:hover {
     line-height: 1.75;
 }
 
+.faq-page {
+    min-height: calc(100vh - 160px);
+}
+
+.page-kicker {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: var(--vermelho);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.faq-cabecalho h1,
+.team-heading h1 {
+    margin-bottom: 12px;
+    font-size: 42px;
+    color: var(--preto);
+}
+
+.team-page {
+    min-height: calc(100vh - 160px);
+    padding: 88px 0;
+    background: var(--cinza-fundo);
+}
+
+.team-heading {
+    margin-bottom: 44px;
+    text-align: center;
+}
+
+.team-heading p {
+    color: var(--cinza-suave);
+    font-size: 17px;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.team-card {
+    padding: 32px 24px;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 20px;
+    background: var(--branco);
+    text-align: center;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .05);
+}
+
+.team-avatar {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--vermelho), var(--vermelho-escuro));
+    color: var(--branco);
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.team-card h2 {
+    margin-bottom: 6px;
+    color: var(--preto);
+    font-size: 20px;
+}
+
+.team-card p {
+    margin-bottom: 20px;
+    color: var(--cinza-suave);
+}
+
+.team-links {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.team-links a {
+    padding: 9px 13px;
+    border-radius: 9px;
+    background: var(--vermelho-claro);
+    color: var(--vermelho-escuro);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.team-links a:hover {
+    background: var(--vermelho);
+    color: var(--branco);
+}
+
 /* ==========================================================
    Landing — CTA final com mascote
    ========================================================== */
@@ -2275,6 +2488,25 @@ header button:hover {
 
     .landing-sobre,
     .landing-faq {
+        padding: 64px 0;
+    }
+
+    .landing-footer-inner {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .landing-footer-links {
+        justify-content: center;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+        margin: 0 auto;
+    }
+
+    .team-page {
         padding: 64px 0;
     }
 }

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="style.css">
+    <title>GlicHelp — Perguntas frequentes</title>
+</head>
+<body class="landing-body">
+    <nav class="landing-nav" aria-label="Navegação principal">
+        <a class="landing-logo" href="index.html" aria-label="GlicHelp — Início">
+            <img src="Logos/Favicon.png" alt="GlicHelp" class="landing-logo-img">
+            <span class="landing-logo-wordmark">GlicHelp</span>
+        </a>
+        <button class="landing-menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="landing-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="landing-nav-actions" id="landing-menu">
+            <a class="landing-nav-link" href="faq.html">Perguntas frequentes</a>
+            <a class="landing-nav-link" href="equipe.html">Equipe</a>
+            <a class="landing-nav-link" href="login.html">Entrar</a>
+            <a class="btn-verde" href="cadastro.html">Criar conta</a>
+        </div>
+    </nav>
+
+    <main class="landing-faq faq-page">
+        <div class="landing-section-inner">
+            <div class="faq-cabecalho">
+                <span class="page-kicker">Ajuda</span>
+                <h1>Perguntas frequentes</h1>
+                <p>Explicações simples para você entender o GlicHelp antes de começar.</p>
+            </div>
+            <div class="faq-lista">
+                <div class="faq-item">
+                    <button class="faq-pergunta" aria-expanded="false" aria-controls="faq-resp-1">O GlicHelp é gratuito?<span class="faq-icone" aria-hidden="true">+</span></button>
+                    <div class="faq-resposta" id="faq-resp-1" role="region" hidden>Sim. O GlicHelp é gratuito e não esconde recursos essenciais atrás de pagamento.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-pergunta" aria-expanded="false" aria-controls="faq-resp-2">Onde meus dados ficam salvos?<span class="faq-icone" aria-hidden="true">+</span></button>
+                    <div class="faq-resposta" id="faq-resp-2" role="region" hidden>
+                        Atualmente, os dados ficam salvos no armazenamento do navegador, no próprio dispositivo. Pense nele como um pequeno banco de dados particular do navegador: ele guarda seu perfil e seus registros para que continuem disponíveis quando você voltar pelo mesmo navegador. Nesta versão, os dados não são enviados para um banco de dados na internet nem ficam disponíveis automaticamente em outro celular ou computador. Por isso, limpar os dados do navegador pode apagar essas informações.
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-pergunta" aria-expanded="false" aria-controls="faq-resp-3">O GlicHelp substitui meu médico?<span class="faq-icone" aria-hidden="true">+</span></button>
+                    <div class="faq-resposta" id="faq-resp-3" role="region" hidden>Não. Ele é uma ferramenta de apoio para organização e acompanhamento. Decisões sobre insulina, alimentação ou tratamento devem ser feitas com sua equipe de saúde.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-pergunta" aria-expanded="false" aria-controls="faq-resp-4">O aplicativo funciona no celular?<span class="faq-icone" aria-hidden="true">+</span></button>
+                    <div class="faq-resposta" id="faq-resp-4" role="region" hidden>Sim. O layout é responsivo e pode ser acessado pelo navegador do celular, tablet ou computador.</div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="landing-footer"><p>© 2025 GlicHelp. <a href="index.html">Voltar ao início</a></p></footer>
+    <script src="Js/faq.js"></script>
+    <script src="Js/landing-menu.js"></script>
+</body>
+</html>
