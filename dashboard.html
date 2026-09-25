@@ -68,7 +68,8 @@
             <section class="cards">
                 <div class="card">
                     <h3>Última Glicemia</h3>
-                    <h1 id="ultimaGlicemia">120 mg/dL</h1>
+                    <h1 id="ultimaGlicemia">—</h1>
+                    <p class="card-detail">Dose aplicada: <strong id="ultimaDose">0 U</strong></p>
                 </div>
 
             </section>
@@ -115,29 +116,7 @@
                     <h2>Últimos Registros</h2>
                 </div>
 
-                <div class="registro">
-                    <div class="registro-label">
-                        <span class="metric-pill metric-glicemia">G</span>
-                        <span>Glicemia</span>
-                    </div>
-                    <span id="ultimaGlicemiaResumo">120 mg/dL</span>
-                </div>
-
-                <div class="registro">
-                    <div class="registro-label">
-                        <span class="metric-pill metric-refeicao">R</span>
-                        <span>Refeição</span>
-                    </div>
-                    <span id="ultimaRefeicao">Café da Manhã</span>
-                </div>
-
-                <div class="registro">
-                    <div class="registro-label">
-                        <span class="metric-pill metric-medicao">M</span>
-                        <span>Medição</span>
-                    </div>
-                    <span id="ultimaInsulina">6 U</span>
-                </div>
+                <div id="ultimosRegistrosDashboard" class="dashboard-registros"></div>
             </section>
         </main>
     </div>
@@ -155,6 +134,16 @@
                     <div class="form-grid">
                         <label for="inputHora">Horário da medição
                             <input type="time" id="inputHora">
+                        </label>
+                        <label for="inputRefeicao">Refeição
+                            <select id="inputRefeicao">
+                                <option value="">Selecione...</option>
+                                <option value="☕ Café da Manhã">☕ Café da Manhã</option>
+                                <option value="🍛 Almoço">🍛 Almoço</option>
+                                <option value="🥪 Lanche">🥪 Lanche</option>
+                                <option value="🍽️ Janta">🍽️ Janta</option>
+                                <option value="🌙 Ceia">🌙 Ceia</option>
+                            </select>
                         </label>
                         <label for="inputGlicemia">Glicemia (mg/dL)
                             <input type="number" id="inputGlicemia" min="1" placeholder="Ex.: 120">

@@ -273,21 +273,67 @@ header button:hover {
     object-fit: contain;
 }
 .botao-logout {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 28px;
+    padding: 13px 20px;
+    background: var(--branco);
+    color: var(--vermelho-escuro);
+    border: 1px solid rgba(215, 38, 56, .2);
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(177, 17, 32, .08);
+    transition: .2s ease;
 }
 
 .botao-logout:hover {
-    background-color: #e60000;
+    background: var(--vermelho-claro);
+    transform: translateY(-1px);
+}
+
+.botao-logout span {
+    font-size: 20px;
+}
+
+.card-detail {
+    margin-top: 8px;
+    color: var(--cinza-suave);
+    font-size: 14px;
+}
+
+.card-detail strong {
+    color: var(--vermelho-escuro);
+}
+
+.dashboard-registros {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dashboard-registro {
+    padding: 16px 18px;
+}
+
+.dashboard-registro-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    color: var(--cinza-suave);
+    font-size: 13px;
+    text-align: right;
+}
+
+.dashboard-registro-info strong {
+    color: var(--preto);
+}
+
+.dashboard-empty {
+    color: var(--cinza-suave);
 }
 
 /* Cards e resumo */
@@ -986,7 +1032,8 @@ header button:hover {
 }
 
 .form-grid input,
-.form-grid textarea {
+.form-grid textarea,
+.form-grid select {
     width: 100%;
     padding: 13px 14px;
     border: 1px solid var(--cinza-borda);
@@ -997,8 +1044,15 @@ header button:hover {
     font-weight: 400;
 }
 
+.form-grid input[readonly] {
+    background: var(--cinza-fundo);
+    color: var(--cinza-suave);
+    cursor: not-allowed;
+}
+
 .form-grid input:focus,
-.form-grid textarea:focus {
+.form-grid textarea:focus,
+.form-grid select:focus {
     outline: 2px solid rgba(215, 38, 56, .18);
     border-color: var(--vermelho);
 }

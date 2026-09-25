@@ -28,6 +28,7 @@ function fecharModal() {
 
     document.getElementById("inputHora").value = "";
     document.getElementById("inputGlicemia").value = "";
+    document.getElementById("inputRefeicao").value = "";
     const inputDose = document.getElementById("inputDose");
     if (inputDose) {
         inputDose.value = "";
@@ -59,6 +60,36 @@ function obterRefeicao(hora) {
     return "🍽️ Janta"; // após 18:00
 }
 
+function formatarGlicemia(valor) {
+    const numero = Number(valor);
+    return String(valor).toUpperCase() === "HI" || (Number.isFinite(numero) && numero > 600)
+        ? "HI"
+        : `${valor} mg/dL`;
+}
+
+function renderizarUltimosRegistros() {
+    const container = document.getElementById("ultimosRegistrosDashboard");
+    if (!container) return;
+
+    if (!registros.length) {
+        container.innerHTML = '<p class="dashboard-empty">Nenhum registro realizado ainda.</p>';
+        return;
+    }
+
+    container.innerHTML = registros.slice(0, 3).map((registro) => `
+        <div class="registro dashboard-registro">
+            <div class="registro-label">
+                <span class="metric-pill metric-glicemia">G</span>
+                <span>${formatarGlicemia(registro.glicemia)}</span>
+            </div>
+            <div class="dashboard-registro-info">
+                <strong>${registro.refeicao || "Refeição não informada"}</strong>
+                <span>${registro.hora || "--:--"} · Dose: ${Number(registro.dose) || 0} U</span>
+            </div>
+        </div>
+    `).join("");
+}
+
 // Atualização do resumo do dashboard
 function atualizarResumoDashboard() {
     const ultimaGlicemia = document.getElementById("ultimaGlicemia");
@@ -69,17 +100,20 @@ function atualizarResumoDashboard() {
     const ultimaInsulina = document.getElementById("ultimaInsulina");
 
     if (!registros.length) {
+        if (ultimaGlicemia) ultimaGlicemia.innerText = "—";
+        if (ultimaDose) ultimaDose.innerText = "0 U";
+        renderizarUltimosRegistros();
         return;
     }
 
     const ultimoRegistro = registros[0];
 
     if (ultimaGlicemia) {
-        ultimaGlicemia.innerText = `${ultimoRegistro.glicemia} mg/dL`;
+        ultimaGlicemia.innerText = formatarGlicemia(ultimoRegistro.glicemia);
     }
 
     if (ultimaDose) {
-        ultimaDose.innerText = `${ultimoRegistro.glicemia} mg/dL`;
+        ultimaDose.innerText = `${Number(ultimoRegistro.dose) || 0} U`;
     }
 
     if (ultimaHora) {
@@ -87,16 +121,17 @@ function atualizarResumoDashboard() {
     }
 
     if (ultimaRefeicao) {
-        ultimaRefeicao.innerText = ultimoRegistro.refeicao;
+        ultimaRefeicao.innerText = ultimoRegistro.refeicao || "Refeição não informada";
     }
 
     if (ultimaGlicemiaResumo) {
-        ultimaGlicemiaResumo.innerText = `${ultimoRegistro.glicemia} mg/dL`;
+        ultimaGlicemiaResumo.innerText = formatarGlicemia(ultimoRegistro.glicemia);
     }
 
     if (ultimaInsulina) {
-        ultimaInsulina.innerText = `${ultimoRegistro.glicemia} mg/dL`;
+        ultimaInsulina.innerText = `${Number(ultimoRegistro.dose) || 0} U`;
     }
+    renderizarUltimosRegistros();
 }
 
 // SALVAR REGISTRO
@@ -104,15 +139,15 @@ function atualizarResumoDashboard() {
 // Depois persiste em localStorage e atualiza a UI (resumo e gráfico).
 function salvarRegistro() {
     const glicemia = document.getElementById("inputGlicemia").value;
-    const dose = document.getElementById("inputDose").value;
+    const doseInput = document.getElementById("inputDose").value;
+    const dose = doseInput === "" ? 0 : doseInput;
     const hora = document.getElementById("inputHora").value;
+    const refeicao = document.getElementById("inputRefeicao").value;
     // Validação simples: exige que os campos não estejam vazios.
-    if (glicemia === "" || dose === "" || hora === "") {
+    if (glicemia === "" || hora === "" || refeicao === "") {
         alert("Preencha todos os campos!");
         return;
     }
-    const refeicao = obterRefeicao(hora);
-
     // Se estivermos editando um registro existente, atualiza o objeto.
     if (indiceEdicao >= 0) {
         registros[indiceEdicao].glicemia = glicemia;
@@ -156,8 +191,10 @@ function criarGrafico() {
         grafico.destroy(); // remove instância anterior para evitar sobreposição
     }
 
-    // Pega os últimos 7 registros (ou menos) e inverte para ordem cronológica no gráfico
-    const ultimos = [...registros].slice(0, 7).reverse();
+    // O armazenamento mantém o registro mais recente na primeira posição.
+    // Para preservar o fluxo FIFO visual, a janela dos últimos 7 é invertida:
+    // o registro mais antigo aparece à esquerda e o mais recente à direita.
+    const ultimos = registros.slice(0, 7).reverse();
 
     grafico = new Chart(ctx, {
         type: "line",
@@ -165,7 +202,7 @@ function criarGrafico() {
             labels: ultimos.map((registro) => registro.hora),
             datasets: [{
                 label: "Glicemia",
-                data: ultimos.map((registro) => Number(registro.glicemia)),
+                data: ultimos.map((registro) => Math.min(Number(registro.glicemia) || 0, 600)),
                 borderColor: "#c0392b",
                 backgroundColor: "rgba(192, 57, 43, .15)",
                 fill: true,
@@ -178,6 +215,16 @@ function criarGrafico() {
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label(context) {
+                            const registro = ultimos[context.dataIndex];
+                            return Number(registro.glicemia) > 600 || String(registro.glicemia).toUpperCase() === "HI"
+                                ? "Glicemia: HI"
+                                : `Glicemia: ${registro.glicemia} mg/dL`;
+                        }
+                    }
                 }
             }
         }

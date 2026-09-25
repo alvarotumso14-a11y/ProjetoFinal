@@ -4,6 +4,15 @@
 let registros = JSON.parse(localStorage.getItem("registros")) || [];
 let indiceRegistroEdicao = -1;
 
+function formatarGlicemia(valor) {
+    return String(valor).toUpperCase() === "HI" || Number(valor) > 600 ? "HI" : `${valor} mg/dL`;
+}
+
+function dataParaComparacao(data) {
+    const partes = String(data || "").split("/");
+    return partes.length === 3 ? `${partes[2]}-${partes[1].padStart(2, "0")}-${partes[0].padStart(2, "0")}` : data;
+}
+
 function escaparHtml(valor) {
     return String(valor ?? "")
         .replace(/&/g, "&amp;")
@@ -42,14 +51,14 @@ function atualizarHistorico() {
                         <span class="metric-pill metric-glicemia">G</span>
                         <div>
                             <p class="registro-label">Glicemia</p>
-                            <h3>${escaparHtml(registro.glicemia)} mg/dL</h3>
+                            <h3>${escaparHtml(formatarGlicemia(registro.glicemia))}</h3>
                         </div>
                     </div>
 
                     <div class="registro-meta">
                         <div>
                             <span class="meta-label">Dose</span>
-                            <strong>${escaparHtml(registro.dose)} U</strong>
+                            <strong>${Number(registro.dose) || 0} U</strong>
                         </div>
                         <div>
                             <span class="meta-label">Hora</span>
@@ -104,7 +113,6 @@ function salvarEdicaoRegistro(event) {
     registro.dose = document.getElementById("editRegistroDose").value;
     registro.hora = document.getElementById("editRegistroHora").value;
     registro.observacao = document.getElementById("editRegistroObservacao").value.trim();
-    registro.refeicao = obterRefeicao(registro.hora);
     localStorage.setItem("registros", JSON.stringify(registros));
     atualizarHistorico();
     fecharModalEdicao();
@@ -124,11 +132,13 @@ const pesquisa = document.getElementById("pesquisa");
 
 if (pesquisa) {
     pesquisa.addEventListener("input", function () {
-        const texto = pesquisa.value.toLowerCase();
+        const texto = pesquisa.value;
         const cards = document.querySelectorAll(".registro-item");
 
         cards.forEach((card) => {
-            if (card.innerText.toLowerCase().includes(texto)) {
+            const index = Array.from(cards).indexOf(card);
+            const corresponde = !texto || dataParaComparacao(registros[index]?.data) === texto;
+            if (corresponde) {
                 card.style.display = "flex";
             } else {
                 card.style.display = "none";

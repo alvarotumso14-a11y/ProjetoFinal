@@ -25,17 +25,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const fatorSensibilidade = document.getElementById("fatorSensibilidadeInicial").value;
         const hgtAlvo = document.getElementById("hgtAlvoInicial").value;
 
-        if (!idade || !tipoDiabetes || !fatorSensibilidade || !hgtAlvo) {
-            erro.textContent = "Preencha todos os campos para continuar.";
+        if (!idade || Number(idade) < 1 || Number(idade) > 120 || !tipoDiabetes || !fatorSensibilidade || !hgtAlvo) {
+            erro.textContent = "Preencha todos os campos com valores válidos para continuar.";
             erro.hidden = false;
             return;
         }
 
         const dados = {
             idade,
+            idadeInicial: Number(idade),
             tipoDiabetes,
             fatorSensibilidade: Number(fatorSensibilidade),
-            hgtAlvo: Number(hgtAlvo)
+            hgtAlvo: Number(hgtAlvo),
+            idadeDataReferencia: new Date().toISOString()
         };
 
         const usuarioAtual = usuario || {};

@@ -13,6 +13,20 @@ document.addEventListener('DOMContentLoaded', () => {
         hgtAlvo: ''
     };
 
+    function calcularIdadeAtual(profile) {
+        const idadeInicial = Number(profile.idadeInicial ?? profile.idade);
+        if (!Number.isFinite(idadeInicial) || idadeInicial < 1) return '';
+
+        const referencia = new Date(profile.idadeDataReferencia || new Date().toISOString());
+        const agora = new Date();
+        let idade = idadeInicial;
+        let aniversarios = agora.getFullYear() - referencia.getFullYear();
+        const aindaNaoCompletou = agora.getMonth() < referencia.getMonth()
+            || (agora.getMonth() === referencia.getMonth() && agora.getDate() < referencia.getDate());
+        if (aindaNaoCompletou) aniversarios -= 1;
+        return String(Math.max(idade, idade + aniversarios));
+    }
+
     function getProfile() {
         try {
             const raw = localStorage.getItem('profile');
@@ -28,6 +42,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateUI(profile) {
+        const idadeAtual = calcularIdadeAtual(profile);
+        if (idadeAtual) {
+            if (!profile.idadeInicial) {
+                profile.idadeInicial = Number(profile.idade);
+            }
+            profile.idade = idadeAtual;
+            localStorage.setItem('profile', JSON.stringify(profile));
+        }
         // Profile page fields
         const map = {
             nome: '#nome',
@@ -155,14 +177,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="edit-form">
                         <p class="form-intro">Atualize suas informações para personalizar sua experiência.</p>
                         <div class="form-grid">
-                            <label for="editNome">Nome completo<input type="text" id="editNome" /></label>
-                            <label for="editTipo">Tipo de diabetes<input type="text" id="editTipo" /></label>
-                            <label for="editIdade">Idade<input type="number" id="editIdade" min="1" /></label>
-                            <label for="editEmail">E-mail<input type="email" id="editEmail" /></label>
-                            <label for="editCelular">Celular<input type="tel" id="editCelular" /></label>
-                            <label for="editFatorSensibilidade">Fator de sensibilidade<input type="number" id="editFatorSensibilidade" step="0.1" /></label>
-                            <label for="editHgtAlvo">HGT alvo (mg/dL)<input type="number" id="editHgtAlvo" step="0.1" /></label>
-                            <label class="full-width" for="editPhoto">Foto do perfil<input type="file" id="editPhoto" accept="image/*" /></label>
+                            <label for="editTipo">Tipo de diabetes<input type="text" id="editTipo" readonly></label>
+                            <label for="editIdade">Idade<input type="number" id="editIdade" readonly required></label>
+                            <label for="editEmail">E-mail<input type="email" id="editEmail" required></label>
+                            <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="numeric" maxlength="11" placeholder="Somente números"></label>
+                            <label for="editFatorSensibilidade">Fator de sensibilidade<input type="number" id="editFatorSensibilidade" min="0.1" step="0.1" required></label>
+                            <label for="editHgtAlvo">HGT alvo (mg/dL)<input type="number" id="editHgtAlvo" min="1" max="600" step="0.1" required></label>
+                            <label class="full-width" for="editPhoto">Foto do perfil<input type="file" id="editPhoto" accept="image/*"></label>
                         </div>
                         <div class="modal-actions">
                             <button id="cancelProfileBtn" type="button" class="button-secondary">Cancelar</button>
@@ -180,14 +201,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cancelBtn) cancelBtn.onclick = closeModal;
         const saveBtn = document.getElementById('saveProfileBtn');
         if (saveBtn) saveBtn.onclick = saveFromModal;
+        const celularInput = document.getElementById('editCelular');
+        if (celularInput) {
+            celularInput.addEventListener('input', () => {
+                celularInput.value = celularInput.value.replace(/\D/g, '').slice(0, 11);
+            });
+        }
     }
 
     function openModal() {
         ensureModal();
         const profile = getProfile();
-        document.getElementById('editNome').value = profile.nome || '';
         document.getElementById('editTipo').value = profile.tipo || '';
-        document.getElementById('editIdade').value = profile.idade || '';
+        document.getElementById('editIdade').value = calcularIdadeAtual(profile);
         document.getElementById('editEmail').value = profile.email || '';
         document.getElementById('editCelular').value = profile.celular || '';
         document.getElementById('editFatorSensibilidade').value = profile.fatorSensibilidade || '';
@@ -207,38 +233,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fecha o modal após salvar.
     function saveFromModal() {
         const profile = getProfile();
-        profile.nome = document.getElementById('editNome').value || '';
-        profile.tipo = document.getElementById('editTipo').value || '';
-        profile.idade = document.getElementById('editIdade').value || '';
-        profile.email = document.getElementById('editEmail').value || '';
-        profile.celular = document.getElementById('editCelular').value || '';
-        profile.fatorSensibilidade = document.getElementById('editFatorSensibilidade').value || '';
-        profile.hgtAlvo = document.getElementById('editHgtAlvo').value || '';
+        if (!profile.idade) {
+            alert('A idade é obrigatória. Complete a configuração inicial antes de salvar.');
+            return;
+        }
+        const email = document.getElementById('editEmail').value.trim();
+        const fatorSensibilidade = Number(document.getElementById('editFatorSensibilidade').value);
+        const hgtAlvo = Number(document.getElementById('editHgtAlvo').value);
+        if (!email || !Number.isFinite(fatorSensibilidade) || fatorSensibilidade <= 0 || !Number.isFinite(hgtAlvo) || hgtAlvo <= 0 || hgtAlvo > 600) {
+            alert('Informe um e-mail, fator de sensibilidade e HGT alvo válidos. O HGT alvo deve ser no máximo 600.');
+            return;
+        }
+        profile.email = email;
+        profile.celular = document.getElementById('editCelular').value.replace(/\D/g, '').slice(0, 11);
+        profile.fatorSensibilidade = fatorSensibilidade;
+        profile.hgtAlvo = hgtAlvo;
 
         // Salva também na estrutura de usuário para compatibilidade com o dashboard e o cadastro
         const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
         if (usuario) {
             usuario.fatorSensibilidade = profile.fatorSensibilidade;
             usuario.hgtAlvo = profile.hgtAlvo;
+            usuario.email = profile.email;
+            usuario.celular = profile.celular;
+            usuario.idade = profile.idade;
             localStorage.setItem('usuario', JSON.stringify(usuario));
         }
 
-        // Se o usuário escolheu uma imagem, lê como data URL para salvar no localStorage.
         const fileInput = document.getElementById('editPhoto');
         if (fileInput && fileInput.files && fileInput.files[0]) {
-            const file = fileInput.files[0];
             const reader = new FileReader();
-            reader.onload = function (e) {
-                profile.photo = e.target.result; // data:image/... base64
+            reader.onload = (event) => {
+                profile.photo = event.target.result;
                 saveProfile(profile);
                 closeModal();
             };
-            reader.readAsDataURL(file);
-        } else {
-            // sem nova foto: mantém a existente
-            saveProfile(profile);
-            closeModal();
+            reader.onerror = () => alert('Não foi possível carregar a foto selecionada.');
+            reader.readAsDataURL(fileInput.files[0]);
+            return;
         }
+
+        saveProfile(profile);
+        closeModal();
     }
 
     // expose editarPerfil to global scope for existing onclick handlers
@@ -250,12 +286,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-async function logout() {
-    try {
-        await UsuarioApi.logout();
-        window.location.href = 'login.html'; // Redireciona para a página de login
-    } catch (error) {
-        console.error('Erro ao fazer logout:', error);
-        alert(error.message || 'Erro ao se comunicar com o servidor.');
-    }
+function logout() {
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('profile');
+    localStorage.removeItem('usuario');
+    localStorage.removeItem('authToken');
+    window.location.href = 'login.html';
 }
