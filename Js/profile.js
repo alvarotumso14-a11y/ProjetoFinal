@@ -208,28 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('saveProfileBtn');
     if (saveBtn) saveBtn.onclick = saveFromModal;
 
-// Adicionar validação para limitar os valores de glicemia e dose
-document.addEventListener("DOMContentLoaded", () => {
-    const glicemiaInput = document.getElementById("editRegistroGlicemia");
-    const doseInput = document.getElementById("editRegistroDose");
-
-    if (glicemiaInput) {
-        glicemiaInput.addEventListener("input", () => {
-            if (Number(glicemiaInput.value) > 600) {
-                glicemiaInput.value = 600; // Limita o valor a 600
-            }
-        });
-    }
-
-    if (doseInput) {
-        doseInput.addEventListener("input", () => {
-            if (Number(doseInput.value) > 600) {
-                doseInput.value = 600; // Limita o valor a 600
-            }
-        });
-    }
-});
-
     const celularInput = document.getElementById('editCelular');
     if (celularInput) {
         celularInput.addEventListener('input', () => {

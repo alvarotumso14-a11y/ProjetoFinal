@@ -1207,6 +1207,8 @@ header button:hover {
     background: linear-gradient(180deg, rgba(215,38,56,0.08) 0%, rgba(255,255,255,0.9) 100%);
     margin-bottom: 30px;
     border: 1px solid rgba(215,38,56,0.12);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .calc-resultado.mostrar {
@@ -1220,9 +1222,11 @@ header button:hover {
 }
 
 .calc-resultado .valor {
-    font-size: 42px;
+    font-size: clamp(24px, 6vw, 42px);
     font-weight: 800;
     color: var(--vermelho);
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .calc-resultado .classificacao {

@@ -10,32 +10,11 @@ function getConfiguracaoDose() {
     };
 }
 
-function calcularDoseCorrecaPagina() {
-// Adicionar validação para limitar o HGT atual
-const inputHgtAtual = document.getElementById("inputHgtAtual");
-
-if (inputHgtAtual) {
-    inputHgtAtual.addEventListener("input", () => {
-        if (Number(inputHgtAtual.value) > 600) {
-            inputHgtAtual.value = 600; // Limita o valor a 600
-        }
-    });
-}
-    
-
-    const config = getConfiguracaoDose();
-    const hgtAlvo = config.hgtAlvo;
-    const fatorSensibilidade = config.fatorSensibilidade;
-
-    atualizarConfiguracaoPerfilNaTela();
-
-    if (!hgtAtual || !hgtAlvo || !fatorSensibilidade) {
-        renderizarResultadoDose(null);
-        return;
-    }
-
-    const dose = calcularDoseCorrecaoDados(hgtAtual, hgtAlvo, fatorSensibilidade);
-    renderizarResultadoDose(dose);
+// Fórmula: (HGT atual - HGT alvo) / fator de sensibilidade
+function calcularDoseCorrecaoDados(hgtAtual, hgtAlvo, fatorSensibilidade) {
+    if (!fatorSensibilidade) return null;
+    const dose = (hgtAtual - hgtAlvo) / fatorSensibilidade;
+    return dose > 0 ? Number(dose.toFixed(1)) : 0;
 }
 
 function renderizarResultadoDose(dose) {
@@ -132,7 +111,13 @@ window.addEventListener('load', () => {
     }
 
     if (inputHgtAtual) {
-        inputHgtAtual.addEventListener('input', calcularDoseCorrecaPagina);
+        // Limita a digitação do HGT atual a 600 (evita valores fora da faixa e resultado "quebrando" o layout)
+        inputHgtAtual.addEventListener('input', () => {
+            if (Number(inputHgtAtual.value) > 600) {
+                inputHgtAtual.value = 600;
+            }
+            calcularDoseCorrecaPagina();
+        });
     }
 
     atualizarConfiguracaoPerfilNaTela();

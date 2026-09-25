@@ -5,7 +5,18 @@ let registros = JSON.parse(localStorage.getItem("registros")) || [];
 let indiceRegistroEdicao = -1;
 
 function formatarGlicemia(valor) {
-    return String(valor).toUpperCase() === "HI" || Number(valor) > 600 ? "HI" : `${valor} mg/dL`;
+    const numero = Number(valor);
+    const textoValor = String(valor).toUpperCase();
+
+    if (textoValor === "HI" || (Number.isFinite(numero) && numero > 600)) {
+        return "HI";
+    }
+
+    if (textoValor === "LO" || (Number.isFinite(numero) && numero < 20)) {
+        return "LO";
+    }
+
+    return `${valor} mg/dL`;
 }
 
 function dataParaComparacao(data) {
@@ -148,5 +159,26 @@ if (pesquisa) {
 }
 
 // Inicialização
-window.addEventListener("load", atualizarHistorico);
+window.addEventListener("load", () => {
+    atualizarHistorico();
+
+    // Limita a digitação da glicemia a 600 (valores acima disso são exibidos como "HI")
+    const glicemiaInput = document.getElementById("editRegistroGlicemia");
+    if (glicemiaInput) {
+        glicemiaInput.addEventListener("input", () => {
+            if (Number(glicemiaInput.value) > 600) {
+                glicemiaInput.value = 600;
+            }
+        });
+    }
+
+    const doseInput = document.getElementById("editRegistroDose");
+    if (doseInput) {
+        doseInput.addEventListener("input", () => {
+            if (Number(doseInput.value) > 600) {
+                doseInput.value = 600;
+            }
+        });
+    }
+});
 document.getElementById("formEdicaoRegistro")?.addEventListener("submit", salvarEdicaoRegistro);
