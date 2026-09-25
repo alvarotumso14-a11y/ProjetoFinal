@@ -11,14 +11,17 @@ function getConfiguracaoDose() {
 }
 
 function calcularDoseCorrecaPagina() {
-    const inputHgtAtual = document.getElementById('inputHgtAtual');
-    let hgtAtual = parseFloat(inputHgtAtual?.value || '0');
+// Adicionar validação para limitar o HGT atual
+const inputHgtAtual = document.getElementById("inputHgtAtual");
 
-    // Limitar o HGT atual a 600
-    if (hgtAtual > 600) {
-        hgtAtual = 600;
-        inputHgtAtual.value = 600; // Atualiza o valor no campo de entrada
-    }
+if (inputHgtAtual) {
+    inputHgtAtual.addEventListener("input", () => {
+        if (Number(inputHgtAtual.value) > 600) {
+            inputHgtAtual.value = 600; // Limita o valor a 600
+        }
+    });
+}
+    
 
     const config = getConfiguracaoDose();
     const hgtAlvo = config.hgtAlvo;
