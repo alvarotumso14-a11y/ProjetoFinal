@@ -1113,6 +1113,12 @@ header button:hover {
     flex-direction: column;
     gap: 20px;
 }
+.warning-text {
+    color: red;
+    font-size: 0.9rem;
+    display: none; /* Esconde o aviso por padrão */
+    margin-top: 4px;
+}
 
 /* ==========================================================
    Calculadora HbA1c

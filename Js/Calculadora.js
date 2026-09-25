@@ -5,18 +5,34 @@ function getConfiguracaoDose() {
 
     return {
         hgtAtual: parseFloat(localStorage.getItem('ultimoHGT') || '0'),
-        hgtAlvo: Number(config.hgtAlvo ?? 0),
-        fatorSensibilidade: Number(config.fatorSensibilidade ?? 0)
+        hgtAlvo: Math.min(Number(config.hgtAlvo ?? 0), 600), // Limita a 600
+        fatorSensibilidade: Math.min(Number(config.fatorSensibilidade ?? 0), 600) // Limita a 600
     };
 }
 
-function calcularDoseCorrecaoDados(hgtAtual, hgtAlvo, fatorSensibilidade) {
-    if (!hgtAtual || !hgtAlvo || !fatorSensibilidade) {
-        return null;
+function calcularDoseCorrecaPagina() {
+    const inputHgtAtual = document.getElementById('inputHgtAtual');
+    let hgtAtual = parseFloat(inputHgtAtual?.value || '0');
+
+    // Limitar o HGT atual a 600
+    if (hgtAtual > 600) {
+        hgtAtual = 600;
+        inputHgtAtual.value = 600; // Atualiza o valor no campo de entrada
     }
 
-    const dose = (hgtAtual - hgtAlvo) / fatorSensibilidade;
-    return dose <= 0 ? 0 : Number(dose.toFixed(1));
+    const config = getConfiguracaoDose();
+    const hgtAlvo = config.hgtAlvo;
+    const fatorSensibilidade = config.fatorSensibilidade;
+
+    atualizarConfiguracaoPerfilNaTela();
+
+    if (!hgtAtual || !hgtAlvo || !fatorSensibilidade) {
+        renderizarResultadoDose(null);
+        return;
+    }
+
+    const dose = calcularDoseCorrecaoDados(hgtAtual, hgtAlvo, fatorSensibilidade);
+    renderizarResultadoDose(dose);
 }
 
 function renderizarResultadoDose(dose) {

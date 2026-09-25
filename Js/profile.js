@@ -168,46 +168,71 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.id = 'profileEditModal';
         modal.className = 'modal';
         modal.innerHTML = `
-            <div class="modal-box">
-                <div class="modal-topo">
-                    <h2>Editar Perfil</h2>
-                    <button class="close" type="button" aria-label="Fechar">&times;</button>
-                </div>
-                <div class="modal-corpo">
-                    <div class="edit-form">
-                        <p class="form-intro">Atualize suas informações para personalizar sua experiência.</p>
-                        <div class="form-grid">
-                            <label for="editTipo">Tipo de diabetes<input type="text" id="editTipo" readonly></label>
-                            <label for="editIdade">Idade<input type="number" id="editIdade" readonly required></label>
-                            <label for="editEmail">E-mail<input type="email" id="editEmail" required></label>
-                            <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="numeric" maxlength="11" placeholder="Somente números"></label>
-                            <label for="editFatorSensibilidade">Fator de sensibilidade<input type="number" id="editFatorSensibilidade" min="0.1" step="0.1" required></label>
-                            <label for="editHgtAlvo">HGT alvo (mg/dL)<input type="number" id="editHgtAlvo" min="1" max="600" step="0.1" required></label>
-                            <label class="full-width" for="editPhoto">Foto do perfil<input type="file" id="editPhoto" accept="image/*"></label>
-                        </div>
-                        <div class="modal-actions">
-                            <button id="cancelProfileBtn" type="button" class="button-secondary">Cancelar</button>
-                            <button id="saveProfileBtn" type="button">Salvar alterações</button>
-                        </div>
+        <div class="modal-box">
+            <div class="modal-topo">
+                <h2>Editar Perfil</h2>
+                <button class="close" type="button" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-corpo">
+                <div class="edit-form">
+                    <p class="form-intro">Atualize suas informações para personalizar sua experiência.</p>
+                    <div class="form-grid">
+                        <label for="editTipo">Tipo de diabetes<input type="text" id="editTipo" readonly></label>
+                        <label for="editIdade">Idade<input type="number" id="editIdade" readonly required></label>
+                        <label for="editEmail">E-mail<input type="email" id="editEmail" required></label>
+                        <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="numeric" maxlength="11" placeholder="Somente números"></label>
+                        <label for="editFatorSensibilidade">Fator de sensibilidade
+                            <input type="number" id="editFatorSensibilidade" min="1" max="600" step="0.1" required>
+                            <span class="warning-text" id="fatorWarning">O limite máximo é 600.</span>
+                        </label>
+                        <label for="editHgtAlvo">HGT alvo (mg/dL)
+                            <input type="number" id="editHgtAlvo" min="1" max="600" step="0.1" required>
+                            <span class="warning-text" id="hgtWarning">O limite máximo é 600.</span>
+                        </label>
+                        <label class="full-width" for="editPhoto">Foto do perfil<input type="file" id="editPhoto" accept="image/*"></label>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="cancelProfileBtn" type="button" class="button-secondary">Cancelar</button>
+                        <button id="saveProfileBtn" type="button">Salvar alterações</button>
                     </div>
                 </div>
-            </div>`;
+            </div>
+        </div>`;
         document.body.appendChild(modal);
 
-        // wire buttons
-        const closeEl = modal.querySelector('.close');
-        if (closeEl) closeEl.onclick = closeModal;
-        const cancelBtn = document.getElementById('cancelProfileBtn');
-        if (cancelBtn) cancelBtn.onclick = closeModal;
-        const saveBtn = document.getElementById('saveProfileBtn');
-        if (saveBtn) saveBtn.onclick = saveFromModal;
-        const celularInput = document.getElementById('editCelular');
-        if (celularInput) {
-            celularInput.addEventListener('input', () => {
-                celularInput.value = celularInput.value.replace(/\D/g, '').slice(0, 11);
-            });
-        }
+    // wire buttons
+    const closeEl = modal.querySelector('.close');
+    if (closeEl) closeEl.onclick = closeModal;
+    const cancelBtn = document.getElementById('cancelProfileBtn');
+    if (cancelBtn) cancelBtn.onclick = closeModal;
+    const saveBtn = document.getElementById('saveProfileBtn');
+    if (saveBtn) saveBtn.onclick = saveFromModal;
+
+    // Adicionar validação para limitar os valores a 600 e exibir aviso
+    const fatorInput = document.getElementById('editFatorSensibilidade');
+    const hgtAlvoInput = document.getElementById('editHgtAlvo');
+
+    [fatorInput, hgtAlvoInput].forEach((input) => {
+        input.addEventListener('input', () => {
+            const warningId = input.id === 'editFatorSensibilidade' ? 'fatorWarning' : 'hgtWarning';
+            const warningEl = document.getElementById(warningId);
+
+            if (Number(input.value) > 600) {
+                input.value = 600; // Limita o valor a 600
+                warningEl.style.display = 'block'; // Mostra o aviso
+            } else {
+                warningEl.style.display = 'none'; // Esconde o aviso
+            }
+        });
+    });
+
+    const celularInput = document.getElementById('editCelular');
+    if (celularInput) {
+        celularInput.addEventListener('input', () => {
+            celularInput.value = celularInput.value.replace(/\D/g, '').slice(0, 11);
+        });
     }
+}
 
     function openModal() {
         ensureModal();
@@ -237,18 +262,25 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('A idade é obrigatória. Complete a configuração inicial antes de salvar.');
             return;
         }
+    
         const email = document.getElementById('editEmail').value.trim();
-        const fatorSensibilidade = Number(document.getElementById('editFatorSensibilidade').value);
-        const hgtAlvo = Number(document.getElementById('editHgtAlvo').value);
-        if (!email || !Number.isFinite(fatorSensibilidade) || fatorSensibilidade <= 0 || !Number.isFinite(hgtAlvo) || hgtAlvo <= 0 || hgtAlvo > 600) {
+        let fatorSensibilidade = Number(document.getElementById('editFatorSensibilidade').value);
+        let hgtAlvo = Number(document.getElementById('editHgtAlvo').value);
+    
+        // Limitar os valores a 600
+        if (fatorSensibilidade > 600) fatorSensibilidade = 600;
+        if (hgtAlvo > 600) hgtAlvo = 600;
+    
+        if (!email || !Number.isFinite(fatorSensibilidade) || fatorSensibilidade <= 0 || !Number.isFinite(hgtAlvo) || hgtAlvo <= 0) {
             alert('Informe um e-mail, fator de sensibilidade e HGT alvo válidos. O HGT alvo deve ser no máximo 600.');
             return;
         }
+    
         profile.email = email;
         profile.celular = document.getElementById('editCelular').value.replace(/\D/g, '').slice(0, 11);
         profile.fatorSensibilidade = fatorSensibilidade;
         profile.hgtAlvo = hgtAlvo;
-
+    
         // Salva também na estrutura de usuário para compatibilidade com o dashboard e o cadastro
         const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
         if (usuario) {
@@ -259,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
             usuario.idade = profile.idade;
             localStorage.setItem('usuario', JSON.stringify(usuario));
         }
-
+    
         const fileInput = document.getElementById('editPhoto');
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const reader = new FileReader();
@@ -272,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(fileInput.files[0]);
             return;
         }
-
+    
         saveProfile(profile);
         closeModal();
     }
