@@ -146,3 +146,34 @@ const RegistroApi = {
         });
     }
 };
+
+async function logout() {
+    try {
+        const token = localStorage.getItem('authToken'); // Obtém o token do localStorage
+        if (!token) {
+            alert('Usuário não autenticado.');
+            return;
+        }
+
+        const response = await fetch('https://seu-backend.com/api/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            // Logout bem-sucedido
+            localStorage.removeItem('authToken'); // Remove o token do localStorage
+            alert('Logout realizado com sucesso.');
+            window.location.href = 'login.html'; // Redireciona para a página de login
+        } else {
+            const errorData = await response.json();
+            alert(`Erro ao fazer logout: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+        alert('Erro ao se comunicar com o servidor.');
+    }
+}

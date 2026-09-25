@@ -249,3 +249,13 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUI(profile);
 
 });
+
+async function logout() {
+    try {
+        await UsuarioApi.logout();
+        window.location.href = 'login.html'; // Redireciona para a página de login
+    } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+        alert(error.message || 'Erro ao se comunicar com o servidor.');
+    }
+}
