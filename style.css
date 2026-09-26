@@ -545,6 +545,7 @@ header button:hover {
 }
 
 .registro-observacao {
+    min-width: 0;
     margin: 0;
     padding: 12px 14px;
     border-left: 3px solid var(--vermelho);
@@ -552,6 +553,7 @@ header button:hover {
     background: #fff7f7;
     color: var(--cinza-texto);
     line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
 .registro-observacao span {
@@ -562,6 +564,35 @@ header button:hover {
     font-weight: 700;
     letter-spacing: .08em;
     text-transform: uppercase;
+}
+
+.registro-observacao .registro-observacao-texto {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    white-space: pre-wrap;
+}
+
+.registro-observacao .registro-observacao-texto.expandido {
+    display: block;
+    overflow: visible;
+}
+
+.registro-observacao-mais {
+    margin-top: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--vermelho);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.registro-observacao-mais:focus-visible {
+    outline: 2px solid var(--vermelho);
+    outline-offset: 3px;
 }
 
 .registro-header {

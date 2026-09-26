@@ -80,7 +80,13 @@ function atualizarHistorico() {
                             <strong>${escaparHtml(registro.data)}</strong>
                         </div>
                     </div>
-                    ${registro.observacao ? `<p class="registro-observacao"><span>Observação</span>${escaparHtml(registro.observacao)}</p>` : ""}
+                    ${registro.observacao ? `
+                        <div class="registro-observacao">
+                            <span>Observação</span>
+                            <span class="registro-observacao-texto" id="observacao-${index}">${escaparHtml(registro.observacao)}</span>
+                            <button class="registro-observacao-mais" type="button" aria-expanded="false" aria-controls="observacao-${index}" hidden>Ler mais</button>
+                        </div>
+                    ` : ""}
                 </div>
 
                 <div class="botoesRegistro">
@@ -91,7 +97,44 @@ function atualizarHistorico() {
             </div>
         `;
     });
+
+    atualizarBotoesObservacao(lista);
 }
+
+function atualizarBotoesObservacao(lista) {
+    lista.querySelectorAll(".registro-observacao-texto").forEach((texto) => {
+        const botao = texto.parentElement.querySelector(".registro-observacao-mais");
+        if (!botao || botao.getAttribute("aria-expanded") === "true") {
+            return;
+        }
+
+        botao.hidden = texto.scrollHeight <= texto.clientHeight + 1;
+    });
+}
+
+window.addEventListener("resize", () => {
+    const lista = document.getElementById("historicoLista");
+    if (lista) {
+        atualizarBotoesObservacao(lista);
+    }
+});
+
+document.getElementById("historicoLista")?.addEventListener("click", (event) => {
+    const botao = event.target.closest(".registro-observacao-mais");
+    if (!botao) {
+        return;
+    }
+
+    const texto = document.getElementById(botao.getAttribute("aria-controls"));
+    if (!texto) {
+        return;
+    }
+
+    const expandido = botao.getAttribute("aria-expanded") !== "true";
+    botao.setAttribute("aria-expanded", String(expandido));
+    texto.classList.toggle("expandido", expandido);
+    botao.textContent = expandido ? "Ler menos" : "Ler mais";
+});
 
 // EDIÇÃO DE REGISTROS
 function editarRegistro(index) {
