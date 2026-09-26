@@ -43,8 +43,6 @@ function atualizarHistorico() {
         return;
     }
 
-    lista.innerHTML = "";
-
     if (registros.length === 0) {
         lista.innerHTML = `
             <div class="registro">
@@ -54,8 +52,7 @@ function atualizarHistorico() {
         return;
     }
 
-    registros.forEach((registro, index) => {
-        lista.innerHTML += `
+    lista.innerHTML = registros.map((registro, index) => `
             <div class="registro-item">
                 <div class="registro-main">
                     <div class="registro-header">
@@ -95,8 +92,7 @@ function atualizarHistorico() {
                     </button>
                 </div>
             </div>
-        `;
-    });
+        `).join("");
 
     atualizarBotoesObservacao(lista);
 }
@@ -189,8 +185,7 @@ if (pesquisa) {
         const texto = pesquisa.value;
         const cards = document.querySelectorAll(".registro-item");
 
-        cards.forEach((card) => {
-            const index = Array.from(cards).indexOf(card);
+        cards.forEach((card, index) => {
             const corresponde = !texto || dataParaComparacao(registros[index]?.data) === texto;
             if (corresponde) {
                 card.style.display = "flex";

@@ -570,6 +570,7 @@ header button:hover {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 4;
+    line-clamp: 4;
     overflow: hidden;
     white-space: pre-wrap;
 }
@@ -642,14 +643,6 @@ header button:hover {
 
 .metric-glicemia {
     background: linear-gradient(135deg, #d72638, #a81927);
-}
-
-.metric-refeicao {
-    background: linear-gradient(135deg, #e76f51, #c94f3d);
-}
-
-.metric-medicao {
-    background: linear-gradient(135deg, #f39c12, #d97706);
 }
 
 .registro:last-child {
@@ -731,17 +724,6 @@ header button:hover {
     margin-top: 20px;
 }
 
-.perfil-box {
-    background: var(--branco);
-    padding: 28px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-    display: flex;
-    align-items: center;
-    gap: 28px;
-}
-
-
 /* Novo: layout em cartões para a página de perfil */
 .perfil-cards {
     display: grid;
@@ -820,45 +802,6 @@ header button:hover {
     flex: 0 0 auto;
 }
 
-.info-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    flex: 1 1 auto;
-}
-
-.info-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 10px;
-}
-
-.badge {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--cinza-fundo);
-    color: var(--vermelho-escuro);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    flex: 0 0 44px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-}
-
-.info .key {
-    font-size: 13px;
-    color: var(--cinza-suave);
-}
-
-.info .value {
-    font-size: 18px;
-    color: #111;
-    margin-top: 4px;
-}
-
 .botao-alt {
     display: inline-flex;
     align-items: center;
@@ -907,13 +850,6 @@ header button:hover {
 
 /* Ajuste para celular: manter igual mas empilhar */
 @media (max-width: 768px) {
-    .perfil-box {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 18px;
-    }
-
     .perfil-cards {
         grid-template-columns: 1fr;
     }
@@ -922,10 +858,6 @@ header button:hover {
         width: 100%;
         max-width: 220px;
         margin-left: 0;
-    }
-
-    .info-row {
-        justify-content: center;
     }
 
     .registro-item {
@@ -1227,26 +1159,6 @@ header button:hover {
     margin-bottom: 16px;
 }
 
-.calc-btn {
-    width: 100%;
-    padding: 16px;
-    border: none;
-    border-radius: 14px;
-    background: linear-gradient(135deg, var(--vermelho) 0%, var(--vermelho-escuro) 100%);
-    color: var(--branco);
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.25s;
-    margin-bottom: 30px;
-    box-shadow: 0 12px 22px rgba(215,38,56,0.18);
-}
-
-.calc-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 14px 26px rgba(215,38,56,0.24);
-}
-
 .calc-resultado {
     display: none;
     text-align: center;
@@ -1291,35 +1203,9 @@ header button:hover {
     color: var(--vermelho);
 }
 
-.classificacao.atencao {
-    background: rgba(230, 126, 34, 0.12);
-    color: #e67e22;
-}
-
 .classificacao.risco {
     background: rgba(167, 25, 39, 0.12);
     color: var(--vermelho-escuro);
-}
-
-.calc-tabela {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 24px;
-    font-size: 15px;
-}
-
-.calc-tabela th,
-.calc-tabela td {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    text-align: left;
-}
-
-.calc-tabela th {
-    color: var(--cinza-suave);
-    font-weight: 700;
-    font-size: 13px;
-    text-transform: uppercase;
 }
 
 .calc-aviso {
@@ -1618,7 +1504,7 @@ header button:hover {
 .btn-verde {
     display: inline-block;
     background: var(--vermelho);
-    color: var(--branco)fff;
+    color: var(--branco);
     text-decoration: none;
     border: none;
     border-radius: 12px;
@@ -1697,7 +1583,7 @@ header button:hover {
 }
 
 .mockup-card {
-    background: var(--branco)fff;
+    background: var(--branco);
     border-radius: 20px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
     padding: 28px 32px;
@@ -1779,7 +1665,7 @@ header button:hover {
     gap: 10px;
     padding: 10px 20px;
     white-space: nowrap;
-    background: var(--branco)fff;
+    background: var(--branco);
     border-radius: 999px;
     border: 1.5px solid #e5e5e5;
     margin: 0 6px;
@@ -1810,7 +1696,7 @@ header button:hover {
 .landing-cta-final {
     text-align: center;
     padding: 96px 48px;
-    background: var(--branco)fff;
+    background: var(--branco);
 }
 
 .landing-cta-final h2 {
@@ -1869,7 +1755,7 @@ header button:hover {
 }
 
 .landing-footer a:hover {
-    color: var(--branco)fff;
+    color: var(--branco);
 }
 
 /* Landing responsivo */
@@ -2252,7 +2138,7 @@ header button:hover {
 }
 
 .landing-sobre {
-    background: var(--branco)fff;
+    background: var(--branco);
     padding: 96px 0;
 }
 
@@ -2307,7 +2193,7 @@ header button:hover {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: var(--branco)fff;
+    color: var(--branco);
 }
 
 .sobre-card-texto strong {
@@ -2362,7 +2248,7 @@ header button:hover {
 }
 
 .faq-item {
-    background: var(--branco)fff;
+    background: var(--branco);
     border-radius: 16px;
     overflow: hidden;
     border: 1.5px solid #e5e5e5;
@@ -2417,7 +2303,7 @@ header button:hover {
 
 .faq-item.aberto .faq-icone {
     background: var(--vermelho);
-    color: var(--branco)fff;
+    color: var(--branco);
     transform: rotate(45deg);
 }
 

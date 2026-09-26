@@ -88,18 +88,27 @@ function renderizarUltimosRegistros() {
         return;
     }
 
-    container.innerHTML = registros.slice(0, 3).map((registro) => `
+    container.innerHTML = registros.slice(0, 3).map(() => `
         <div class="registro dashboard-registro">
             <div class="registro-label">
                 <span class="metric-pill metric-glicemia">G</span>
-                <span>${formatarGlicemia(registro.glicemia)}</span>
+                <span class="registro-glicemia"></span>
             </div>
             <div class="dashboard-registro-info">
-                <strong>${registro.refeicao || "Refeição não informada"}</strong>
-                <span>${registro.hora || "--:--"} · Dose: ${Number(registro.dose) || 0} U</span>
+                <strong></strong>
+                <span></span>
             </div>
         </div>
     `).join("");
+
+    container.querySelectorAll(".dashboard-registro").forEach((card, index) => {
+        const registro = registros[index];
+        card.querySelector(".registro-glicemia").textContent = formatarGlicemia(registro.glicemia);
+        card.querySelector(".dashboard-registro-info strong").textContent =
+            registro.refeicao || "Refeição não informada";
+        card.querySelector(".dashboard-registro-info span").textContent =
+            `${registro.hora || "--:--"} · Dose: ${Number(registro.dose) || 0} U`;
+    });
 }
 
 // Atualização do resumo do dashboard
