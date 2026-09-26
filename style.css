@@ -1989,7 +1989,7 @@ header button:hover {
 }
 
 .auth-card {
-    background: var(--branco)fff;
+    background: var(--branco);
     border-radius: 24px;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
     padding: 48px 44px;
@@ -2114,7 +2114,7 @@ header button:hover {
     font-size: 16px;
     font-family: 'DM Sans', sans-serif;
     color: var(--preto);
-    background: var(--branco)fff;
+    background: var(--branco);
     transition: border-color 0.2s;
     width: 100%;
 }
@@ -2197,6 +2197,16 @@ header button:hover {
 
     .auth-title {
         font-size: 22px;
+    }
+
+    .auth-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .auth-link-small {
+        white-space: normal;
     }
 }
 
