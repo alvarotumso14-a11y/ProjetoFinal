@@ -33,6 +33,10 @@ function fecharModal() {
     if (inputDose) {
         inputDose.value = "";
         inputDose.dataset.manual = "false";
+    }  
+    const inputObservacao = document.getElementById("inputObservacao");
+    if (inputObservacao) {
+        inputObservacao.value = "";
     }
 }
 
@@ -151,6 +155,7 @@ function salvarRegistro() {
     const dose = doseInput === "" ? 0 : doseInput;
     const hora = document.getElementById("inputHora").value;
     const refeicao = document.getElementById("inputRefeicao").value;
+    const observacao = document.getElementById("inputObservacao")?.value.trim() || "";
     // Validação simples: exige que os campos não estejam vazios.
     if (glicemia === "" || hora === "" || refeicao === "") {
         alert("Preencha todos os campos!");
@@ -162,6 +167,8 @@ function salvarRegistro() {
         registros[indiceEdicao].dose = dose;
         registros[indiceEdicao].hora = hora;
         registros[indiceEdicao].refeicao = refeicao;
+        registros[indiceEdicao].observacao = observacao;
+        
         indiceEdicao = -1;
     } else {
         // Senão, adiciona novo registro no início do array (mais recente primeiro).
@@ -170,6 +177,7 @@ function salvarRegistro() {
             dose,
             hora,
             refeicao,
+            observacao,
             data: new Date().toLocaleDateString("pt-BR")
         });
     }
