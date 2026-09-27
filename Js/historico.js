@@ -24,11 +24,6 @@ function dataParaComparacao(data) {
     return partes.length === 3 ? `${partes[2]}-${partes[1].padStart(2, "0")}-${partes[0].padStart(2, "0")}` : data;
 }
 
-function obterDataIso(data) {
-    const normalizada = dataParaComparacao(data);
-    return /^\d{4}-\d{2}-\d{2}$/.test(normalizada) ? normalizada : "";
-}
-
 function escaparHtml(valor) {
     return String(valor ?? "")
         .replace(/&/g, "&amp;")
@@ -209,7 +204,6 @@ const botaoCancelarExportacao = document.getElementById("cancelarExportarPdf");
 const dataInicioPdf = document.getElementById("pdfDataInicio");
 const dataFimPdf = document.getElementById("pdfDataFim");
 const erroPdf = document.getElementById("pdfErro");
-const periodoImpresso = document.getElementById("pdfPeriodoImpresso");
 
 if (
     botaoBaixarPdf &&
@@ -219,8 +213,7 @@ if (
     botaoCancelarExportacao &&
     dataInicioPdf &&
     dataFimPdf &&
-    erroPdf &&
-    periodoImpresso
+    erroPdf
 ) {
     const fecharModalExportacao = () => {
         modalExportarPdf.style.display = "none";
@@ -247,7 +240,7 @@ if (
         }
     });
 
-    formularioExportarPdf.addEventListener("submit", (event) => {
+    formularioExportarPdf.addEventListener("submit", async (event) => {
         event.preventDefault();
         erroPdf.hidden = true;
         erroPdf.textContent = "";
@@ -266,36 +259,31 @@ if (
             return;
         }
 
-        const registrosNoPeriodo = registros.filter((registro) => {
-            const data = obterDataIso(registro.data);
-            return data && data >= inicio && data <= fim;
-        });
-
-        if (registrosNoPeriodo.length === 0) {
-            erroPdf.textContent = "Não há registros no período selecionado.";
+        try {
+            await solicitarPdfAoBackend(inicio, fim);
+            fecharModalExportacao();
+        } catch (erro) {
+            console.error("Não foi possível exportar o histórico em PDF.", erro);
+            erroPdf.textContent = erro.message || "Não foi possível exportar o histórico em PDF.";
             erroPdf.hidden = false;
-            return;
         }
-
-        document.querySelectorAll("#historicoLista .registro-item").forEach((card, index) => {
-            const registro = registros[index];
-            const data = registro ? obterDataIso(registro.data) : "";
-            card.classList.toggle("fora-periodo-pdf", !data || data < inicio || data > fim);
-        });
-
-        const formatador = new Intl.DateTimeFormat("pt-BR");
-        const formatarData = (data) => formatador.format(new Date(`${data}T00:00:00`));
-        periodoImpresso.textContent = `Registros de ${formatarData(inicio)} até ${formatarData(fim)}`;
-        fecharModalExportacao();
-        window.print();
     });
+}
 
-    window.addEventListener("afterprint", () => {
-        document.querySelectorAll(".fora-periodo-pdf").forEach((card) => {
-            card.classList.remove("fora-periodo-pdf");
-        });
-        periodoImpresso.textContent = "";
-    });
+async function solicitarPdfAoBackend(dataInicio, dataFim) {
+    /*
+     * Ponto de integração com o backend:
+     * 1. Configure a URL/rota e o método HTTP conforme o contrato da API.
+     * 2. Ajuste os nomes e o formato dos parâmetros para dataInicio/dataFim
+     *    (por exemplo, query string ou JSON no corpo da requisição).
+     * 3. Inclua aqui os cabeçalhos de autenticação exigidos pelo backend.
+     * 4. Quando o endpoint estiver pronto, leia a resposta como Blob e dispare
+     *    o download usando URL.createObjectURL; o endpoint deve retornar PDF.
+     * A URL base existente para a API fica em Js/Api.js (API_BASE_URL).
+     */
+    void dataInicio;
+    void dataFim;
+    throw new Error("A exportação em PDF ainda precisa ser conectada ao endpoint do backend.");
 }
 
 // Inicialização

@@ -1125,10 +1125,6 @@ header button:hover {
     margin-top: 0;
 }
 
-.pdf-periodo-impresso {
-    display: none;
-}
-
 .pesquisa input {
     width: 100%;
     padding: 15px;
@@ -2651,101 +2647,4 @@ header button:hover {
 
 :root[data-theme="dark"] .landing-footer {
     background: #090909;
-}
-
-@media print {
-    @page {
-        margin: 16mm;
-    }
-
-    :root[data-theme="dark"] {
-        --branco: #fff;
-        --cinza-fundo: #fff;
-        --cinza-borda: #bbb;
-        --cinza-texto: #111;
-        --cinza-suave: #444;
-        --preto: #111;
-    }
-
-    body,
-    :root[data-theme="dark"] body {
-        background: #fff;
-        color: #111;
-    }
-
-    .topbar,
-    .sidebar,
-    .menu-overlay,
-    .pesquisa,
-    .pdf-button,
-    .botoesRegistro,
-    .modal,
-    .user-top {
-        display: none !important;
-    }
-
-    .container,
-    .conteudo {
-        display: block;
-        width: 100%;
-        max-width: none;
-        min-height: 0;
-        margin: 0;
-        padding: 0;
-    }
-
-    .conteudo header {
-        margin-bottom: 16px;
-    }
-
-    .pdf-periodo-impresso {
-        display: block;
-        margin-top: 4px;
-        color: #111;
-    }
-
-    .conteudo header h1,
-    .conteudo header p,
-    .titulo h2,
-    .registro-header h3,
-    .registro-meta strong,
-    .registro-label span:last-child,
-    .registro-observacao {
-        color: #111;
-    }
-
-    .historico,
-    .registro,
-    .registro-item {
-        background: #fff;
-        border: 1px solid #bbb;
-        box-shadow: none;
-        color: #111;
-    }
-
-    .historico {
-        margin: 0;
-        padding: 0;
-    }
-
-    .registro-item {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    .registro-item.fora-periodo-pdf {
-        display: none !important;
-    }
-
-    .registro-item:not(.fora-periodo-pdf) {
-        display: flex !important;
-    }
-
-    .registro-observacao {
-        background: #f5f5f5;
-    }
-
-    :root[data-theme="dark"] .registro-observacao {
-        background: #f5f5f5;
-    }
 }
