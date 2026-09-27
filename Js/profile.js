@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fatorSensibilidade: '',
         hgtAlvo: ''
     };
+    let salvandoPerfil = false;
 
     function calcularIdadeAtual(profile) {
         const idadeInicial = Number(profile.idadeInicial ?? profile.idade);
@@ -236,6 +237,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openModal() {
         ensureModal();
+        if (!salvandoPerfil) {
+            const botaoSalvar = document.getElementById('saveProfileBtn');
+            botaoSalvar.disabled = false;
+            botaoSalvar.textContent = 'Salvar alterações';
+        }
         const profile = getProfile();
         document.getElementById('editTipo').value = profile.tipo || '';
         document.getElementById('editIdade').value = calcularIdadeAtual(profile);
@@ -257,6 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // para dataURL usando FileReader e persiste tudo em localStorage via saveProfile().
     // Fecha o modal após salvar.
     function saveFromModal() {
+        if (salvandoPerfil) return;
+
         const profile = getProfile();
         if (!profile.idade) {
             alert('A idade é obrigatória. Complete a configuração inicial antes de salvar.');
@@ -275,6 +283,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Informe um e-mail, fator de sensibilidade e HGT alvo válidos. O HGT alvo deve ser no máximo 600.');
             return;
         }
+
+        salvandoPerfil = true;
+        const botaoSalvar = document.getElementById('saveProfileBtn');
+        botaoSalvar.disabled = true;
+        botaoSalvar.textContent = 'Salvando...';
     
         profile.email = email;
         profile.celular = document.getElementById('editCelular').value.replace(/\D/g, '').slice(0, 11);
@@ -298,14 +311,23 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (event) => {
                 profile.photo = event.target.result;
                 saveProfile(profile);
+                salvandoPerfil = false;
+                botaoSalvar.textContent = 'Salvo';
                 closeModal();
             };
-            reader.onerror = () => alert('Não foi possível carregar a foto selecionada.');
+            reader.onerror = () => {
+                salvandoPerfil = false;
+                botaoSalvar.disabled = false;
+                botaoSalvar.textContent = 'Salvar alterações';
+                alert('Não foi possível carregar a foto selecionada.');
+            };
             reader.readAsDataURL(fileInput.files[0]);
             return;
         }
     
         saveProfile(profile);
+        salvandoPerfil = false;
+        botaoSalvar.textContent = 'Salvo';
         closeModal();
     }
 
