@@ -1,4 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        const themeLabel = document.getElementById('themeToggleLabel');
+        const atualizarBotaoTema = () => {
+            const modoEscuroAtivo = document.documentElement.dataset.theme === 'dark';
+            themeToggle.setAttribute('aria-pressed', String(modoEscuroAtivo));
+            themeLabel.textContent = modoEscuroAtivo ? 'Ativar modo claro' : 'Ativar modo escuro';
+        };
+
+        atualizarBotaoTema();
+        themeToggle.addEventListener('click', () => {
+            const modoEscuroAtivo = document.documentElement.dataset.theme !== 'dark';
+            document.documentElement.dataset.theme = modoEscuroAtivo ? 'dark' : 'light';
+            localStorage.setItem('tema', modoEscuroAtivo ? 'escuro' : 'claro');
+            atualizarBotaoTema();
+        });
+    }
+
     // LOCAL STORAGE: estrutura padrão para o perfil. O objeto é usado como fallback quando
     // não há dados gravados em localStorage. A chave utilizada é 'profile' e o valor
     // é armazenado em JSON via saveProfile/getProfile.

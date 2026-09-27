@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+    <script src="Js/theme.js"></script>
     <link rel="stylesheet" href="style.css">
     <title>GlicHelp — Criar conta</title>
 </head>
@@ -58,29 +59,39 @@
 
                 <div class="auth-field">
                     <label for="senha">Senha</label>
-                    <input
-                        type="password"
-                        id="senha"
-                        name="senha"
-                        autocomplete="new-password"
-                        placeholder="Mínimo 8 caracteres"
-                        required
-                        aria-required="true"
-                        minlength="8"
-                    >
+                    <div class="password-input-wrap">
+                        <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            autocomplete="new-password"
+                            placeholder="Mínimo 8 caracteres"
+                            required
+                            aria-required="true"
+                            minlength="8"
+                        >
+                        <button class="password-visibility" type="button" data-target="senha" aria-label="Segure para mostrar senha" aria-pressed="false">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="auth-field">
                     <label for="confirmarSenha">Confirmar senha</label>
-                    <input
-                        type="password"
-                        id="confirmarSenha"
-                        name="confirmarSenha"
-                        autocomplete="new-password"
-                        placeholder="Repita a senha"
-                        required
-                        aria-required="true"
-                    >
+                    <div class="password-input-wrap">
+                        <input
+                            type="password"
+                            id="confirmarSenha"
+                            name="confirmarSenha"
+                            autocomplete="new-password"
+                            placeholder="Repita a senha"
+                            required
+                            aria-required="true"
+                        >
+                        <button class="password-visibility" type="button" data-target="confirmarSenha" aria-label="Segure para mostrar senha" aria-pressed="false">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="auth-field">

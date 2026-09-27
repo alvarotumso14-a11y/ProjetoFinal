@@ -1,6 +1,44 @@
 // Script simples para processar o formulário de cadastro e salvar as configurações do usuário
 const form = document.getElementById('formCadastro');
 const erroCadastro = document.getElementById('erroCadastro');
+const botoesVisibilidade = document.querySelectorAll('.password-visibility');
+
+botoesVisibilidade.forEach((botao) => {
+    const campo = document.getElementById(botao.dataset.target);
+    if (!campo) return;
+
+    const ocultarSenha = () => {
+        campo.type = 'password';
+        botao.setAttribute('aria-label', 'Segure para mostrar senha');
+        botao.setAttribute('aria-pressed', 'false');
+    };
+
+    const mostrarSenha = () => {
+        campo.type = 'text';
+        botao.setAttribute('aria-label', 'Solte para ocultar senha');
+        botao.setAttribute('aria-pressed', 'true');
+    };
+
+    botao.addEventListener('pointerdown', (evento) => {
+        evento.preventDefault();
+        mostrarSenha();
+        botao.setPointerCapture(evento.pointerId);
+    });
+    botao.addEventListener('pointerup', ocultarSenha);
+    botao.addEventListener('pointercancel', ocultarSenha);
+    botao.addEventListener('lostpointercapture', ocultarSenha);
+    botao.addEventListener('pointerleave', ocultarSenha);
+    botao.addEventListener('keydown', (evento) => {
+        if (evento.key === ' ' || evento.key === 'Enter') {
+            evento.preventDefault();
+            mostrarSenha();
+        }
+    });
+    botao.addEventListener('keyup', (evento) => {
+        if (evento.key === ' ' || evento.key === 'Enter') ocultarSenha();
+    });
+    botao.addEventListener('blur', ocultarSenha);
+});
 
 if (form) {
     form.addEventListener('submit', function (e) {
@@ -10,12 +48,20 @@ if (form) {
 
         const nome = document.getElementById('nome').value.trim();
         const email = document.getElementById('email').value.trim();
+        const emailValido = /^[^\s@]+@[^\s@]+(?:\.[^\s@]+)+$/.test(email)
+            && document.getElementById('email').checkValidity();
         const senha = document.getElementById('senha').value;
         const confirmarSenha = document.getElementById('confirmarSenha').value;
 
         // Validações básicas
         if (!nome || !email || !senha || !confirmarSenha) {
             erroCadastro.innerText = 'Preencha todos os campos.';
+            erroCadastro.style.display = 'block';
+            return;
+        }
+
+        if (!emailValido) {
+            erroCadastro.innerText = 'Informe um e-mail válido.';
             erroCadastro.style.display = 'block';
             return;
         }
@@ -35,7 +81,7 @@ if (form) {
         // Monta objeto do usuário (armazenamento local para este protótipo)
         const usuario = {
             nome,
-            email,
+            email: email.toLowerCase(),
             tipoDiabetes: '',
             idade: '',
             // Atenção: em produção, não armazenar senha em texto limpo.
@@ -50,7 +96,7 @@ if (form) {
             nome,
             tipo: '',
             idade: '',
-            email,
+            email: email.toLowerCase(),
             celular: '',
             photo: '',
             fatorSensibilidade: '',
