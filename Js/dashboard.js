@@ -161,7 +161,7 @@ function atualizarResumoDashboard() {
 function salvarRegistro() {
     const glicemia = document.getElementById("inputGlicemia").value;
     const doseInput = document.getElementById("inputDose").value;
-    const dose = doseInput === "" ? 0 : doseInput;
+    const dose = doseInput == "" ? 0 : Number(doseInput);
     const hora = document.getElementById("inputHora").value;
     const refeicao = document.getElementById("inputRefeicao").value;
     const observacao = document.getElementById("inputObservacao")?.value.trim() || "";
