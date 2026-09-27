@@ -6,7 +6,7 @@
     <!-- Favicon: arquivo PNG da logo -->
     <link rel="icon" type="image/png" href="Logos/Favicon.png">
     <script src="Js/theme.js"></script>
-    <title>Histórico</title>
+    <title>Histórico - GlicHelp</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -59,8 +59,9 @@
                 <div>
                     <h1>Histórico</h1>
                     <p>Todos os registros realizados.</p>
-                    <button class="pdf-button" id="BaixarPdf" type="button">Baixar PDF</button>
+                    <p id="pdfPeriodoImpresso" class="pdf-periodo-impresso"></p>
                 </div>
+                <button class="pdf-button" id="BaixarPdf" type="button">Baixar PDF</button>
             </header>
 
             <div class="pesquisa">
@@ -105,6 +106,36 @@
                     </form>
                 </div>
         </div>
+    </div>
+
+    <div id="modalExportarPdf" class="modal" aria-hidden="true">
+        <section class="modal-box modal-box-small pdf-modal" role="dialog" aria-modal="true" aria-labelledby="tituloExportarPdf">
+            <div class="modal-topo">
+                <div>
+                    <span class="modal-kicker">Histórico</span>
+                    <h2 id="tituloExportarPdf">Baixar registros em PDF</h2>
+                </div>
+                <button id="fecharExportarPdf" class="close" type="button" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-corpo pdf-modal-corpo">
+                <form id="formExportarPdf" class="edit-form" novalidate>
+                    <p class="form-intro">Escolha o período dos registros que deseja incluir no PDF.</p>
+                    <div class="pdf-date-range">
+                        <label for="pdfDataInicio">De
+                            <input type="date" id="pdfDataInicio" required>
+                        </label>
+                        <label for="pdfDataFim">Até
+                            <input type="date" id="pdfDataFim" required>
+                        </label>
+                    </div>
+                    <p id="pdfErro" class="pdf-export-error" role="alert" aria-live="polite" hidden></p>
+                    <div class="modal-actions">
+                        <button id="cancelarExportarPdf" class="button-secondary" type="button">Cancelar</button>
+                        <button class="pdf-button" type="submit">Gerar PDF</button>
+                    </div>
+                </form>
+            </div>
+        </section>
     </div>
 
     <script src="Js/profile.js"></script>

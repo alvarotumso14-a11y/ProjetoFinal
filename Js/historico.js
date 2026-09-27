@@ -24,6 +24,11 @@ function dataParaComparacao(data) {
     return partes.length === 3 ? `${partes[2]}-${partes[1].padStart(2, "0")}-${partes[0].padStart(2, "0")}` : data;
 }
 
+function obterDataIso(data) {
+    const normalizada = dataParaComparacao(data);
+    return /^\d{4}-\d{2}-\d{2}$/.test(normalizada) ? normalizada : "";
+}
+
 function escaparHtml(valor) {
     return String(valor ?? "")
         .replace(/&/g, "&amp;")
@@ -193,6 +198,103 @@ if (pesquisa) {
                 card.style.display = "none";
             }
         });
+    });
+}
+
+const botaoBaixarPdf = document.getElementById("BaixarPdf");
+const modalExportarPdf = document.getElementById("modalExportarPdf");
+const formularioExportarPdf = document.getElementById("formExportarPdf");
+const botaoFecharExportacao = document.getElementById("fecharExportarPdf");
+const botaoCancelarExportacao = document.getElementById("cancelarExportarPdf");
+const dataInicioPdf = document.getElementById("pdfDataInicio");
+const dataFimPdf = document.getElementById("pdfDataFim");
+const erroPdf = document.getElementById("pdfErro");
+const periodoImpresso = document.getElementById("pdfPeriodoImpresso");
+
+if (
+    botaoBaixarPdf &&
+    modalExportarPdf &&
+    formularioExportarPdf &&
+    botaoFecharExportacao &&
+    botaoCancelarExportacao &&
+    dataInicioPdf &&
+    dataFimPdf &&
+    erroPdf &&
+    periodoImpresso
+) {
+    const fecharModalExportacao = () => {
+        modalExportarPdf.style.display = "none";
+        modalExportarPdf.setAttribute("aria-hidden", "true");
+        botaoBaixarPdf.focus();
+    };
+
+    botaoBaixarPdf.addEventListener("click", () => {
+        erroPdf.hidden = true;
+        erroPdf.textContent = "";
+        modalExportarPdf.style.display = "flex";
+        modalExportarPdf.setAttribute("aria-hidden", "false");
+        dataInicioPdf.focus();
+    });
+
+    botaoFecharExportacao.addEventListener("click", fecharModalExportacao);
+    botaoCancelarExportacao.addEventListener("click", fecharModalExportacao);
+    modalExportarPdf.addEventListener("click", (event) => {
+        if (event.target === modalExportarPdf) fecharModalExportacao();
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modalExportarPdf.getAttribute("aria-hidden") === "false") {
+            fecharModalExportacao();
+        }
+    });
+
+    formularioExportarPdf.addEventListener("submit", (event) => {
+        event.preventDefault();
+        erroPdf.hidden = true;
+        erroPdf.textContent = "";
+        const inicio = dataInicioPdf.value;
+        const fim = dataFimPdf.value;
+
+        if (!inicio || !fim) {
+            erroPdf.textContent = "Selecione as datas inicial e final para gerar o PDF.";
+            erroPdf.hidden = false;
+            return;
+        }
+
+        if (inicio > fim) {
+            erroPdf.textContent = "A data inicial deve ser anterior ou igual à data final.";
+            erroPdf.hidden = false;
+            return;
+        }
+
+        const registrosNoPeriodo = registros.filter((registro) => {
+            const data = obterDataIso(registro.data);
+            return data && data >= inicio && data <= fim;
+        });
+
+        if (registrosNoPeriodo.length === 0) {
+            erroPdf.textContent = "Não há registros no período selecionado.";
+            erroPdf.hidden = false;
+            return;
+        }
+
+        document.querySelectorAll("#historicoLista .registro-item").forEach((card, index) => {
+            const registro = registros[index];
+            const data = registro ? obterDataIso(registro.data) : "";
+            card.classList.toggle("fora-periodo-pdf", !data || data < inicio || data > fim);
+        });
+
+        const formatador = new Intl.DateTimeFormat("pt-BR");
+        const formatarData = (data) => formatador.format(new Date(`${data}T00:00:00`));
+        periodoImpresso.textContent = `Registros de ${formatarData(inicio)} até ${formatarData(fim)}`;
+        fecharModalExportacao();
+        window.print();
+    });
+
+    window.addEventListener("afterprint", () => {
+        document.querySelectorAll(".fora-periodo-pdf").forEach((card) => {
+            card.classList.remove("fora-periodo-pdf");
+        });
+        periodoImpresso.textContent = "";
     });
 }
 
