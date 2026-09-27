@@ -3,6 +3,7 @@
 // Se não existir chave, inicializa com array vazio.
 let registros = JSON.parse(localStorage.getItem("registros")) || [];
 let indiceRegistroEdicao = -1;
+let salvandoEdicaoRegistro = false;
 
 function formatarGlicemia(valor) {
     const numero = Number(valor);
@@ -136,6 +137,12 @@ document.getElementById("historicoLista")?.addEventListener("click", (event) => 
 function editarRegistro(index) {
     const registro = registros[index];
     if (!registro) return;
+    salvandoEdicaoRegistro = false;
+    const botaoSalvar = document.querySelector("#formEdicaoRegistro button[type='submit']");
+    if (botaoSalvar) {
+        botaoSalvar.disabled = false;
+        botaoSalvar.textContent = "Salvar alterações";
+    }
     indiceRegistroEdicao = index;
     document.getElementById("editRegistroGlicemia").value = registro.glicemia || "";
     document.getElementById("editRegistroDose").value = registro.dose || "";
@@ -157,13 +164,19 @@ function fecharModalEdicao() {
 
 function salvarEdicaoRegistro(event) {
     event.preventDefault();
-    if (indiceRegistroEdicao < 0) return;
+    if (salvandoEdicaoRegistro || indiceRegistroEdicao < 0) return;
+
+    salvandoEdicaoRegistro = true;
+    const botaoSalvar = document.querySelector("#formEdicaoRegistro button[type='submit']");
+    if (botaoSalvar) botaoSalvar.disabled = true;
+
     const registro = registros[indiceRegistroEdicao];
     registro.glicemia = document.getElementById("editRegistroGlicemia").value;
     registro.dose = document.getElementById("editRegistroDose").value;
     registro.hora = document.getElementById("editRegistroHora").value;
     registro.observacao = document.getElementById("editRegistroObservacao").value.trim();
     localStorage.setItem("registros", JSON.stringify(registros));
+    if (botaoSalvar) botaoSalvar.textContent = "Salvo";
     atualizarHistorico();
     fecharModalEdicao();
 }

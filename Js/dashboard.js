@@ -5,6 +5,7 @@ let registros = JSON.parse(localStorage.getItem("registros")) || [];
 
 // indiceEdicao guarda o índice do registro que está sendo editado. Valor -1 indica que não estamos editando.
 let indiceEdicao = -1;
+let salvandoRegistro = false;
 
 // Referência ao objeto Chart (gráfico) para que possamos destruir e recriar quando os dados mudarem.
 let grafico = null;
@@ -14,6 +15,12 @@ const modal = document.getElementById("modalRegistro");
 
 // CONTROLE DO MODAL: cuida da abertura e fechamento do formulário de registro.
 function abrirModal() {
+    salvandoRegistro = false;
+    const botaoSalvar = document.querySelector("#modalRegistro .form-submit");
+    if (botaoSalvar) {
+        botaoSalvar.disabled = false;
+        botaoSalvar.textContent = "Salvar registro";
+    }
     modal.style.display = "flex";
     const hora = document.getElementById("inputHora");
     if (hora && !hora.value) {
@@ -159,6 +166,8 @@ function atualizarResumoDashboard() {
 // Lê valores do formulário, valida, e cria ou atualiza um registro.
 // Depois persiste em localStorage e atualiza a UI (resumo e gráfico).
 function salvarRegistro() {
+    if (salvandoRegistro) return;
+
     const glicemia = document.getElementById("inputGlicemia").value;
     const doseInput = document.getElementById("inputDose").value;
     const dose = doseInput == "" ? 0 : Number(doseInput);
@@ -170,6 +179,13 @@ function salvarRegistro() {
         alert("Preencha todos os campos!");
         return;
     }
+
+    salvandoRegistro = true;
+    const botaoSalvar = document.querySelector("#modalRegistro .form-submit");
+    if (botaoSalvar) {
+        botaoSalvar.disabled = true;
+    }
+
     // Se estivermos editando um registro existente, atualiza o objeto.
     if (indiceEdicao >= 0) {
         registros[indiceEdicao].glicemia = glicemia;
@@ -193,6 +209,7 @@ function salvarRegistro() {
 
     // Persiste os registros em localStorage (chave: 'registros') em formato JSON.
     localStorage.setItem("registros", JSON.stringify(registros));
+    if (botaoSalvar) botaoSalvar.textContent = "Salvo";
 
     // Atualiza a interface: resumo, fecha modal e recria o gráfico com os novos dados.
     atualizarResumoDashboard();
