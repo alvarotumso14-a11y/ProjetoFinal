@@ -72,42 +72,35 @@ if (form) {
             return;
         }
 
+        if (!document.getElementById('aceitouTermos')?.checked) {
+            erroCadastro.innerText = 'Para criar a conta, leia e aceite os Termos de Uso e a Política de Privacidade.';
+            erroCadastro.style.display = 'block';
+            return;
+        }
+
+        if (!document.getElementById('consentimentoSaude')?.checked) {
+            erroCadastro.innerText = 'O GlicHelp precisa da sua autorização para guardar dados de saúde (glicemia e insulina).';
+            erroCadastro.style.display = 'block';
+            return;
+        }
+
         if (senha.length < 8) {
             erroCadastro.innerText = 'A senha deve ter no mínimo 8 caracteres.';
             erroCadastro.style.display = 'block';
             return;
         }
 
-        // Monta objeto do usuário (armazenamento local para este protótipo)
-        const usuario = {
+        // A conta só é criada na API depois da configuração inicial (tipo de diabetes,
+        // fator de sensibilidade e HGT alvo são obrigatórios no back-end).
+        // Até lá, os dados ficam só nesta aba (sessionStorage some ao fechar a aba).
+        sessionStorage.setItem('cadastroPendente', JSON.stringify({
             nome,
             email: email.toLowerCase(),
-            tipoDiabetes: '',
-            idade: '',
-            // Atenção: em produção, não armazenar senha em texto limpo.
             senha,
-            fatorSensibilidade: '',
-            hgtAlvo: '',
-            onboardingConcluido: false,
-            criadoEm: new Date().toISOString()
-        };
+            aceitouTermos: true,
+            consentiuDadosSaude: true
+        }));
 
-        const profile = {
-            nome,
-            tipo: '',
-            idade: '',
-            email: email.toLowerCase(),
-            celular: '',
-            photo: '',
-            fatorSensibilidade: '',
-            hgtAlvo: ''
-        };
-
-        // Salva como usuário atual e também no perfil para reutilização em todas as telas
-        localStorage.setItem('usuario', JSON.stringify(usuario));
-        localStorage.setItem('profile', JSON.stringify(profile));
-
-        // A configuração de saúde acontece na primeira tela após o cadastro.
         window.location.href = 'configuracao-inicial.html';
     });
 } else {

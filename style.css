@@ -618,7 +618,7 @@ header button:hover {
 
 .registro-meta {
     display: grid;
-    grid-template-columns: repeat(3, minmax(90px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
     gap: 12px;
 }
 
@@ -2647,4 +2647,9 @@ header button:hover {
 
 :root[data-theme="dark"] .landing-footer {
     background: #090909;
+}
+
+/* Dashboard: últimos registros no mesmo formato do histórico */
+.dashboard-registros .registro-item + .registro-item {
+    margin-top: 12px;
 }

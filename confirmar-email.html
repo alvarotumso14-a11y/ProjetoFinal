@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <script src="Js/theme.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>GlicHelp — Confirmar e-mail</title>
+</head>
+<body class="auth-body">
+
+    <div class="auth-page">
+        <div class="auth-card">
+
+            <a href="index.html" class="auth-brand" aria-label="Voltar para a página inicial do GlicHelp">
+                <img src="Logos/Favicon.png" alt="GlicHelp" class="auth-logo-img">
+                <span class="auth-brand-name">GlicHelp</span>
+            </a>
+
+            <h1 class="auth-title">Confirme seu e-mail</h1>
+            <p class="auth-subtitle">Enviamos um código de 6 números para <strong id="emailDestino">seu e-mail</strong>. Confira também a caixa de spam.</p>
+
+            <div id="erroConfirmacao" class="auth-error" role="alert" aria-live="polite" style="display:none;"></div>
+            <div id="avisoConfirmacao" class="auth-subtitle" role="status" aria-live="polite" style="display:none; color:#0d9e6e; font-weight:600;"></div>
+
+            <form id="formConfirmacao" class="auth-form" novalidate>
+                <div class="auth-field">
+                    <label for="codigo">Código de confirmação</label>
+                    <input
+                        type="text"
+                        id="codigo"
+                        name="codigo"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                        placeholder="000000"
+                        required
+                        aria-required="true"
+                        style="letter-spacing: 8px; font-size: 1.4rem; text-align: center;"
+                    >
+                </div>
+
+                <button type="submit" class="btn-verde auth-submit">Confirmar</button>
+            </form>
+
+            <p class="auth-footer-text">
+                Não recebeu? <a href="#" id="reenviarCodigo" class="auth-link">Enviar novo código</a>
+            </p>
+            <p class="auth-footer-text">
+                <a href="login.html" class="auth-link">Voltar para o login</a>
+            </p>
+
+        </div>
+    </div>
+
+    <script src="Js/Api.js"></script>
+    <script src="Js/confirmar-email.js"></script>
+</body>
+</html>

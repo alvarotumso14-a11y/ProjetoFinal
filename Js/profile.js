@@ -196,8 +196,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="edit-form">
                     <p class="form-intro">Atualize suas informações para personalizar sua experiência.</p>
                     <div class="form-grid">
-                        <label for="editTipo">Tipo de diabetes<input type="text" id="editTipo" readonly></label>
-                        <label for="editIdade">Idade<input type="number" id="editIdade" readonly required></label>
+                        <label class="full-width" for="editNome">Nome<input type="text" id="editNome" maxlength="100" required></label>
+                        <label for="editTipo">Tipo de diabetes
+                            <select id="editTipo" required>
+                                <option value="Tipo 1">Tipo 1</option>
+                                <option value="Tipo 2">Tipo 2</option>
+                                <option value="Gestacional">Gestacional</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </label>
+                        <label for="editIdade">Idade<input type="number" id="editIdade" min="1" max="120" step="1" required></label>
                         <label for="editEmail">E-mail<input type="email" id="editEmail" required></label>
                         <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="numeric" maxlength="11" placeholder="Somente números"></label>
                         <label for="editFatorSensibilidade">Fator de sensibilidade
@@ -243,7 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
             botaoSalvar.textContent = 'Salvar alterações';
         }
         const profile = getProfile();
-        document.getElementById('editTipo').value = profile.tipo || '';
+        document.getElementById('editNome').value = profile.nome || '';
+        document.getElementById('editTipo').value = profile.tipo || 'Tipo 1';
         document.getElementById('editIdade').value = calcularIdadeAtual(profile);
         document.getElementById('editEmail').value = profile.email || '';
         document.getElementById('editCelular').value = profile.celular || '';
@@ -266,8 +275,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (salvandoPerfil) return;
 
         const profile = getProfile();
-        if (!profile.idade) {
-            alert('A idade é obrigatória. Complete a configuração inicial antes de salvar.');
+        const nome = document.getElementById('editNome').value.trim();
+        const tipoDiabetes = document.getElementById('editTipo').value;
+        const idade = Number(document.getElementById('editIdade').value);
+
+        if (!nome) {
+            alert('Informe o nome.');
+            return;
+        }
+
+        if (!Number.isInteger(idade) || idade < 1 || idade > 120) {
+            alert('A idade é obrigatória e deve estar entre 1 e 120.');
             return;
         }
     
@@ -289,32 +307,54 @@ document.addEventListener('DOMContentLoaded', () => {
         botaoSalvar.disabled = true;
         botaoSalvar.textContent = 'Salvando...';
     
-        profile.email = email;
-        profile.celular = document.getElementById('editCelular').value.replace(/\D/g, '').slice(0, 11);
-        profile.fatorSensibilidade = fatorSensibilidade;
-        profile.hgtAlvo = hgtAlvo;
-    
-        // Salva também na estrutura de usuário para compatibilidade com o dashboard e o cadastro
-        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-        if (usuario) {
-            usuario.fatorSensibilidade = profile.fatorSensibilidade;
-            usuario.hgtAlvo = profile.hgtAlvo;
-            usuario.email = profile.email;
-            usuario.celular = profile.celular;
-            usuario.idade = profile.idade;
-            localStorage.setItem('usuario', JSON.stringify(usuario));
+        const celular = document.getElementById('editCelular').value.replace(/\D/g, '').slice(0, 11);
+        const hgtAlvoInteiro = Math.round(hgtAlvo);
+        const fatorArredondado = Math.round(fatorSensibilidade * 10) / 10;
+
+        if (fatorArredondado < 1) {
+            alert('O fator de sensibilidade deve ser no mínimo 1.');
+            salvandoPerfil = false;
+            botaoSalvar.disabled = false;
+            botaoSalvar.textContent = 'Salvar alterações';
+            return;
         }
-    
+
+        const concluir = (photo) => {
+            UsuarioApi.atualizarPerfil({
+                name: nome,
+                tipoDiabetes,
+                idade,
+                email,
+                celular,
+                fatorSensibilidade: fatorArredondado,
+                hgtAlvo: hgtAlvoInteiro
+            }).then(() => {
+                profile.nome = nome;
+                profile.tipo = tipoDiabetes;
+                profile.idade = String(idade);
+                delete profile.idadeInicial;
+                delete profile.idadeDataReferencia;
+                profile.email = email.toLowerCase();
+                profile.celular = celular;
+                profile.fatorSensibilidade = fatorArredondado;
+                profile.hgtAlvo = hgtAlvoInteiro;
+                if (photo !== undefined) profile.photo = photo; // foto fica só neste navegador
+                saveProfile(profile);
+                botaoSalvar.textContent = 'Salvo';
+                closeModal();
+            }).catch((erro) => {
+                alert(erro.message);
+                botaoSalvar.disabled = false;
+                botaoSalvar.textContent = 'Salvar alterações';
+            }).finally(() => {
+                salvandoPerfil = false;
+            });
+        };
+
         const fileInput = document.getElementById('editPhoto');
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const reader = new FileReader();
-            reader.onload = (event) => {
-                profile.photo = event.target.result;
-                saveProfile(profile);
-                salvandoPerfil = false;
-                botaoSalvar.textContent = 'Salvo';
-                closeModal();
-            };
+            reader.onload = (event) => concluir(event.target.result);
             reader.onerror = () => {
                 salvandoPerfil = false;
                 botaoSalvar.disabled = false;
@@ -324,26 +364,46 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(fileInput.files[0]);
             return;
         }
-    
-        saveProfile(profile);
-        salvandoPerfil = false;
-        botaoSalvar.textContent = 'Salvo';
-        closeModal();
+
+        concluir(undefined);
     }
 
     // expose editarPerfil to global scope for existing onclick handlers
     window.editarPerfil = openModal;
 
-    // Initial load
+    // EXCLUSÃO DEFINITIVA DA CONTA (LGPD): apaga a conta e todos os registros no servidor.
+    window.excluirConta = async function () {
+        const confirmou = confirm(
+            'Excluir sua conta apaga DEFINITIVAMENTE todos os seus dados (perfil e registros de glicemia).\n' +
+            'Isso não pode ser desfeito. Se quiser guardar seu histórico, baixe o PDF antes.\n\nDeseja continuar?'
+        );
+        if (!confirmou) return;
+
+        const senha = prompt('Para confirmar, digite sua senha:');
+        if (!senha) return;
+
+        try {
+            await UsuarioApi.excluirConta(senha);
+            alert('Sua conta e seus dados foram excluídos.');
+            limparSessao();
+            localStorage.removeItem('profile');
+            window.location.href = 'index.html';
+        } catch (erro) {
+            alert(erro.message);
+        }
+    };
+
+    // Initial load: mostra o que está salvo e depois atualiza com os dados da API
     const profile = getProfile();
     updateUI(profile);
 
-});
+    if (typeof estaLogado === 'function' && estaLogado()) {
+        UsuarioApi.perfil()
+            .then((usuario) => {
+                salvarPerfilLocal(usuario);
+                updateUI(getProfile());
+            })
+            .catch((erro) => console.warn('Não foi possível atualizar o perfil pela API.', erro));
+    }
 
-function logout() {
-    localStorage.removeItem('usuarioId');
-    localStorage.removeItem('profile');
-    localStorage.removeItem('usuario');
-    localStorage.removeItem('authToken');
-    window.location.href = 'login.html';
-}
+});

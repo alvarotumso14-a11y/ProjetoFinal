@@ -1,14 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
-    const profile = JSON.parse(localStorage.getItem("profile") || "null");
-    const nome = usuario?.nome || profile?.nome || "seja bem-vindo";
+    const pendente = JSON.parse(sessionStorage.getItem("cadastroPendente") || "null");
+
+    // Sem cadastro em andamento: volta para o início do fluxo.
+    if (!pendente) {
+        window.location.replace(estaLogado() ? "dashboard.html" : "cadastro.html");
+        return;
+    }
+
     const nomeBoasVindas = document.getElementById("nomeBoasVindas");
     const boasVindas = document.getElementById("boasVindas");
     const configuracao = document.getElementById("configuracao");
     const form = document.getElementById("formConfiguracao");
     const erro = document.getElementById("erroConfiguracao");
 
-    nomeBoasVindas.textContent = nome.split(" ")[0];
+    nomeBoasVindas.textContent = pendente.nome.split(" ")[0];
+
+    // Menor de 18: mostra os campos do responsável legal (LGPD art. 14)
+    const campoIdade = document.getElementById("idadeInicial");
+    const blocoResponsavel = document.getElementById("blocoResponsavel");
+    campoIdade.addEventListener("input", () => {
+        const idade = Number(campoIdade.value);
+        blocoResponsavel.hidden = !(idade >= 1 && idade < 18);
+    });
 
     document.getElementById("iniciarConfiguracao").addEventListener("click", () => {
         boasVindas.hidden = true;
@@ -16,43 +29,75 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("idadeInicial").focus();
     });
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
         erro.hidden = true;
 
-        const idade = document.getElementById("idadeInicial").value;
+        const idade = Number(document.getElementById("idadeInicial").value);
         const tipoDiabetes = document.getElementById("tipoDiabetesInicial").value;
-        const fatorSensibilidade = document.getElementById("fatorSensibilidadeInicial").value;
-        const hgtAlvo = document.getElementById("hgtAlvoInicial").value;
+        const fatorSensibilidade = Number(document.getElementById("fatorSensibilidadeInicial").value);
+        const hgtAlvo = Math.round(Number(document.getElementById("hgtAlvoInicial").value));
 
-        if (!idade || Number(idade) < 1 || Number(idade) > 120 || !tipoDiabetes || !fatorSensibilidade || !hgtAlvo) {
-            erro.textContent = "Preencha todos os campos com valores válidos para continuar.";
-            erro.hidden = false;
+        if (!idade || idade < 1 || idade > 120 || !tipoDiabetes
+            || !(fatorSensibilidade >= 1 && fatorSensibilidade <= 600)
+            || !(hgtAlvo >= 1 && hgtAlvo <= 600)) {
+            mostrarErro("Preencha todos os campos com valores válidos (fator e HGT alvo entre 1 e 600).");
             return;
         }
 
-        const dados = {
-            idade,
-            idadeInicial: Number(idade),
-            tipoDiabetes,
-            fatorSensibilidade: Number(fatorSensibilidade),
-            hgtAlvo: Number(hgtAlvo),
-            idadeDataReferencia: new Date().toISOString()
-        };
+        const menor = idade < 18;
+        const responsavelNome = document.getElementById("responsavelNome").value.trim();
+        const consentimentoResponsavel = document.getElementById("consentimentoResponsavel").checked;
 
-        const usuarioAtual = usuario || {};
-        Object.assign(usuarioAtual, dados, { onboardingConcluido: true });
-        localStorage.setItem("usuario", JSON.stringify(usuarioAtual));
+        if (menor && (!responsavelNome || !consentimentoResponsavel)) {
+            mostrarErro("Para menores de 18 anos, informe o nome do responsável legal e marque a autorização.");
+            return;
+        }
 
-        const profileAtual = profile || {};
-        Object.assign(profileAtual, {
-            nome,
-            idade,
-            tipo: tipoDiabetes,
-            fatorSensibilidade: dados.fatorSensibilidade,
-            hgtAlvo: dados.hgtAlvo
-        });
-        localStorage.setItem("profile", JSON.stringify(profileAtual));
-        window.location.href = "dashboard.html";
+        const botao = form.querySelector("button[type='submit']");
+        botao.disabled = true;
+        botao.textContent = "Criando sua conta...";
+
+        try {
+            await UsuarioApi.criar({
+                name: pendente.nome,
+                email: pendente.email,
+                senha: pendente.senha,
+                tipoDiabetes,
+                idade,
+                fatorSensibilidade: Math.round(fatorSensibilidade * 10) / 10,
+                hgtAlvo,
+                aceitouTermos: pendente.aceitouTermos === true,
+                consentiuDadosSaude: pendente.consentiuDadosSaude === true,
+                responsavelNome: menor ? responsavelNome : null,
+                consentimentoResponsavel: menor ? consentimentoResponsavel : false
+            });
+
+            try {
+                const resposta = await UsuarioApi.login({ email: pendente.email, senha: pendente.senha });
+                sessionStorage.removeItem("cadastroPendente");
+                salvarSessao(resposta);
+                window.location.href = "dashboard.html";
+            } catch (erroLogin) {
+                if (erroLogin.status === 403) {
+                    // Conta criada; falta confirmar o e-mail com o código enviado.
+                    window.location.href = "confirmar-email.html";
+                    return;
+                }
+                throw erroLogin;
+            }
+        } catch (e) {
+            const jaExiste = /já existe/i.test(e.message);
+            mostrarErro(jaExiste
+                ? "Este e-mail já tem cadastro. Faça login ou volte e use outro e-mail."
+                : e.message);
+            botao.disabled = false;
+            botao.textContent = "Salvar e entrar";
+        }
     });
+
+    function mostrarErro(mensagem) {
+        erro.textContent = mensagem;
+        erro.hidden = false;
+    }
 });

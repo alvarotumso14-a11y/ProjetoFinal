@@ -52,6 +52,8 @@
                     <li><a href="historico.html">Histórico</a></li>
                     <li><a href="Calculadora.html">Calculadora</a></li>
                     <li><a href="glicbot.html">TiaBete</a></li>
+                    <li><a class="ativo" href="Profile.html">Perfil</a></li>
+                    <li><a href="login.html" onclick="logout(); return false;">Sair</a></li>
                     
                 </ul>
             </nav>
@@ -117,9 +119,18 @@
             <button class="botao-logout" onclick="logout()" aria-label="Sair da conta">
                 Logout
             </button>
+            <p style="margin-top:28px;font-size:.9rem;color:var(--cinza-texto,#555);">
+                <a href="termos.html" class="auth-link">Termos de Uso</a> ·
+                <a href="politica-privacidade.html" class="auth-link">Política de Privacidade</a>
+            </p>
+            <button class="button-secondary" type="button" onclick="excluirConta()"
+                style="margin-top:8px;border:1px solid #a81927;color:#a81927;background:transparent;border-radius:10px;padding:10px 16px;cursor:pointer;font-weight:700;">
+                Excluir minha conta e meus dados
+            </button>
         </main>
     </div>
 
+    <script src="Js/Api.js"></script>
     <script src="Js/profile.js"></script>
     <script src="Js/menu.js"></script>
 </body>

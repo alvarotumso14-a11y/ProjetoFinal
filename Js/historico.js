@@ -1,7 +1,20 @@
-﻿// Estado do histórico
-// LOCAL STORAGE: carrega os registros salvos (persistidos pelo dashboard) para exibir o histórico.
-// Se não existir chave, inicializa com array vazio.
-let registros = JSON.parse(localStorage.getItem("registros")) || [];
+﻿// Estado do histórico: registros vindos da API (mais recentes primeiro).
+let registros = [];
+
+async function carregarHistorico() {
+    const lista = document.getElementById("historicoLista");
+    try {
+        const dados = await RegistroApi.listar(1, 500);
+        registros = dados.map(registroDaApi);
+    } catch (erro) {
+        console.error("Não foi possível carregar o histórico.", erro);
+        if (lista) {
+            lista.innerHTML = `<div class="registro"><h3>${escaparHtml(erro.message)}</h3></div>`;
+        }
+        return;
+    }
+    atualizarHistorico();
+}
 let indiceRegistroEdicao = -1;
 let salvandoEdicaoRegistro = false;
 
@@ -77,6 +90,10 @@ function atualizarHistorico() {
                             <span class="meta-label">Data</span>
                             <strong>${escaparHtml(registro.data)}</strong>
                         </div>
+                        <div>
+                            <span class="meta-label">Refeição</span>
+                            <strong>${escaparHtml(registro.refeicao)}</strong>
+                        </div>
                     </div>
                     ${registro.observacao ? `
                         <div class="registro-observacao">
@@ -90,6 +107,9 @@ function atualizarHistorico() {
                 <div class="botoesRegistro">
                     <button class="editar" onclick="editarRegistro(${index})">
                         Alterar
+                    </button>
+                    <button class="excluir" onclick="excluirRegistro(${index})">
+                        Excluir
                     </button>
                 </div>
             </div>
@@ -144,9 +164,13 @@ function editarRegistro(index) {
         botaoSalvar.textContent = "Salvar alterações";
     }
     indiceRegistroEdicao = index;
-    document.getElementById("editRegistroGlicemia").value = registro.glicemia || "";
+    document.getElementById("editRegistroGlicemia").value =
+        registro.glicemiaAcimaDoLimite ? "" : (registro.glicemia || "");
     document.getElementById("editRegistroDose").value = registro.dose || "";
     document.getElementById("editRegistroHora").value = registro.hora || "";
+    document.getElementById("editRegistroData").value = registro.dataIso || "";
+    document.getElementById("editRegistroData").max = hojeIso();
+    document.getElementById("editRegistroRefeicao").value = registro.refeicao || "☕ Café da Manhã";
     document.getElementById("editRegistroObservacao").value = registro.observacao || "";
     const modal = document.getElementById("modalEdicaoRegistro");
     modal.style.display = "flex";
@@ -162,23 +186,88 @@ function fecharModalEdicao() {
     indiceRegistroEdicao = -1;
 }
 
-function salvarEdicaoRegistro(event) {
+async function salvarEdicaoRegistro(event) {
     event.preventDefault();
     if (salvandoEdicaoRegistro || indiceRegistroEdicao < 0) return;
 
+    const registro = registros[indiceRegistroEdicao];
+    const glicemia = document.getElementById("editRegistroGlicemia").value;
+    const dose = document.getElementById("editRegistroDose").value;
+    const hora = document.getElementById("editRegistroHora").value;
+    const data = document.getElementById("editRegistroData").value;
+    const refeicao = document.getElementById("editRegistroRefeicao").value;
+    const observacao = document.getElementById("editRegistroObservacao").value.trim();
+
+    if (!hora || !data || !refeicao || (glicemia === "" && !registro.glicemiaAcimaDoLimite)) {
+        alert("Preencha glicemia, data, horário e refeição.");
+        return;
+    }
+
+    if (glicemia !== "" && (Number(glicemia) < 20 || Number(glicemia) > 600)) {
+        alert("A glicemia deve estar entre 20 e 600 mg/dL.");
+        return;
+    }
+
+    if (dose !== "" && (Number(dose) < 0 || Number(dose) > 100)) {
+        alert("A dose deve estar entre 0 e 100 unidades.");
+        return;
+    }
+
+    if (data > hojeIso()) {
+        alert("A data não pode ser no futuro.");
+        return;
+    }
+
     salvandoEdicaoRegistro = true;
     const botaoSalvar = document.querySelector("#formEdicaoRegistro button[type='submit']");
-    if (botaoSalvar) botaoSalvar.disabled = true;
+    if (botaoSalvar) {
+        botaoSalvar.disabled = true;
+        botaoSalvar.textContent = "Salvando...";
+    }
 
-    const registro = registros[indiceRegistroEdicao];
-    registro.glicemia = document.getElementById("editRegistroGlicemia").value;
-    registro.dose = document.getElementById("editRegistroDose").value;
-    registro.hora = document.getElementById("editRegistroHora").value;
-    registro.observacao = document.getElementById("editRegistroObservacao").value.trim();
-    localStorage.setItem("registros", JSON.stringify(registros));
+    // Leitura "HI" sem número digitado continua HI; com número vira leitura normal.
+    const continuaHi = registro.glicemiaAcimaDoLimite && (glicemia === "" || glicemia === "HI");
+
+    try {
+        await RegistroApi.atualizar(registro.id, {
+            glicemia: continuaHi ? null : Number(glicemia),
+            glicemiaAcimaDoLimite: continuaHi,
+            dose: dose === "" ? 0 : Math.round(Number(dose) * 10) / 10,
+            hora: `${hora}:00`,
+            refeicao,
+            data,
+            observacao: observacao || null
+        });
+    } catch (erro) {
+        alert(erro.message);
+        salvandoEdicaoRegistro = false;
+        if (botaoSalvar) {
+            botaoSalvar.disabled = false;
+            botaoSalvar.textContent = "Salvar alterações";
+        }
+        return;
+    }
+
     if (botaoSalvar) botaoSalvar.textContent = "Salvo";
-    atualizarHistorico();
     fecharModalEdicao();
+    await carregarHistorico();
+}
+
+async function excluirRegistro(index) {
+    const registro = registros[index];
+    if (!registro) return;
+
+    if (!confirm(`Excluir o registro de ${registro.data} às ${registro.hora}?`)) {
+        return;
+    }
+
+    try {
+        await RegistroApi.excluir(registro.id);
+    } catch (erro) {
+        alert(erro.message);
+        return;
+    }
+    await carregarHistorico();
 }
 
 function obterRefeicao(hora) {
@@ -284,24 +373,23 @@ if (
 }
 
 async function solicitarPdfAoBackend(dataInicio, dataFim) {
-    /*
-     * Ponto de integração com o backend:
-     * 1. Configure a URL/rota e o método HTTP conforme o contrato da API.
-     * 2. Ajuste os nomes e o formato dos parâmetros para dataInicio/dataFim
-     *    (por exemplo, query string ou JSON no corpo da requisição).
-     * 3. Inclua aqui os cabeçalhos de autenticação exigidos pelo backend.
-     * 4. Quando o endpoint estiver pronto, leia a resposta como Blob e dispare
-     *    o download usando URL.createObjectURL; o endpoint deve retornar PDF.
-     * A URL base existente para a API fica em Js/Api.js (API_BASE_URL).
-     */
-    void dataInicio;
-    void dataFim;
-    throw new Error("A exportação em PDF ainda precisa ser conectada ao endpoint do backend.");
+    const pdf = await RegistroApi.pdf(dataInicio, dataFim);
+
+    const url = URL.createObjectURL(pdf);
+    const link = document.createElement("a");
+    const [ai, mi, di] = dataInicio.split("-");
+    const [af, mf, df] = dataFim.split("-");
+    link.href = url;
+    link.download = `historico-glicemia-${di}-${mi}-${ai}-a-${df}-${mf}-${af}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // Inicialização
 window.addEventListener("load", () => {
-    atualizarHistorico();
+    carregarHistorico();
 
     // Limita a digitação da glicemia a 600 (valores acima disso são exibidos como "HI")
     const glicemiaInput = document.getElementById("editRegistroGlicemia");
@@ -316,8 +404,11 @@ window.addEventListener("load", () => {
     const doseInput = document.getElementById("editRegistroDose");
     if (doseInput) {
         doseInput.addEventListener("input", () => {
-            if (Number(doseInput.value) > 600) {
-                doseInput.value = 600;
+            if (Number(doseInput.value) > 100) {
+                doseInput.value = 100;
+            }
+            if (Number(doseInput.value) < 0) {
+                doseInput.value = 0;
             }
         });
     }

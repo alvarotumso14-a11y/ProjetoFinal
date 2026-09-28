@@ -96,16 +96,18 @@
 
                 <div class="auth-field">
                     <label class="auth-checkbox">
-                        <input
-                            type="checkbox"
-                            id="aceitouTermos"
-                            name="aceitouTermos"
-                            required
-                            aria-required="true"
-                        >
-                        Li e aceito os
-                        <!-- Stub — página de termos a ser criada futuramente -->
-                        <a href="#" class="auth-link">Termos de Uso</a>
+                        <input type="checkbox" id="aceitouTermos" name="aceitouTermos" required aria-required="true">
+                        <span>Li e aceito os
+                            <a href="termos.html" class="auth-link" target="_blank" rel="noopener">Termos de Uso</a> e a
+                            <a href="politica-privacidade.html" class="auth-link" target="_blank" rel="noopener">Política de Privacidade</a></span>
+                    </label>
+                </div>
+
+                <div class="auth-field">
+                    <label class="auth-checkbox">
+                        <input type="checkbox" id="consentimentoSaude" name="consentimentoSaude" required aria-required="true">
+                        <span><strong>Autorizo o tratamento dos meus dados de saúde</strong> (glicemia, insulina, refeições e tipo de diabetes)
+                            para as funções do GlicHelp, conforme a Política de Privacidade. Posso revogar quando quiser excluindo minha conta.</span>
                     </label>
                 </div>
 
@@ -120,7 +122,7 @@
         </div>
     </div>
 
-    <script src="Js/utils.js"></script>
+    <script src="Js/Api.js"></script>
     <script src="Js/cadastro.js"></script>
 </body>
 </html>
