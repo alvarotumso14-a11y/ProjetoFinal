@@ -4,14 +4,18 @@ const campoEmail = document.getElementById("email");
 const campoSenha = document.getElementById("senha");
 const lembrarMe = document.getElementById("lembrarMe");
 
+// Já logado: vai direto para o painel.
+if (estaLogado()) {
+    window.location.replace("dashboard.html");
+}
+
 if (formLogin && erroLogin && campoEmail && campoSenha && lembrarMe) {
     campoEmail.value = localStorage.getItem("emailLembrado") || "";
     lembrarMe.checked = campoEmail.value !== "";
 
-    formLogin.addEventListener("submit", (event) => {
+    formLogin.addEventListener("submit", async (event) => {
         event.preventDefault();
-        erroLogin.textContent = "";
-        erroLogin.style.display = "none";
+        esconderErro();
 
         if (!formLogin.reportValidity()) {
             return;
@@ -19,62 +23,47 @@ if (formLogin && erroLogin && campoEmail && campoSenha && lembrarMe) {
 
         const email = campoEmail.value.trim().toLowerCase();
         const senha = campoSenha.value;
-        const dadosSalvos = localStorage.getItem("usuario");
+        const botao = formLogin.querySelector("button[type='submit']");
+        const textoOriginal = botao.textContent;
 
-        if (!dadosSalvos) {
-            mostrarErro("E-mail ou senha inválidos.");
-            return;
-        }
+        botao.disabled = true;
+        botao.textContent = "Entrando...";
+        // O servidor gratuito "dorme" sem uso; o primeiro acesso pode levar até 1 minuto.
+        const aviso = setTimeout(() => { botao.textContent = "Acordando o servidor..."; }, 4000);
 
-        let usuario;
         try {
-            usuario = JSON.parse(dadosSalvos);
+            const resposta = await UsuarioApi.login({ email, senha });
+            salvarSessao(resposta);
+
+            if (lembrarMe.checked) {
+                localStorage.setItem("emailLembrado", email);
+            } else {
+                localStorage.removeItem("emailLembrado");
+            }
+
+            window.location.href = "dashboard.html";
         } catch (erro) {
-            console.error("Não foi possível ler os dados da conta salvos neste navegador.", erro);
-            mostrarErro("Não foi possível ler os dados da conta. Tente criar a conta novamente.");
-            return;
+            if (erro.status === 403) {
+                // Senha certa, mas o e-mail ainda não foi confirmado.
+                sessionStorage.setItem("cadastroPendente", JSON.stringify({ nome: "", email, senha }));
+                window.location.href = "confirmar-email.html";
+                return;
+            }
+            mostrarErro(erro.message || "E-mail ou senha inválidos.");
+            botao.disabled = false;
+            botao.textContent = textoOriginal;
+        } finally {
+            clearTimeout(aviso);
         }
-
-        if (
-            !usuario ||
-            typeof usuario !== "object" ||
-            typeof usuario.email !== "string" ||
-            typeof usuario.senha !== "string" ||
-            usuario.email.trim().toLowerCase() !== email ||
-            usuario.senha !== senha
-        ) {
-            mostrarErro("E-mail ou senha inválidos.");
-            return;
-        }
-
-        const usuarioId = usuario.id || Date.now();
-        usuario.id = usuarioId;
-        localStorage.setItem("usuario", JSON.stringify(usuario));
-        localStorage.setItem("usuarioId", String(usuarioId));
-
-        const profile = JSON.parse(localStorage.getItem("profile") || "{}");
-        Object.assign(profile, {
-            nome: usuario.nome || usuario.name || profile.nome || "",
-            tipo: usuario.tipoDiabetes || profile.tipo || "",
-            idade: usuario.idade || profile.idade || "",
-            email: usuario.email,
-            celular: usuario.celular || profile.celular || "",
-            fatorSensibilidade: usuario.fatorSensibilidade || profile.fatorSensibilidade || "",
-            hgtAlvo: usuario.hgtAlvo || profile.hgtAlvo || ""
-        });
-        localStorage.setItem("profile", JSON.stringify(profile));
-
-        if (lembrarMe.checked) {
-            localStorage.setItem("emailLembrado", email);
-        } else {
-            localStorage.removeItem("emailLembrado");
-        }
-
-        window.location.href = usuario.onboardingConcluido ? "dashboard.html" : "configuracao-inicial.html";
     });
 }
 
 function mostrarErro(mensagem) {
     erroLogin.textContent = mensagem;
     erroLogin.style.display = "block";
+}
+
+function esconderErro() {
+    erroLogin.textContent = "";
+    erroLogin.style.display = "none";
 }

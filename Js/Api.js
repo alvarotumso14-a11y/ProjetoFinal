@@ -1,179 +1,248 @@
 // ============================================================
-// api.js — Ponto único de comunicação com o backend (ASP.NET)
+// Api.js — Ponto único de comunicação com o back-end (ASP.NET)
+// Carregue ANTES dos scripts de página em todo HTML que fala com a API.
 // ============================================================
-//
-// COMO CONFIGURAR A URL DO BACKEND:
-// Abra o launchSettings.json do seu projeto (Presentation/Properties/launchSettings.json)
-// e veja o campo "applicationUrl" do perfil que você usa pra rodar (http ou https).
-//
-// Exemplo típico:
-//   "http":  "applicationUrl": "http://localhost:5288"
-//   "https": "applicationUrl": "https://localhost:7130;http://localhost:5288"
-//
-// Repare que o perfil "https" sobe as DUAS portas ao mesmo tempo — por isso é seguro
-// usar sempre a porta HTTP (5288) aqui, mesmo rodando o projeto com o perfil https.
-// Isso evita erro de certificado autoassinado no fetch (comum em localhost).
-const API_BASE_URL = "https://localhost:7130/api";
 
 // ------------------------------------------------------------
-// Função genérica que faz a chamada e já trata erros comuns.
-// Todas as outras funções abaixo usam essa por baixo dos panos.
+// ENDEREÇO DA API
+// - Rodando no seu computador (localhost / arquivo aberto direto): usa a API local.
+// - Rodando no site publicado: usa API_PRODUCAO.
+// Depois de publicar a API, troque API_PRODUCAO pela URL do Render.
+// ------------------------------------------------------------
+const API_PRODUCAO = "https://glichelp-api.onrender.com/api";
+const API_LOCAL = "http://localhost:5288/api";
+
+const API_BASE_URL = (() => {
+    const host = window.location.hostname;
+    const local = window.location.protocol === "file:" || host === "localhost" || host === "127.0.0.1";
+    return local ? API_LOCAL : API_PRODUCAO;
+})();
+
+// ------------------------------------------------------------
+// SESSÃO (token JWT + dados do perfil usados pelas telas)
+// ------------------------------------------------------------
+const CHAVE_TOKEN = "authToken";
+
+function obterToken() {
+    return localStorage.getItem(CHAVE_TOKEN);
+}
+
+function estaLogado() {
+    return !!obterToken();
+}
+
+// Converte o usuário da API para o formato "profile" que as telas já usam.
+function salvarPerfilLocal(usuario) {
+    const anterior = JSON.parse(localStorage.getItem("profile") || "{}");
+    localStorage.setItem("profile", JSON.stringify({
+        nome: usuario.name,
+        tipo: usuario.tipoDiabetes,
+        idade: usuario.idade ?? "",
+        email: usuario.email,
+        celular: usuario.celular ?? "",
+        fatorSensibilidade: usuario.fatorSensibilidade,
+        hgtAlvo: usuario.hgtAlvo,
+        photo: anterior.email === usuario.email ? (anterior.photo || "") : "" // foto fica só neste navegador
+    }));
+    localStorage.setItem("usuarioId", String(usuario.id));
+}
+
+function salvarSessao(loginResposta) {
+    localStorage.setItem(CHAVE_TOKEN, loginResposta.token);
+    salvarPerfilLocal(loginResposta.usuario);
+}
+
+function limparSessao() {
+    [CHAVE_TOKEN, "usuarioId", "profile", "usuario", "registros", "ultimoHGT", "ultimoInsulinaEstimada"]
+        .forEach((chave) => localStorage.removeItem(chave));
+}
+
+function logout() {
+    limparSessao();
+    window.location.href = "login.html";
+}
+
+// Páginas que exigem login: sem token, volta para o login.
+(function protegerPaginas() {
+    const protegidas = ["dashboard.html", "historico.html", "profile.html", "calculadora.html", "glicbot.html"];
+    const pagina = (window.location.pathname.split("/").pop() || "").toLowerCase();
+    if (protegidas.includes(pagina) && !estaLogado()) {
+        window.location.replace("login.html");
+    }
+})();
+
+// ------------------------------------------------------------
+// Chamada genérica: adiciona o token, trata erros e mensagens da API.
 // ------------------------------------------------------------
 async function apiFetch(caminho, opcoes = {}) {
+    const token = obterToken();
+    const headers = { ...(opcoes.headers || {}) };
+
+    if (opcoes.body !== undefined && !headers["Content-Type"]) {
+        headers["Content-Type"] = "application/json";
+    }
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
     let resposta;
     try {
-        resposta = await fetch(`${API_BASE_URL}${caminho}`, {
-            headers: {
-                "Content-Type": "application/json",
-                ...(opcoes.headers || {})
-            },
-            ...opcoes
-        });
+        resposta = await fetch(`${API_BASE_URL}${caminho}`, { ...opcoes, headers });
     } catch (erroDeRede) {
-        // Isso cai aqui quando o backend está desligado, a porta está errada,
-        // ou o CORS bloqueou a chamada — o fetch nem chega a ter resposta.
         console.error("Erro de rede ao chamar a API:", erroDeRede);
-        throw new Error(
-            `Não foi possível conectar ao backend em ${API_BASE_URL}. ` +
-            `Confira se ele está rodando e se a porta está correta.`
-        );
+        throw new Error("Não foi possível conectar ao servidor. Verifique sua internet e tente de novo em instantes.");
+    }
+
+    // Token vencido ou conta desativada: encerra a sessão (exceto na própria tela de login).
+    if (resposta.status === 401 && token && !caminho.startsWith("/usuario/login")) {
+        limparSessao();
+        window.location.replace("login.html");
+        throw new Error("Sua sessão expirou. Entre novamente.");
     }
 
     if (!resposta.ok) {
-        let mensagem = `Erro HTTP ${resposta.status}`;
-        try {
-            const corpoErro = await resposta.json();
-            mensagem = corpoErro.title || corpoErro.message || mensagem;
-        } catch {
-            // corpo não era JSON, mantém a mensagem padrão
-        }
-        throw new Error(mensagem);
+        const erro = new Error(await lerMensagemDeErro(resposta));
+        erro.status = resposta.status; // ex.: 403 = e-mail ainda não confirmado
+        throw erro;
     }
 
-    // Respostas 204 (No Content) não têm corpo — não tenta fazer .json()
     if (resposta.status === 204) {
         return null;
     }
 
-    return resposta.json();
+    const tipo = resposta.headers.get("Content-Type") || "";
+    if (tipo.includes("application/json")) {
+        return resposta.json();
+    }
+    if (tipo.includes("application/pdf")) {
+        return resposta.blob();
+    }
+    return resposta.text();
+}
+
+// A API devolve erros como texto simples ("Email ou senha inválidos.")
+// ou como ValidationProblemDetails ({ title, errors: { Campo: ["msg"] } }).
+async function lerMensagemDeErro(resposta) {
+    const texto = await resposta.text();
+    if (!texto) {
+        return resposta.status === 429
+            ? "Muitas tentativas seguidas. Aguarde um minuto e tente de novo."
+            : `Erro ${resposta.status} ao falar com o servidor.`;
+    }
+
+    try {
+        const corpo = JSON.parse(texto);
+        if (typeof corpo === "string") return corpo;
+        if (corpo.errors) {
+            return Object.values(corpo.errors).flat().join(" ");
+        }
+        return corpo.title || corpo.message || texto;
+    } catch {
+        return texto;
+    }
+}
+
+// Data de hoje no fuso do usuário, no formato da API (yyyy-mm-dd).
+function hojeIso() {
+    const agora = new Date();
+    const mes = String(agora.getMonth() + 1).padStart(2, "0");
+    const dia = String(agora.getDate()).padStart(2, "0");
+    return `${agora.getFullYear()}-${mes}-${dia}`;
 }
 
 // ------------------------------------------------------------
 // USUÁRIOS  (/api/usuario)
-// Rotas reais do UsuarioControllers.cs:
-//   POST   /api/usuario            -> Create
-//   POST   /api/usuario/login      -> Login
-//   GET    /api/usuario/{id}       -> GetById
-//   GET    /api/usuario            -> GetAll
-//   PUT    /api/usuario/{id}       -> Update
-//   DELETE /api/usuario/{id}       -> Delete
 // ------------------------------------------------------------
 const UsuarioApi = {
+    // dto: { email, senha } -> { token, usuario }
     login(dto) {
-        // dto: { email, senha }
-        return apiFetch("/usuario/login", {
-            method: "POST",
-            body: JSON.stringify(dto)
-        });
+        return apiFetch("/usuario/login", { method: "POST", body: JSON.stringify(dto) });
     },
 
+    // dto: { name, email, senha, tipoDiabetes, idade, celular, fatorSensibilidade, hgtAlvo }
     criar(dto) {
-        // dto: { name, email, senha, tipoDiabetes, idade, celular, fatorSensibilidade, hgtAlvo }
-        return apiFetch("/usuario", {
-            method: "POST",
-            body: JSON.stringify(dto)
-        });
+        return apiFetch("/usuario", { method: "POST", body: JSON.stringify(dto) });
     },
 
-    buscarPorId(id) {
-        return apiFetch(`/usuario/${id}`);
+    perfil() {
+        return apiFetch("/usuario/perfil");
     },
 
-    listarTodos() {
-        return apiFetch("/usuario");
+    // dto: { email, codigo } — código de 6 dígitos enviado por e-mail
+    confirmarEmail(dto) {
+        return apiFetch("/usuario/confirmar-email", { method: "POST", body: JSON.stringify(dto) });
     },
 
-    atualizar(id, dto) {
-        return apiFetch(`/usuario/${id}`, {
-            method: "PUT",
-            body: JSON.stringify(dto)
-        });
+    reenviarCodigo(email) {
+        return apiFetch("/usuario/reenviar-codigo", { method: "POST", body: JSON.stringify({ email }) });
     },
 
-    excluir(id) {
-        return apiFetch(`/usuario/${id}`, {
-            method: "DELETE"
-        });
+    // dto parcial: só os campos que mudaram
+    atualizarPerfil(dto) {
+        return apiFetch("/usuario/perfil", { method: "PATCH", body: JSON.stringify(dto) });
+    },
+
+    // Exclusão definitiva (LGPD): apaga conta e registros. Exige a senha.
+    excluirConta(senha) {
+        return apiFetch("/usuario/excluir-conta", { method: "POST", body: JSON.stringify({ senha }) });
     }
 };
 
 // ------------------------------------------------------------
-// REGISTROS DE GLICEMIA  (/api/registros-glicemia)
-// Rotas reais do RegistroGlicemiaController.cs:
-//   POST   /api/registros-glicemia          -> Create
-//   GET    /api/registros-glicemia/{id}     -> GetById
-//   GET    /api/registros-glicemia          -> GetAll
-//   PUT    /api/registros-glicemia?id=      -> Update (SEM {id} na rota — o id vem por query string mesmo, de propósito)
-//   DELETE /api/registros-glicemia?id=      -> Delete (idem)
+// REGISTROS DE GLICEMIA  (/api/registro-glicemia)
 // ------------------------------------------------------------
 const RegistroApi = {
-    criar(dto) {
-        // dto: { glicemia, dose, hora, refeicao, data, usuarioId }
-        return apiFetch("/registros-glicemia", {
-            method: "POST",
-            body: JSON.stringify(dto)
-        });
+    // Mais recentes primeiro. tamanho máximo: 500
+    listar(pagina = 1, tamanho = 100) {
+        return apiFetch(`/registro-glicemia?pagina=${pagina}&tamanho=${tamanho}`);
     },
 
     buscarPorId(id) {
-        return apiFetch(`/registros-glicemia/${id}`);
+        return apiFetch(`/registro-glicemia/${id}`);
     },
 
-    listarTodos() {
-        return apiFetch("/registros-glicemia");
+    // dto: { glicemia, glicemiaAcimaDoLimite, dose, hora "HH:MM:SS", refeicao, data "yyyy-mm-dd", observacao }
+    criar(dto) {
+        return apiFetch("/registro-glicemia", { method: "POST", body: JSON.stringify(dto) });
     },
 
     atualizar(id, dto) {
-        return apiFetch(`/registros-glicemia?id=${id}`, {
-            method: "PUT",
-            body: JSON.stringify(dto)
-        });
+        return apiFetch(`/registro-glicemia/${id}`, { method: "PUT", body: JSON.stringify(dto) });
     },
 
     excluir(id) {
-        return apiFetch(`/registros-glicemia?id=${id}`, {
-            method: "DELETE"
-        });
+        return apiFetch(`/registro-glicemia/${id}`, { method: "DELETE" });
+    },
+
+    // Devolve o PDF como Blob
+    pdf(dataInicial, dataFinal) {
+        return apiFetch(`/registro-glicemia/pdf?dataInicial=${dataInicial}&dataFinal=${dataFinal}`);
     }
 };
 
-async function logout() {
-    try {
-        const token = localStorage.getItem('authToken'); // Obtém o token do localStorage
-        if (!token) {
-            alert('Usuário não autenticado.');
-            return;
-        }
+// ------------------------------------------------------------
+// Conversão entre o registro da API e o formato usado nas telas
+// ------------------------------------------------------------
+const EMOJI_REFEICAO = {
+    "Café da Manhã": "☕ Café da Manhã",
+    "Almoço": "🍛 Almoço",
+    "Lanche": "🥪 Lanche",
+    "Jantar": "🍽️ Janta",
+    "Ceia": "🌙 Ceia",
+    "Outro": "Outro"
+};
 
-        const response = await fetch('https://seu-backend.com/api/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.ok) {
-            // Logout bem-sucedido
-            localStorage.removeItem('authToken'); // Remove o token do localStorage
-            alert('Logout realizado com sucesso.');
-            window.location.href = 'login.html'; // Redireciona para a página de login
-        } else {
-            const errorData = await response.json();
-            alert(`Erro ao fazer logout: ${errorData.message}`);
-        }
-    } catch (error) {
-        console.error('Erro ao fazer logout:', error);
-        alert('Erro ao se comunicar com o servidor.');
-    }
+function registroDaApi(r) {
+    const [ano, mes, dia] = String(r.data).split("-");
+    return {
+        id: r.id,
+        glicemia: r.glicemiaAcimaDoLimite ? "HI" : r.glicemia,
+        glicemiaAcimaDoLimite: r.glicemiaAcimaDoLimite,
+        dose: Number(r.dose) || 0,
+        hora: String(r.hora).slice(0, 5),
+        refeicao: EMOJI_REFEICAO[r.refeicao] || r.refeicao,
+        observacao: r.observacao || "",
+        data: `${dia}/${mes}/${ano}`,
+        dataIso: r.data
+    };
 }

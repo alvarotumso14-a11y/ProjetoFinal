@@ -1,7 +1,6 @@
 ﻿// Estado da aplicação
-// LOCAL STORAGE: registros é carregado do localStorage para persistir os registros entre sessões.
-// Ao salvar, os registros são gravados em localStorage (JSON) para que persistam após reload/fechar o navegador.
-let registros = JSON.parse(localStorage.getItem("registros")) || [];
+// Os registros vêm da API (mais recentes primeiro). Veja carregarRegistros().
+let registros = [];
 
 // indiceEdicao guarda o índice do registro que está sendo editado. Valor -1 indica que não estamos editando.
 let indiceEdicao = -1;
@@ -86,6 +85,16 @@ function formatarGlicemia(valor) {
     return `${valor} mg/dL`;
 }
 
+function escaparHtmlDashboard(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Últimos 3 registros no mesmo formato visual do histórico
 function renderizarUltimosRegistros() {
     const container = document.getElementById("ultimosRegistrosDashboard");
     if (!container) return;
@@ -95,27 +104,37 @@ function renderizarUltimosRegistros() {
         return;
     }
 
-    container.innerHTML = registros.slice(0, 3).map(() => `
-        <div class="registro dashboard-registro">
-            <div class="registro-label">
-                <span class="metric-pill metric-glicemia">G</span>
-                <span class="registro-glicemia"></span>
-            </div>
-            <div class="dashboard-registro-info">
-                <strong></strong>
-                <span></span>
+    container.innerHTML = registros.slice(0, 3).map((registro) => `
+        <div class="registro-item">
+            <div class="registro-main">
+                <div class="registro-header">
+                    <span class="metric-pill metric-glicemia">G</span>
+                    <div>
+                        <p class="registro-label">Glicemia</p>
+                        <h3>${escaparHtmlDashboard(formatarGlicemia(registro.glicemia))}</h3>
+                    </div>
+                </div>
+                <div class="registro-meta">
+                    <div>
+                        <span class="meta-label">Dose</span>
+                        <strong>${Number(registro.dose) || 0} U</strong>
+                    </div>
+                    <div>
+                        <span class="meta-label">Hora</span>
+                        <strong>${escaparHtmlDashboard(registro.hora)}</strong>
+                    </div>
+                    <div>
+                        <span class="meta-label">Data</span>
+                        <strong>${escaparHtmlDashboard(registro.data)}</strong>
+                    </div>
+                    <div>
+                        <span class="meta-label">Refeição</span>
+                        <strong>${escaparHtmlDashboard(registro.refeicao || "Não informada")}</strong>
+                    </div>
+                </div>
             </div>
         </div>
     `).join("");
-
-    container.querySelectorAll(".dashboard-registro").forEach((card, index) => {
-        const registro = registros[index];
-        card.querySelector(".registro-glicemia").textContent = formatarGlicemia(registro.glicemia);
-        card.querySelector(".dashboard-registro-info strong").textContent =
-            registro.refeicao || "Refeição não informada";
-        card.querySelector(".dashboard-registro-info span").textContent =
-            `${registro.hora || "--:--"} · Dose: ${Number(registro.dose) || 0} U`;
-    });
 }
 
 // Atualização do resumo do dashboard
@@ -162,21 +181,47 @@ function atualizarResumoDashboard() {
     renderizarUltimosRegistros();
 }
 
+// Busca os registros do usuário na API e atualiza resumo, lista e gráfico.
+async function carregarRegistros() {
+    try {
+        const dados = await RegistroApi.listar(1, 50);
+        registros = dados.map(registroDaApi);
+    } catch (erro) {
+        console.error("Não foi possível carregar os registros.", erro);
+        const container = document.getElementById("ultimosRegistrosDashboard");
+        if (container) {
+            container.innerHTML = `<p class="dashboard-empty">${erro.message}</p>`;
+        }
+        return;
+    }
+    atualizarResumoDashboard();
+    criarGrafico();
+}
+
 // SALVAR REGISTRO
-// Lê valores do formulário, valida, e cria ou atualiza um registro.
-// Depois persiste em localStorage e atualiza a UI (resumo e gráfico).
-function salvarRegistro() {
+// Lê valores do formulário, valida e envia para a API.
+async function salvarRegistro() {
     if (salvandoRegistro) return;
 
     const glicemia = document.getElementById("inputGlicemia").value;
     const doseInput = document.getElementById("inputDose").value;
-    const dose = doseInput == "" ? 0 : Number(doseInput);
+    const dose = doseInput == "" ? 0 : Math.round(Number(doseInput) * 10) / 10;
     const hora = document.getElementById("inputHora").value;
     const refeicao = document.getElementById("inputRefeicao").value;
     const observacao = document.getElementById("inputObservacao")?.value.trim() || "";
-    // Validação simples: exige que os campos não estejam vazios.
+
     if (glicemia === "" || hora === "" || refeicao === "") {
         alert("Preencha todos os campos!");
+        return;
+    }
+
+    if (Number(glicemia) < 20 || Number(glicemia) > 600) {
+        alert("A glicemia deve estar entre 20 e 600 mg/dL.");
+        return;
+    }
+
+    if (dose < 0 || dose > 100) {
+        alert("A dose deve estar entre 0 e 100 unidades.");
         return;
     }
 
@@ -184,37 +229,32 @@ function salvarRegistro() {
     const botaoSalvar = document.querySelector("#modalRegistro .form-submit");
     if (botaoSalvar) {
         botaoSalvar.disabled = true;
+        botaoSalvar.textContent = "Salvando...";
     }
 
-    // Se estivermos editando um registro existente, atualiza o objeto.
-    if (indiceEdicao >= 0) {
-        registros[indiceEdicao].glicemia = glicemia;
-        registros[indiceEdicao].dose = dose;
-        registros[indiceEdicao].hora = hora;
-        registros[indiceEdicao].refeicao = refeicao;
-        registros[indiceEdicao].observacao = observacao;
-        
-        indiceEdicao = -1;
-    } else {
-        // Senão, adiciona novo registro no início do array (mais recente primeiro).
-        registros.unshift({
-            glicemia,
+    try {
+        await RegistroApi.criar({
+            glicemia: Number(glicemia),
+            glicemiaAcimaDoLimite: false,
             dose,
-            hora,
+            hora: `${hora}:00`,
             refeicao,
-            observacao,
-            data: new Date().toLocaleDateString("pt-BR")
+            data: hojeIso(),
+            observacao: observacao || null
         });
+    } catch (erro) {
+        alert(erro.message);
+        salvandoRegistro = false;
+        if (botaoSalvar) {
+            botaoSalvar.disabled = false;
+            botaoSalvar.textContent = "Salvar registro";
+        }
+        return;
     }
 
-    // Persiste os registros em localStorage (chave: 'registros') em formato JSON.
-    localStorage.setItem("registros", JSON.stringify(registros));
     if (botaoSalvar) botaoSalvar.textContent = "Salvo";
-
-    // Atualiza a interface: resumo, fecha modal e recria o gráfico com os novos dados.
-    atualizarResumoDashboard();
     fecharModal();
-    criarGrafico();
+    await carregarRegistros();
 }
 
 // GRÁFICO GLICÊMICO
@@ -225,8 +265,8 @@ function salvarRegistro() {
 function criarGrafico() {
     const ctx = document.getElementById("graficoGlicemia");
 
-    if (!ctx) {
-        return; // página pode não ter canvas; nada a fazer
+    if (!ctx || typeof Chart === "undefined") {
+        return; // sem canvas ou Chart.js não carregou (CDN fora do ar): segue sem gráfico
     }
 
     if (grafico) {
@@ -241,7 +281,10 @@ function criarGrafico() {
     grafico = new Chart(ctx, {
         type: "line",
         data: {
-            labels: ultimos.map((registro) => registro.hora),
+            labels: ultimos.map((registro) => {
+                const variosDias = new Set(ultimos.map((r) => r.data)).size > 1;
+                return variosDias ? `${registro.data.slice(0, 5)} ${registro.hora}` : registro.hora;
+            }),
             datasets: [{
                 label: "Glicemia",
                 data: ultimos.map((registro) => Math.min(Number(registro.glicemia) || 0, 600)),
@@ -333,10 +376,9 @@ function preencherDoseSugerida() {
 // CARREGAMENTO DO DASHBOARD
 // Quando a página carrega, inicializamos o resumo, o gráfico e o campo de HGT usando os dados em localStorage.
 window.addEventListener("load", () => {
-    // Atualiza os elementos do resumo (última glicemia, dose, hora, etc.)
+    // Mostra o estado vazio enquanto busca os dados na API
     atualizarResumoDashboard();
-    // Gera o gráfico inicial com os dados disponíveis
-    criarGrafico();
+    carregarRegistros();
 
     const inputHGT = document.getElementById("inputHGT");
     if (inputHGT) {
@@ -348,6 +390,8 @@ window.addEventListener("load", () => {
     if (inputDoseModal) {
         inputDoseModal.addEventListener('input', function () {
             inputDoseModal.dataset.manual = 'true';
+            if (Number(inputDoseModal.value) > 100) inputDoseModal.value = 100;
+            if (Number(inputDoseModal.value) < 0) inputDoseModal.value = 0;
         });
     }
 
