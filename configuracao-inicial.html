@@ -36,6 +36,24 @@
                         <input type="number" id="idadeInicial" min="1" max="120" placeholder="Sua idade" required aria-required="true">
                     </div>
 
+                    <div id="blocoResponsavel" hidden>
+                        <p class="auth-subtitle" style="text-align:left;margin:0 0 8px;">
+                            <strong>Menor de 18 anos:</strong> o cadastro precisa ser autorizado por um dos pais ou pelo responsável legal.
+                        </p>
+                        <div class="auth-field">
+                            <label for="responsavelNome">Nome do pai, mãe ou responsável legal</label>
+                            <input type="text" id="responsavelNome" maxlength="100" placeholder="Nome completo do responsável">
+                        </div>
+                        <div class="auth-field">
+                            <label class="auth-checkbox">
+                                <input type="checkbox" id="consentimentoResponsavel">
+                                <span>Sou pai, mãe ou responsável legal e autorizo o cadastro e o tratamento dos dados de saúde deste menor
+                                    no GlicHelp, conforme os <a href="termos.html" class="auth-link" target="_blank" rel="noopener">Termos</a> e a
+                                    <a href="politica-privacidade.html" class="auth-link" target="_blank" rel="noopener">Política de Privacidade</a>.</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="auth-field">
                         <label for="tipoDiabetesInicial">Tipo de diabetes</label>
                         <select id="tipoDiabetesInicial" required>
@@ -49,7 +67,7 @@
 
                     <div class="auth-field">
                         <label for="fatorSensibilidadeInicial">Fator de sensibilidade</label>
-                        <input type="number" id="fatorSensibilidadeInicial" min="0.1" max="600" step="0.1" required>
+                        <input type="number" id="fatorSensibilidadeInicial" min="1" max="600" step="0.1" required>
                     </div>
 
                     <div class="auth-field">
@@ -62,6 +80,7 @@
             </div>
         </section>
     </main>
+    <script src="Js/Api.js"></script>
     <script src="Js/configuracao-inicial.js"></script>
 </body>
 </html>
