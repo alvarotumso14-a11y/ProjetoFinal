@@ -19,8 +19,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const campoIdade = document.getElementById("idadeInicial");
     const blocoResponsavel = document.getElementById("blocoResponsavel");
     campoIdade.addEventListener("input", () => {
+        if (campoIdade.valueAsNumber > 120) campoIdade.value = "120";
         const idade = Number(campoIdade.value);
         blocoResponsavel.hidden = !(idade >= 1 && idade < 18);
+    });
+
+    ["fatorSensibilidadeInicial", "hgtAlvoInicial"].forEach((id) => {
+        const campo = document.getElementById(id);
+        campo.addEventListener("input", () => {
+            if (campo.valueAsNumber > 600) campo.value = "600";
+        });
     });
 
     document.getElementById("iniciarConfiguracao").addEventListener("click", () => {
