@@ -207,17 +207,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         </label>
                         <label for="editIdade">Idade
                             <input type="number" id="editIdade" min="1" max="120" step="1" required>
-                            <span class="warning-text" id="idadeWarning" role="status" aria-live="polite">Limite máximo de 120 anos atingido. O valor foi ajustado para 120.</span>
+                            <span class="warning-text" id="idadeWarning" role="status" aria-live="polite">Limite máximo e de 120 anos</span>
                         </label>
                         <label for="editEmail">E-mail<input type="email" id="editEmail" required></label>
                         <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="numeric" maxlength="11" placeholder="Somente números"></label>
                         <label for="editFatorSensibilidade">Fator de sensibilidade
                             <input type="number" id="editFatorSensibilidade" min="1" max="600" step="0.1" required>
-                            <span class="warning-text" id="fatorWarning" role="status" aria-live="polite">Limite máximo de 600 atingido. O valor foi ajustado para 600.</span>
+                            <span class="warning-text" id="fatorWarning" role="status" aria-live="polite">Limite máximo e de 600</span>
                         </label>
                         <label for="editHgtAlvo">HGT alvo (mg/dL)
                             <input type="number" id="editHgtAlvo" min="1" max="600" step="0.1" required>
-                            <span class="warning-text" id="hgtWarning" role="status" aria-live="polite">Limite máximo de 600 mg/dL atingido. O valor foi ajustado para 600.</span>
+                            <span class="warning-text" id="hgtWarning" role="status" aria-live="polite">Limite máximo e de 600 mg/dL</span>
                         </label>
                         <label class="full-width" for="editPhoto">Foto do perfil<input type="file" id="editPhoto" accept="image/*"></label>
                     </div>
