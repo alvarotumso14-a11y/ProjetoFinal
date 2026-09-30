@@ -19,15 +19,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const campoIdade = document.getElementById("idadeInicial");
     const blocoResponsavel = document.getElementById("blocoResponsavel");
     campoIdade.addEventListener("input", () => {
-        if (campoIdade.valueAsNumber > 120) campoIdade.value = "120";
+        aplicarLimite(campoIdade, 120, document.getElementById("idadeInicialWarning"));
         const idade = Number(campoIdade.value);
         blocoResponsavel.hidden = !(idade >= 1 && idade < 18);
     });
 
-    ["fatorSensibilidadeInicial", "hgtAlvoInicial"].forEach((id) => {
+    [
+        ["fatorSensibilidadeInicial", "fatorSensibilidadeInicialWarning"],
+        ["hgtAlvoInicial", "hgtAlvoInicialWarning"]
+    ].forEach(([id, avisoId]) => {
         const campo = document.getElementById(id);
         campo.addEventListener("input", () => {
-            if (campo.valueAsNumber > 600) campo.value = "600";
+            aplicarLimite(campo, 600, document.getElementById(avisoId));
         });
     });
 
@@ -107,5 +110,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function mostrarErro(mensagem) {
         erro.textContent = mensagem;
         erro.hidden = false;
+    }
+
+    function aplicarLimite(campo, limite, aviso) {
+        const excedeuLimite = campo.valueAsNumber > limite;
+        if (excedeuLimite) campo.value = String(limite);
+        aviso.style.display = excedeuLimite ? "block" : "none";
     }
 });

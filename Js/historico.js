@@ -108,9 +108,6 @@ function atualizarHistorico() {
                     <button class="editar" onclick="editarRegistro(${index})">
                         Alterar
                     </button>
-                    <button class="excluir" onclick="excluirRegistro(${index})">
-                        Excluir
-                    </button>
                 </div>
             </div>
         `).join("");
@@ -250,23 +247,6 @@ async function salvarEdicaoRegistro(event) {
 
     if (botaoSalvar) botaoSalvar.textContent = "Salvo";
     fecharModalEdicao();
-    await carregarHistorico();
-}
-
-async function excluirRegistro(index) {
-    const registro = registros[index];
-    if (!registro) return;
-
-    if (!confirm(`Excluir o registro de ${registro.data} às ${registro.hora}?`)) {
-        return;
-    }
-
-    try {
-        await RegistroApi.excluir(registro.id);
-    } catch (erro) {
-        alert(erro.message);
-        return;
-    }
     await carregarHistorico();
 }
 
