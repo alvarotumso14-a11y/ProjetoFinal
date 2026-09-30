@@ -819,10 +819,6 @@ header button:hover {
     box-shadow: 0 8px 18px rgba(215,38,56,0.16);
 }
 
-.theme-toggle {
-    margin: 28px 0 0;
-}
-
 .botao-alt:hover {
     transform: translateY(-1px);
     box-shadow: 0 10px 20px rgba(215,38,56,0.22);
@@ -2588,6 +2584,15 @@ header button:hover {
     color: var(--preto);
 }
 
+:root[data-theme="dark"] .topbar {
+    background: rgba(30, 30, 30, 0.95);
+    border-bottom-color: var(--cinza-borda);
+}
+
+:root[data-theme="dark"] .user-top .user-info {
+    color: var(--cinza-suave);
+}
+
 :root[data-theme="dark"] .card,
 :root[data-theme="dark"] .atalho,
 :root[data-theme="dark"] .grafico-box,
@@ -2647,6 +2652,42 @@ header button:hover {
 
 :root[data-theme="dark"] .landing-footer {
     background: #090909;
+}
+
+.theme-toggle-float {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1000;
+    display: grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 50%;
+    background: var(--branco);
+    color: var(--vermelho-escuro);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.theme-toggle-float:hover {
+    transform: translateY(-2px);
+}
+
+.theme-toggle-float:focus-visible {
+    outline: 3px solid var(--vermelho);
+    outline-offset: 3px;
+}
+
+.theme-toggle-float svg {
+    width: 23px;
+    height: 23px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
 }
 
 /* Dashboard: últimos registros no mesmo formato do histórico */
