@@ -185,7 +185,7 @@ function atualizarResumoDashboard() {
 async function carregarRegistros() {
     try {
         const dados = await RegistroApi.listar(1, 50);
-        registros = dados.map(registroDaApi);
+        registros = ordenarRegistrosRecentes(dados.map(registroDaApi));
     } catch (erro) {
         console.error("Não foi possível carregar os registros.", erro);
         const container = document.getElementById("ultimosRegistrosDashboard");

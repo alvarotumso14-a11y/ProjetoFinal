@@ -252,3 +252,11 @@ function registroDaApi(r) {
         dataIso: r.data
     };
 }
+
+function ordenarRegistrosRecentes(registros) {
+    return [...registros].sort((a, b) => {
+        const dataHoraA = `${a.dataIso || ""}T${a.hora || ""}`;
+        const dataHoraB = `${b.dataIso || ""}T${b.hora || ""}`;
+        return dataHoraB.localeCompare(dataHoraA);
+    });
+}

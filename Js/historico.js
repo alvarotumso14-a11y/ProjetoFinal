@@ -5,7 +5,7 @@ async function carregarHistorico() {
     const lista = document.getElementById("historicoLista");
     try {
         const dados = await RegistroApi.listar(1, 500);
-        registros = dados.map(registroDaApi);
+        registros = ordenarRegistrosRecentes(dados.map(registroDaApi));
     } catch (erro) {
         console.error("Não foi possível carregar o histórico.", erro);
         if (lista) {
