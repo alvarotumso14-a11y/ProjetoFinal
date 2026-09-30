@@ -56,18 +56,18 @@ function obterRefeicao(hora) {
     const horario = horas * 60 + minutos;
 
     if (horario <= 660) {
-        return "☕ Café da Manhã"; // até 11:00 (660min)
+        return "Café da Manhã"; // até 11:00 (660min)
     }
 
     if (horario <= 840) {
-        return "🍛 Almoço"; // até 14:00 (840min)
+        return "Almoço"; // até 14:00 (840min)
     }
 
     if (horario <= 1080) {
-        return "🥪 Lanche"; // até 18:00 (1080min)
+        return "Lanche"; // até 18:00 (1080min)
     }
 
-    return "🍽️ Janta"; // após 18:00
+    return "Jantar"; // após 18:00
 }
 
 function formatarGlicemia(valor) {
@@ -215,8 +215,9 @@ async function salvarRegistro() {
         return;
     }
 
-    if (Number(glicemia) < 20 || Number(glicemia) > 600) {
-        alert("A glicemia deve estar entre 20 e 600 mg/dL.");
+    const valorGlicemia = Number(glicemia);
+    if (!Number.isFinite(valorGlicemia) || valorGlicemia < 0) {
+        alert("Informe uma glicemia válida igual ou maior que 0 mg/dL.");
         return;
     }
 
@@ -234,8 +235,8 @@ async function salvarRegistro() {
 
     try {
         await RegistroApi.criar({
-            glicemia: Number(glicemia),
-            glicemiaAcimaDoLimite: false,
+            glicemia: valorGlicemia > 600 ? null : valorGlicemia,
+            glicemiaAcimaDoLimite: valorGlicemia > 600,
             dose,
             hora: `${hora}:00`,
             refeicao,
@@ -287,7 +288,9 @@ function criarGrafico() {
             }),
             datasets: [{
                 label: "Glicemia",
-                data: ultimos.map((registro) => Math.min(Number(registro.glicemia) || 0, 600)),
+                data: ultimos.map((registro) => registro.glicemiaAcimaDoLimite
+                    ? 600
+                    : Math.min(Number(registro.glicemia) || 0, 600)),
                 borderColor: "#c0392b",
                 backgroundColor: "rgba(192, 57, 43, .15)",
                 fill: true,
@@ -395,13 +398,4 @@ window.addEventListener("load", () => {
         });
     }
 
-    // Limita a digitação da glicemia a 600 (valores acima disso são exibidos como "HI")
-    const inputGlicemia = document.getElementById("inputGlicemia");
-    if (inputGlicemia) {
-        inputGlicemia.addEventListener("input", () => {
-            if (Number(inputGlicemia.value) > 600) {
-                inputGlicemia.value = 600;
-            }
-        });
-    }
 });

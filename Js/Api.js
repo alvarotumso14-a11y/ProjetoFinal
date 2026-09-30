@@ -223,12 +223,18 @@ const RegistroApi = {
 // ------------------------------------------------------------
 // Conversão entre o registro da API e o formato usado nas telas
 // ------------------------------------------------------------
-const EMOJI_REFEICAO = {
-    "Café da Manhã": "☕ Café da Manhã",
-    "Almoço": "🍛 Almoço",
-    "Lanche": "🥪 Lanche",
-    "Jantar": "🍽️ Janta",
-    "Ceia": "🌙 Ceia",
+const REFEICAO_EXIBICAO = {
+    "Café da Manhã": "Café da Manhã",
+    "Almoço": "Almoço",
+    "Lanche": "Lanche",
+    "Jantar": "Jantar",
+    "Ceia": "Ceia",
+    "☕ Café da Manhã": "Café da Manhã",
+    "🍛 Almoço": "Almoço",
+    "🥪 Lanche": "Lanche",
+    "🍽️ Janta": "Jantar",
+    "🍽️ Jantar": "Jantar",
+    "🌙 Ceia": "Ceia",
     "Outro": "Outro"
 };
 
@@ -240,7 +246,7 @@ function registroDaApi(r) {
         glicemiaAcimaDoLimite: r.glicemiaAcimaDoLimite,
         dose: Number(r.dose) || 0,
         hora: String(r.hora).slice(0, 5),
-        refeicao: EMOJI_REFEICAO[r.refeicao] || r.refeicao,
+        refeicao: REFEICAO_EXIBICAO[r.refeicao] || r.refeicao,
         observacao: r.observacao || "",
         data: `${dia}/${mes}/${ano}`,
         dataIso: r.data

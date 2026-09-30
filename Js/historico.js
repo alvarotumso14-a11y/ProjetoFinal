@@ -162,12 +162,12 @@ function editarRegistro(index) {
     }
     indiceRegistroEdicao = index;
     document.getElementById("editRegistroGlicemia").value =
-        registro.glicemiaAcimaDoLimite ? "" : (registro.glicemia || "");
+        registro.glicemiaAcimaDoLimite ? "" : (registro.glicemia ?? "");
     document.getElementById("editRegistroDose").value = registro.dose || "";
     document.getElementById("editRegistroHora").value = registro.hora || "";
     document.getElementById("editRegistroData").value = registro.dataIso || "";
     document.getElementById("editRegistroData").max = hojeIso();
-    document.getElementById("editRegistroRefeicao").value = registro.refeicao || "☕ Café da Manhã";
+    document.getElementById("editRegistroRefeicao").value = registro.refeicao || "Café da Manhã";
     document.getElementById("editRegistroObservacao").value = registro.observacao || "";
     const modal = document.getElementById("modalEdicaoRegistro");
     modal.style.display = "flex";
@@ -200,8 +200,9 @@ async function salvarEdicaoRegistro(event) {
         return;
     }
 
-    if (glicemia !== "" && (Number(glicemia) < 20 || Number(glicemia) > 600)) {
-        alert("A glicemia deve estar entre 20 e 600 mg/dL.");
+    const valorGlicemia = Number(glicemia);
+    if (glicemia !== "" && (!Number.isFinite(valorGlicemia) || valorGlicemia < 0)) {
+        alert("Informe uma glicemia válida igual ou maior que 0 mg/dL.");
         return;
     }
 
@@ -222,12 +223,12 @@ async function salvarEdicaoRegistro(event) {
         botaoSalvar.textContent = "Salvando...";
     }
 
-    // Leitura "HI" sem número digitado continua HI; com número vira leitura normal.
-    const continuaHi = registro.glicemiaAcimaDoLimite && (glicemia === "" || glicemia === "HI");
+    const continuaHi = (registro.glicemiaAcimaDoLimite && glicemia === "")
+        || (glicemia !== "" && valorGlicemia > 600);
 
     try {
         await RegistroApi.atualizar(registro.id, {
-            glicemia: continuaHi ? null : Number(glicemia),
+            glicemia: continuaHi ? null : valorGlicemia,
             glicemiaAcimaDoLimite: continuaHi,
             dose: dose === "" ? 0 : Math.round(Number(dose) * 10) / 10,
             hora: `${hora}:00`,
@@ -253,10 +254,10 @@ async function salvarEdicaoRegistro(event) {
 function obterRefeicao(hora) {
     const [horas, minutos] = hora.split(":").map(Number);
     const horario = horas * 60 + minutos;
-    if (horario <= 660) return "☕ Café da Manhã";
-    if (horario <= 840) return "🍛 Almoço";
-    if (horario <= 1080) return "🥪 Lanche";
-    return "🍽️ Janta";
+    if (horario <= 660) return "Café da Manhã";
+    if (horario <= 840) return "Almoço";
+    if (horario <= 1080) return "Lanche";
+    return "Jantar";
 }
 
 // Filtro de pesquisa
@@ -370,16 +371,6 @@ async function solicitarPdfAoBackend(dataInicio, dataFim) {
 // Inicialização
 window.addEventListener("load", () => {
     carregarHistorico();
-
-    // Limita a digitação da glicemia a 600 (valores acima disso são exibidos como "HI")
-    const glicemiaInput = document.getElementById("editRegistroGlicemia");
-    if (glicemiaInput) {
-        glicemiaInput.addEventListener("input", () => {
-            if (Number(glicemiaInput.value) > 600) {
-                glicemiaInput.value = 600;
-            }
-        });
-    }
 
     const doseInput = document.getElementById("editRegistroDose");
     if (doseInput) {
