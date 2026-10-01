@@ -73,12 +73,19 @@
                 >
             </div>
 
+            <div class="filtros-historico" role="group" aria-label="Filtrar registros por período">
+                <button type="button" class="filtro-periodo ativo" data-periodo="todos" aria-pressed="true">Todos</button>
+                <button type="button" class="filtro-periodo" data-periodo="hoje" aria-pressed="false">Hoje</button>
+                <button type="button" class="filtro-periodo" data-periodo="ontem" aria-pressed="false">Ontem</button>
+                <button type="button" class="filtro-periodo" data-periodo="semana" aria-pressed="false">Esta semana</button>
+            </div>
+
             <section class="historico">
                 <div class="titulo">
                     <h2>Últimos Registros</h2>
                 </div>
 
-                <div id="historicoLista"></div>
+                <div id="historicoLista" aria-live="polite"></div>
             </section>
         </main>
     </div>

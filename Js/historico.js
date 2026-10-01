@@ -47,9 +47,25 @@ function escaparHtml(valor) {
         .replace(/'/g, "&#039;");
 }
 
+function formatarDataCompleta(dataIso) {
+    const [ano, mes, dia] = dataIso.split("-").map(Number);
+    return new Intl.DateTimeFormat("pt-BR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    }).format(new Date(ano, mes - 1, dia, 12));
+}
+
+function dataLocalIso(data = new Date()) {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const dia = String(data.getDate()).padStart(2, "0");
+    return `${ano}-${mes}-${dia}`;
+}
+
 // HISTÓRICO DE MEDIÇÕES
 // atualiza a lista de registros exibida na página de histórico.
-// Constrói os elementos HTML a partir do array `registros` carregado do localStorage.
+// Constrói os elementos HTML a partir dos registros carregados da API.
 function atualizarHistorico() {
     const lista = document.getElementById("historicoLista");
 
@@ -57,17 +73,54 @@ function atualizarHistorico() {
         return;
     }
 
-    if (registros.length === 0) {
+    const periodoAtivo = document.querySelector(".filtro-periodo.ativo")?.dataset.periodo || "todos";
+    const dataPesquisa = pesquisa?.value || "";
+    const hoje = new Date();
+    const hojeIso = dataLocalIso(hoje);
+    const ontem = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - 1, 12);
+    const ontemIso = dataLocalIso(ontem);
+    const inicioSemana = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 12);
+    const diasDesdeSegunda = (inicioSemana.getDay() + 6) % 7;
+    inicioSemana.setDate(inicioSemana.getDate() - diasDesdeSegunda);
+    const inicioSemanaIso = dataLocalIso(inicioSemana);
+
+    const registrosFiltrados = registros
+        .map((registro, indice) => ({ registro, indice }))
+        .filter(({ registro }) => {
+            const dataRegistro = registro.dataIso || dataParaComparacao(registro.data);
+            if (dataPesquisa) return dataRegistro === dataPesquisa;
+            if (periodoAtivo === "hoje") return dataRegistro === hojeIso;
+            if (periodoAtivo === "ontem") return dataRegistro === ontemIso;
+            if (periodoAtivo === "semana") return dataRegistro >= inicioSemanaIso && dataRegistro <= hojeIso;
+            return true;
+        });
+
+    if (registrosFiltrados.length === 0) {
+        const mensagem = registros.length === 0
+            ? "Nenhum registro encontrado."
+            : "Nenhum registro encontrado para este período.";
         lista.innerHTML = `
-            <div class="registro">
-                <h3>Nenhum registro encontrado.</h3>
-            </div>
+            <p class="historico-vazio">${mensagem}</p>
         `;
         return;
     }
 
-    lista.innerHTML = registros.map((registro, index) => `
-            <div class="registro-item">
+    const gruposPorData = new Map();
+    registrosFiltrados.forEach((item) => {
+        const dataIso = item.registro.dataIso || dataParaComparacao(item.registro.data);
+        if (!gruposPorData.has(dataIso)) gruposPorData.set(dataIso, []);
+        gruposPorData.get(dataIso).push(item);
+    });
+
+    lista.innerHTML = Array.from(gruposPorData, ([dataIso, itens], indiceGrupo) => `
+        <details class="historico-dia"${indiceGrupo === 0 ? " open" : ""}>
+            <summary>
+                <time datetime="${escaparHtml(dataIso)}">${escaparHtml(formatarDataCompleta(dataIso))}</time>
+                <span class="historico-dia-contagem">${itens.length} ${itens.length === 1 ? "medição" : "medições"}</span>
+            </summary>
+            <div class="historico-dia-registros">
+            ${itens.map(({ registro, indice }) => `
+            <article class="registro-item">
                 <div class="registro-main">
                     <div class="registro-header">
                         <span class="metric-pill metric-glicemia">G</span>
@@ -88,7 +141,7 @@ function atualizarHistorico() {
                         </div>
                         <div>
                             <span class="meta-label">Data</span>
-                            <strong>${escaparHtml(registro.data)}</strong>
+                            <strong>${escaparHtml(formatarDataCompleta(dataIso))}</strong>
                         </div>
                         <div>
                             <span class="meta-label">Refeição</span>
@@ -105,12 +158,15 @@ function atualizarHistorico() {
                 </div>
 
                 <div class="botoesRegistro">
-                    <button class="editar" onclick="editarRegistro(${index})">
+                    <button class="editar" type="button" onclick="editarRegistro(${indice})">
                         Alterar
                     </button>
                 </div>
+            </article>
+            `).join("")}
             </div>
-        `).join("");
+        </details>
+    `).join("");
 
     atualizarBotoesObservacao(lista);
 }
@@ -127,6 +183,13 @@ function atualizarBotoesObservacao(lista) {
 }
 
 window.addEventListener("resize", () => {
+    const lista = document.getElementById("historicoLista");
+    if (lista) {
+        atualizarBotoesObservacao(lista);
+    }
+});
+
+window.addEventListener("accessibilityfontsizechange", () => {
     const lista = document.getElementById("historicoLista");
     if (lista) {
         atualizarBotoesObservacao(lista);
@@ -260,24 +323,30 @@ function obterRefeicao(hora) {
     return "Jantar";
 }
 
-// Filtro de pesquisa
 const pesquisa = document.getElementById("pesquisa");
 
 if (pesquisa) {
-    pesquisa.addEventListener("input", function () {
-        const texto = pesquisa.value;
-        const cards = document.querySelectorAll(".registro-item");
-
-        cards.forEach((card, index) => {
-            const corresponde = !texto || dataParaComparacao(registros[index]?.data) === texto;
-            if (corresponde) {
-                card.style.display = "flex";
-            } else {
-                card.style.display = "none";
-            }
+    pesquisa.addEventListener("input", () => {
+        document.querySelectorAll(".filtro-periodo").forEach((botao) => {
+            const ativo = !pesquisa.value && botao.dataset.periodo === "todos";
+            botao.classList.toggle("ativo", ativo);
+            botao.setAttribute("aria-pressed", String(ativo));
         });
+        atualizarHistorico();
     });
 }
+
+document.querySelectorAll(".filtro-periodo").forEach((botao) => {
+    botao.addEventListener("click", () => {
+        pesquisa.value = "";
+        document.querySelectorAll(".filtro-periodo").forEach((outroBotao) => {
+            const ativo = outroBotao === botao;
+            outroBotao.classList.toggle("ativo", ativo);
+            outroBotao.setAttribute("aria-pressed", String(ativo));
+        });
+        atualizarHistorico();
+    });
+});
 
 const botaoBaixarPdf = document.getElementById("BaixarPdf");
 const modalExportarPdf = document.getElementById("modalExportarPdf");

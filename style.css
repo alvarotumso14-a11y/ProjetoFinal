@@ -2694,3 +2694,265 @@ header button:hover {
 .dashboard-registros .registro-item + .registro-item {
     margin-top: 12px;
 }
+
+/* Acessibilidade */
+.accessibility-toggle-float {
+    position: fixed;
+    right: 20px;
+    bottom: 78px;
+    z-index: 1001;
+    display: grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    border: 2px solid var(--vermelho-escuro);
+    border-radius: 50%;
+    background: var(--branco);
+    color: var(--vermelho-escuro);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    font-size: 21px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.accessibility-toggle-float:focus-visible,
+.painel-acessibilidade :focus-visible {
+    outline: 3px solid var(--vermelho);
+    outline-offset: 3px;
+}
+
+.painel-acessibilidade {
+    position: fixed;
+    right: 20px;
+    bottom: 138px;
+    z-index: 1010;
+    width: min(320px, calc(100vw - 32px));
+    padding: 20px;
+    border: 2px solid var(--cinza-borda);
+    border-radius: 16px;
+    background: var(--branco);
+    color: var(--preto);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.24);
+}
+
+.painel-acessibilidade[hidden] {
+    display: none;
+}
+
+.painel-acessibilidade h2 {
+    margin-bottom: 16px;
+    font-size: 20px;
+}
+
+.acessibilidade-controle,
+.acessibilidade-opcao {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.acessibilidade-controle div {
+    display: flex;
+    gap: 8px;
+}
+
+.painel-acessibilidade button {
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 8px;
+    background: var(--branco);
+    color: var(--preto);
+    font: inherit;
+    cursor: pointer;
+}
+
+.painel-acessibilidade button:hover {
+    border-color: var(--vermelho-escuro);
+}
+
+.painel-acessibilidade button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.acessibilidade-opcao {
+    justify-content: flex-start;
+}
+
+.acessibilidade-opcao input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--vermelho-escuro);
+}
+
+.painel-acessibilidade .acessibilidade-leitura {
+    width: 100%;
+    margin-top: 8px;
+    border-color: var(--vermelho-escuro);
+    background: var(--vermelho-escuro);
+    color: #fff;
+    font-weight: 700;
+}
+
+.acessibilidade-ajuda {
+    margin-top: 12px;
+    color: var(--cinza-suave);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+html[data-contrast="high"] body,
+html[data-contrast="high"] .topbar,
+html[data-contrast="high"] .sidebar,
+html[data-contrast="high"] .historico,
+html[data-contrast="high"] .historico-dia,
+html[data-contrast="high"] .historico-dia > summary,
+html[data-contrast="high"] .registro-item,
+html[data-contrast="high"] .card,
+html[data-contrast="high"] .atalho,
+html[data-contrast="high"] .grafico-box,
+html[data-contrast="high"] .perfil-card,
+html[data-contrast="high"] .card-calc,
+html[data-contrast="high"] .chat-container,
+html[data-contrast="high"] .mockup-card,
+html[data-contrast="high"] .auth-card,
+html[data-contrast="high"] .landing-hero,
+html[data-contrast="high"] .landing-sobre,
+html[data-contrast="high"] .landing-faq,
+html[data-contrast="high"] .landing-cta-final,
+html[data-contrast="high"] .team-page,
+html[data-contrast="high"] .team-card,
+html[data-contrast="high"] .sobre-card,
+html[data-contrast="high"] .faq-item,
+html[data-contrast="high"] .modal-box,
+html[data-contrast="high"] .registro-observacao,
+html[data-contrast="high"] .painel-acessibilidade,
+html[data-contrast="high"] .theme-toggle-float,
+html[data-contrast="high"] .accessibility-toggle-float {
+    border-color: #ffeb3b !important;
+    background: #000 !important;
+    color: #fff !important;
+    background-image: none !important;
+}
+
+html[data-contrast="high"] body,
+html[data-contrast="high"] body :is(h1, h2, h3, h4, p, span, strong, label, li, summary, time, .meta-label, .registro-label) {
+    color: #fff !important;
+}
+
+html[data-contrast="high"] body a,
+html[data-contrast="high"] body button,
+html[data-contrast="high"] body summary::marker,
+html[data-contrast="high"] .historico-dia-contagem {
+    color: #ffeb3b !important;
+}
+
+html[data-contrast="high"] body :is(input, select, textarea),
+html[data-contrast="high"] .painel-acessibilidade button,
+html[data-contrast="high"] .filtro-periodo {
+    border: 2px solid #ffeb3b !important;
+    background: #000 !important;
+    color: #fff !important;
+}
+
+html[data-contrast="high"] body :is(button, a, input, select, textarea, summary):focus,
+html[data-contrast="high"] body :is(button, a, input, select, textarea, summary):focus-visible,
+body.a11y-focus-visible :focus {
+    outline: 3px solid #ffeb3b !important;
+    outline-offset: 3px;
+}
+
+/* Grupos diários do histórico */
+.historico-dia {
+    overflow: hidden;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 14px;
+    background: var(--branco);
+}
+
+.historico-dia + .historico-dia {
+    margin-top: 14px;
+}
+
+.historico-dia > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    background: var(--cinza-fundo);
+    color: var(--preto);
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style-position: inside;
+}
+
+.historico-dia-contagem {
+    flex: 0 0 auto;
+    color: var(--cinza-suave);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.historico-dia-registros {
+    padding: 14px;
+}
+
+.historico-vazio {
+    padding: 18px;
+    color: var(--cinza-suave);
+}
+
+.filtros-historico {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: -12px 0 24px;
+}
+
+.filtro-periodo {
+    min-height: 42px;
+    padding: 9px 16px;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 999px;
+    background: var(--branco);
+    color: var(--cinza-texto);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.filtro-periodo:hover,
+.filtro-periodo.ativo {
+    border-color: var(--vermelho-escuro);
+    background: var(--vermelho-escuro);
+    color: #fff;
+}
+
+.filtro-periodo:focus-visible,
+.historico-dia > summary:focus-visible {
+    outline: 3px solid var(--vermelho);
+    outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+    .painel-acessibilidade,
+    .accessibility-toggle-float,
+    .theme-toggle-float {
+        right: 14px;
+    }
+
+    .historico-dia > summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .historico-dia-registros {
+        padding: 10px;
+    }
+}
