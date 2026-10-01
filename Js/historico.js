@@ -1,4 +1,4 @@
-﻿// Estado do histórico: registros vindos da API (mais recentes primeiro).
+// Estado do histórico: registros vindos da API (mais recentes primeiro).
 let registros = [];
 
 async function carregarHistorico() {
@@ -22,11 +22,11 @@ function formatarGlicemia(valor) {
     const numero = Number(valor);
     const textoValor = String(valor).toUpperCase();
 
-    if (textoValor === "HI" || (Number.isFinite(numero) && numero > 600)) {
+    if (textoValor === "HI") {
         return "HI";
     }
 
-    if (textoValor === "LO" || (Number.isFinite(numero) && numero < 20)) {
+    if (textoValor === "LO") {
         return "LO";
     }
 
@@ -151,8 +151,8 @@ function atualizarHistorico() {
                     ${registro.observacao ? `
                         <div class="registro-observacao">
                             <span>Observação</span>
-                            <span class="registro-observacao-texto" id="observacao-${index}">${escaparHtml(registro.observacao)}</span>
-                            <button class="registro-observacao-mais" type="button" aria-expanded="false" aria-controls="observacao-${index}" hidden>Ler mais</button>
+                            <span class="registro-observacao-texto" id="observacao-${indice}">${escaparHtml(registro.observacao)}</span>
+                            <button class="registro-observacao-mais" type="button" aria-expanded="false" aria-controls="observacao-${indice}" hidden>Ler mais</button>
                         </div>
                     ` : ""}
                 </div>
@@ -225,8 +225,8 @@ function editarRegistro(index) {
     }
     indiceRegistroEdicao = index;
     document.getElementById("editRegistroGlicemia").value =
-        registro.glicemiaAcimaDoLimite ? "" : (registro.glicemia ?? "");
-    document.getElementById("editRegistroDose").value = registro.dose || "";
+        registro.glicemiaAcimaDoLimite ? "HI" : (registro.glicemia || "");
+    document.getElementById("editRegistroDose").value = registro.dose ?? "";
     document.getElementById("editRegistroHora").value = registro.hora || "";
     document.getElementById("editRegistroData").value = registro.dataIso || "";
     document.getElementById("editRegistroData").max = hojeIso();
@@ -251,7 +251,7 @@ async function salvarEdicaoRegistro(event) {
     if (salvandoEdicaoRegistro || indiceRegistroEdicao < 0) return;
 
     const registro = registros[indiceRegistroEdicao];
-    const glicemia = document.getElementById("editRegistroGlicemia").value;
+    const glicemia = document.getElementById("editRegistroGlicemia").value.trim().toUpperCase();
     const dose = document.getElementById("editRegistroDose").value;
     const hora = document.getElementById("editRegistroHora").value;
     const data = document.getElementById("editRegistroData").value;
@@ -263,9 +263,8 @@ async function salvarEdicaoRegistro(event) {
         return;
     }
 
-    const valorGlicemia = Number(glicemia);
-    if (glicemia !== "" && (!Number.isFinite(valorGlicemia) || valorGlicemia < 0)) {
-        alert("Informe uma glicemia válida igual ou maior que 0 mg/dL.");
+    if (glicemia !== "" && glicemia !== "HI" && (!Number.isInteger(Number(glicemia)) || Number(glicemia) < 1)) {
+        alert("Informe glicemia inteira positiva ou HI.");
         return;
     }
 
@@ -286,16 +285,16 @@ async function salvarEdicaoRegistro(event) {
         botaoSalvar.textContent = "Salvando...";
     }
 
-    const continuaHi = (registro.glicemiaAcimaDoLimite && glicemia === "")
-        || (glicemia !== "" && valorGlicemia > 600);
+    // Leitura "HI" sem número digitado continua HI; com número vira leitura normal.
+    const continuaHi = glicemia === "HI" || (registro.glicemiaAcimaDoLimite && glicemia === "");
 
     try {
         await RegistroApi.atualizar(registro.id, {
-            glicemia: continuaHi ? null : valorGlicemia,
+            glicemia: continuaHi ? null : Number(glicemia),
             glicemiaAcimaDoLimite: continuaHi,
             dose: dose === "" ? 0 : Math.round(Number(dose) * 10) / 10,
             hora: `${hora}:00`,
-            refeicao,
+            refeicao: refeicaoParaApi(refeicao),
             data,
             observacao: observacao || null
         });
@@ -440,6 +439,8 @@ async function solicitarPdfAoBackend(dataInicio, dataFim) {
 // Inicialização
 window.addEventListener("load", () => {
     carregarHistorico();
+
+
 
     const doseInput = document.getElementById("editRegistroDose");
     if (doseInput) {

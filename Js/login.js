@@ -4,6 +4,13 @@ const campoEmail = document.getElementById("email");
 const campoSenha = document.getElementById("senha");
 const lembrarMe = document.getElementById("lembrarMe");
 
+const avisoLogin = sessionStorage.getItem("avisoLogin");
+if (avisoLogin) {
+    const aviso = document.createElement("p");
+    aviso.className = "auth-subtitle"; aviso.setAttribute("role", "status"); aviso.textContent = avisoLogin;
+    formLogin.before(aviso); sessionStorage.removeItem("avisoLogin");
+}
+
 // Já logado: vai direto para o painel.
 if (estaLogado()) {
     window.location.replace("dashboard.html");
@@ -43,12 +50,6 @@ if (formLogin && erroLogin && campoEmail && campoSenha && lembrarMe) {
 
             window.location.href = "dashboard.html";
         } catch (erro) {
-            if (erro.status === 403) {
-                // Senha certa, mas o e-mail ainda não foi confirmado.
-                sessionStorage.setItem("cadastroPendente", JSON.stringify({ nome: "", email, senha }));
-                window.location.href = "confirmar-email.html";
-                return;
-            }
             mostrarErro(erro.message || "E-mail ou senha inválidos.");
             botao.disabled = false;
             botao.textContent = textoOriginal;
@@ -66,4 +67,12 @@ function mostrarErro(mensagem) {
 function esconderErro() {
     erroLogin.textContent = "";
     erroLogin.style.display = "none";
+}
+
+const cadastroEmAndamento = JSON.parse(sessionStorage.getItem("cadastroPendente") || "null");
+if (cadastroEmAndamento?.tentativaId) {
+    const retomar = document.createElement("a");
+    retomar.href = "confirmar-email.html"; retomar.className = "auth-link";
+    retomar.textContent = "Continuar confirmação do cadastro nesta aba";
+    document.querySelector(".auth-footer-text").append(document.createElement("br"), retomar);
 }

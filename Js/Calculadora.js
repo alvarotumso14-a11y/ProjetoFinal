@@ -111,13 +111,8 @@ window.addEventListener('load', () => {
     }
 
     if (inputHgtAtual) {
-        // Limita a digitação do HGT atual a 600 (evita valores fora da faixa e resultado "quebrando" o layout)
-        inputHgtAtual.addEventListener('input', () => {
-            if (Number(inputHgtAtual.value) > 600) {
-                inputHgtAtual.value = 600;
-            }
-            calcularDoseCorrecaPagina();
-        });
+        // Preserve a leitura informada; não substitua valores silenciosamente.
+        inputHgtAtual.addEventListener('input', calcularDoseCorrecaPagina);
     }
 
     atualizarConfiguracaoPerfilNaTela();
