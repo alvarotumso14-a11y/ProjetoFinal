@@ -1,3 +1,37 @@
+// Consulta ao sair do campo e novamente ao enviar, sem criar usuário ou enviar e-mail.
+let consultaCadastroEmail = '';
+let consultaCadastroPromise;
+function consultarFluxoCadastro(email) {
+    if (consultaCadastroEmail !== email || !consultaCadastroPromise) {
+        consultaCadastroEmail = email;
+        consultaCadastroPromise = UsuarioApi.consultarCadastro(email).catch(erro => {
+            consultaCadastroPromise = undefined;
+            throw erro;
+        });
+    }
+    return consultaCadastroPromise;
+}
+function encaminharReativacao(email) {
+    sessionStorage.removeItem('cadastroPendente');
+    sessionStorage.setItem('emailReativacao', email);
+    window.location.href = 'reativar-conta.html';
+}
+document.getElementById('email')?.addEventListener('blur', async (evento) => {
+    const email = evento.target.value.trim().toLowerCase();
+    if (!email || !evento.target.checkValidity()) return;
+    try {
+        const resposta = await consultarFluxoCadastro(email);
+        if (document.getElementById('email').value.trim().toLowerCase() !== email) return;
+        if (resposta.status === 'desativado') encaminharReativacao(email);
+        else if (resposta.status === 'ativo') {
+            erroCadastro.innerText = 'Este e-mail já tem uma conta ativa. Entre pela página de login.';
+            erroCadastro.style.display = 'block';
+        }
+    } catch (erro) {
+        erroCadastro.innerText = erro.message;
+        erroCadastro.style.display = 'block';
+    }
+});
 // Script simples para processar o formulário de cadastro e salvar as configurações do usuário
 const form = document.getElementById('formCadastro');
 const erroCadastro = document.getElementById('erroCadastro');
@@ -41,7 +75,7 @@ botoesVisibilidade.forEach((botao) => {
 });
 
 if (form) {
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
         erroCadastro.style.display = 'none';
         erroCadastro.innerText = '';
@@ -84,12 +118,33 @@ if (form) {
             return;
         }
 
-        if (senha.length < 8) {
-            erroCadastro.innerText = 'A senha deve ter no mínimo 8 caracteres.';
+        if (senha.length < 8 || senha.length > 64 || new TextEncoder().encode(senha).length > 72) {
+            erroCadastro.innerText = 'A senha deve ter entre 8 e 64 caracteres e até 72 bytes; letras acentuadas podem ocupar mais de um byte.';
             erroCadastro.style.display = 'block';
             return;
         }
 
+        const botao = form.querySelector('button[type="submit"]');
+        if (botao.disabled) return;
+        botao.disabled = true;
+        try {
+            const resposta = await consultarFluxoCadastro(email.toLowerCase());
+            if (resposta.status === 'desativado') {
+                encaminharReativacao(email.toLowerCase());
+                return;
+            }
+            if (resposta.status === 'ativo') {
+                erroCadastro.innerText = 'Este e-mail já tem uma conta ativa. Entre pela página de login.';
+                erroCadastro.style.display = 'block';
+                return;
+            }
+        } catch (erro) {
+            erroCadastro.innerText = erro.message;
+            erroCadastro.style.display = 'block';
+            return;
+        } finally {
+            botao.disabled = false;
+        }
         // A conta só é criada na API depois da configuração inicial (tipo de diabetes,
         // fator de sensibilidade e HGT alvo são obrigatórios no back-end).
         // Até lá, os dados ficam só nesta aba (sessionStorage some ao fechar a aba).

@@ -1,4 +1,4 @@
-﻿// Estado da aplicação
+// Estado da aplicação
 // Os registros vêm da API (mais recentes primeiro). Veja carregarRegistros().
 let registros = [];
 
@@ -74,11 +74,11 @@ function formatarGlicemia(valor) {
     const numero = Number(valor);
     const textoValor = String(valor).toUpperCase();
 
-    if (textoValor === "HI" || (Number.isFinite(numero) && numero > 600)) {
+    if (textoValor === "HI") {
         return "HI";
     }
 
-    if (textoValor === "LO" || (Number.isFinite(numero) && numero < 20)) {
+    if (textoValor === "LO") {
         return "LO";
     }
 
@@ -190,7 +190,7 @@ async function carregarRegistros() {
         console.error("Não foi possível carregar os registros.", erro);
         const container = document.getElementById("ultimosRegistrosDashboard");
         if (container) {
-            container.innerHTML = `<p class="dashboard-empty">${erro.message}</p>`;
+            container.innerHTML = `<p class="dashboard-empty">${escaparHtmlDashboard(erro.message)}</p>`;
         }
         return;
     }
@@ -203,7 +203,8 @@ async function carregarRegistros() {
 async function salvarRegistro() {
     if (salvandoRegistro) return;
 
-    const glicemia = document.getElementById("inputGlicemia").value;
+    const glicemia = document.getElementById("inputGlicemia").value.trim().toUpperCase();
+    const hi = glicemia === "HI";
     const doseInput = document.getElementById("inputDose").value;
     const dose = doseInput == "" ? 0 : Math.round(Number(doseInput) * 10) / 10;
     const hora = document.getElementById("inputHora").value;
@@ -215,9 +216,8 @@ async function salvarRegistro() {
         return;
     }
 
-    const valorGlicemia = Number(glicemia);
-    if (!Number.isFinite(valorGlicemia) || valorGlicemia < 0) {
-        alert("Informe uma glicemia válida igual ou maior que 0 mg/dL.");
+    if (!hi && (!Number.isInteger(Number(glicemia)) || Number(glicemia) < 1)) {
+        alert("Informe glicemia inteira positiva ou HI.");
         return;
     }
 
@@ -235,11 +235,11 @@ async function salvarRegistro() {
 
     try {
         await RegistroApi.criar({
-            glicemia: valorGlicemia > 600 ? null : valorGlicemia,
-            glicemiaAcimaDoLimite: valorGlicemia > 600,
+            glicemia: hi ? null : Number(glicemia),
+            glicemiaAcimaDoLimite: hi,
             dose,
             hora: `${hora}:00`,
-            refeicao,
+            refeicao: refeicaoParaApi(refeicao),
             data: hojeIso(),
             observacao: observacao || null
         });
@@ -288,9 +288,7 @@ function criarGrafico() {
             }),
             datasets: [{
                 label: "Glicemia",
-                data: ultimos.map((registro) => registro.glicemiaAcimaDoLimite
-                    ? 600
-                    : Math.min(Number(registro.glicemia) || 0, 600)),
+                data: ultimos.map((registro) => (registro.glicemiaAcimaDoLimite ? null : Number(registro.glicemia))),
                 borderColor: "#c0392b",
                 backgroundColor: "rgba(192, 57, 43, .15)",
                 fill: true,
@@ -397,5 +395,6 @@ window.addEventListener("load", () => {
             if (Number(inputDoseModal.value) < 0) inputDoseModal.value = 0;
         });
     }
+
 
 });
