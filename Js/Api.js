@@ -9,12 +9,14 @@
 // - Rodando no site publicado: usa API_PRODUCAO.
 // Depois de publicar a API, troque API_PRODUCAO pela URL do Render.
 // ------------------------------------------------------------
-const API_PRODUCAO = "https://glichelp-api.onrender.com/api";
-const API_LOCAL = "http://localhost:5288/api";
+const API_PRODUCAO = ""; // Configure explicitamente antes de publicar esta copia.
+const API_LOCAL = "http://localhost:5388/api";
 
 const API_BASE_URL = (() => {
     const host = window.location.hostname;
     const local = window.location.protocol === "file:" || host === "localhost" || host === "127.0.0.1";
+    const configurada = window.GLICHELP_API_URL;
+    if (configurada) return configurada.replace(/\/$/, "");
     return local ? API_LOCAL : API_PRODUCAO;
 })();
 
@@ -53,7 +55,8 @@ function salvarSessao(loginResposta) {
 }
 
 function limparSessao() {
-    [CHAVE_TOKEN, "usuarioId", "profile", "usuario", "registros", "ultimoHGT", "ultimoInsulinaEstimada"]
+    sessionStorage.removeItem("alteracaoEmailPendente");
+    [CHAVE_TOKEN, "usuarioId", "profile", "usuario", "registros", "ultimoHGT", "ultimoInsulinaEstimada", "glicbotLogs"]
         .forEach((chave) => localStorage.removeItem(chave));
 }
 
@@ -75,6 +78,7 @@ function logout() {
 // Chamada genérica: adiciona o token, trata erros e mensagens da API.
 // ------------------------------------------------------------
 async function apiFetch(caminho, opcoes = {}) {
+    if (!API_BASE_URL) throw new Error("A API deste site ainda não foi configurada.");
     const token = obterToken();
     const headers = { ...(opcoes.headers || {}) };
 
@@ -136,7 +140,7 @@ async function lerMensagemDeErro(resposta) {
         if (corpo.errors) {
             return Object.values(corpo.errors).flat().join(" ");
         }
-        return corpo.title || corpo.message || texto;
+        return corpo.detail || corpo.title || corpo.mensagem || corpo.message || texto;
     } catch {
         return texto;
     }
@@ -168,7 +172,7 @@ const UsuarioApi = {
         return apiFetch("/usuario/perfil");
     },
 
-    // dto: { email, codigo } — código de 6 dígitos enviado por e-mail
+    // dto: { email, codigo, tentativaId } — código de 6 dígitos enviado por e-mail
     confirmarEmail(dto) {
         return apiFetch("/usuario/confirmar-email", { method: "POST", body: JSON.stringify(dto) });
     },
@@ -182,9 +186,20 @@ const UsuarioApi = {
         return apiFetch("/usuario/perfil", { method: "PATCH", body: JSON.stringify(dto) });
     },
 
-    // Exclusão definitiva (LGPD): apaga conta e registros. Exige a senha.
-    excluirConta(senha) {
-        return apiFetch("/usuario/excluir-conta", { method: "POST", body: JSON.stringify({ senha }) });
+    confirmarNovoEmail(codigo) {
+        return apiFetch("/usuario/confirmar-novo-email", { method: "POST", body: JSON.stringify({ codigo }) });
+    },
+
+    desativar() {
+        return apiFetch("/usuario/perfil", { method: "DELETE" });
+    },
+
+    consultarCadastro(email) {
+        return apiFetch("/usuario/consultar-cadastro", { method: "POST", body: JSON.stringify({ email }) });
+    },
+
+    reativar(dto) {
+        return apiFetch("/usuario/reativar", { method: "POST", body: JSON.stringify(dto) });
     }
 };
 
@@ -192,9 +207,9 @@ const UsuarioApi = {
 // REGISTROS DE GLICEMIA  (/api/registro-glicemia)
 // ------------------------------------------------------------
 const RegistroApi = {
-    // Mais recentes primeiro. tamanho máximo: 500
-    listar(pagina = 1, tamanho = 100) {
-        return apiFetch(`/registro-glicemia?pagina=${pagina}&tamanho=${tamanho}`);
+    // O backend atual retorna a lista completa, sem paginação.
+    listar() {
+        return apiFetch("/registro-glicemia");
     },
 
     buscarPorId(id) {
@@ -251,6 +266,11 @@ function registroDaApi(r) {
         data: `${dia}/${mes}/${ano}`,
         dataIso: r.data
     };
+}
+
+// Os ícones pertencem à apresentação; a API recebe o nome da refeição.
+function refeicaoParaApi(valor) {
+    return REFEICAO_EXIBICAO[valor] || valor;
 }
 
 function ordenarRegistrosRecentes(registros) {

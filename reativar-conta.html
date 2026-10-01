@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <script src="Js/theme.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>GlicHelp — Reativar conta</title>
+</head>
+<body class="auth-body">
+    <div class="auth-page"><div class="auth-card">
+        <a href="index.html" class="auth-brand"><img src="Logos/Favicon.png" alt="GlicHelp" class="auth-logo-img"><span class="auth-brand-name">GlicHelp</span></a>
+        <h1 class="auth-title">Reativar conta</h1>
+        <p class="auth-subtitle">Encontramos uma conta desativada com este e-mail. Informe sua senha atual para recuperar o acesso e seus registros.</p>
+        <div id="erroReativacao" class="auth-error" role="alert" aria-live="polite" style="display:none;"></div>
+        <form id="formReativacao" class="auth-form">
+            <div class="auth-field"><label for="email">E-mail</label><input id="email" type="email" autocomplete="email" required maxlength="255"></div>
+            <div class="auth-field"><label for="senha">Senha atual</label><input id="senha" type="password" autocomplete="current-password" required maxlength="64"></div>
+            <button type="submit" class="btn-verde auth-submit">Reativar conta</button>
+        </form>
+        <p class="auth-footer-text"><a href="cadastro.html" class="auth-link">Voltar para criar conta</a> · <a href="login.html" class="auth-link">Entrar</a></p>
+    </div></div>
+    <script src="Js/Api.js"></script>
+    <script src="Js/reativar-conta.js"></script>
+</body>
+</html>

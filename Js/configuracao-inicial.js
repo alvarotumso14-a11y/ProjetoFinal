@@ -47,12 +47,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const idade = Number(document.getElementById("idadeInicial").value);
         const tipoDiabetes = document.getElementById("tipoDiabetesInicial").value;
         const fatorSensibilidade = Number(document.getElementById("fatorSensibilidadeInicial").value);
-        const hgtAlvo = Math.round(Number(document.getElementById("hgtAlvoInicial").value));
+        const hgtAlvo = Number(document.getElementById("hgtAlvoInicial").value);
 
-        if (!idade || idade < 1 || idade > 120 || !tipoDiabetes
+        if (!Number.isInteger(idade) || !Number.isInteger(fatorSensibilidade) || !Number.isInteger(hgtAlvo) || !idade || idade < 1 || idade > 120 || !tipoDiabetes
             || !(fatorSensibilidade >= 1 && fatorSensibilidade <= 600)
             || !(hgtAlvo >= 1 && hgtAlvo <= 600)) {
-            mostrarErro("Preencha todos os campos com valores válidos (fator e HGT alvo entre 1 e 600).");
+            mostrarErro("Preencha idade, fator e HGT alvo com números inteiros válidos (fator e HGT alvo entre 1 e 600).");
             return;
         }
 
@@ -70,13 +70,13 @@ document.addEventListener("DOMContentLoaded", () => {
         botao.textContent = "Criando sua conta...";
 
         try {
-            await UsuarioApi.criar({
+            const cadastro = await UsuarioApi.criar({
                 name: pendente.nome,
                 email: pendente.email,
                 senha: pendente.senha,
                 tipoDiabetes,
                 idade,
-                fatorSensibilidade: Math.round(fatorSensibilidade * 10) / 10,
+                fatorSensibilidade: fatorSensibilidade,
                 hgtAlvo,
                 aceitouTermos: pendente.aceitouTermos === true,
                 consentiuDadosSaude: pendente.consentiuDadosSaude === true,
@@ -84,26 +84,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 consentimentoResponsavel: menor ? consentimentoResponsavel : false
             });
 
-            try {
-                const resposta = await UsuarioApi.login({ email: pendente.email, senha: pendente.senha });
-                sessionStorage.removeItem("cadastroPendente");
-                salvarSessao(resposta);
-                window.location.href = "dashboard.html";
-            } catch (erroLogin) {
-                if (erroLogin.status === 403) {
-                    // Conta criada; falta confirmar o e-mail com o código enviado.
-                    window.location.href = "confirmar-email.html";
-                    return;
-                }
-                throw erroLogin;
-            }
+            if (!cadastro?.tentativaId) throw new Error("O servidor não retornou a tentativa de cadastro.");
+            sessionStorage.setItem("cadastroPendente", JSON.stringify({
+                nome: pendente.nome, email: pendente.email, senha: pendente.senha,
+                tentativaId: cadastro.tentativaId
+            }));
+            window.location.href = "confirmar-email.html";
         } catch (e) {
             const jaExiste = /já existe/i.test(e.message);
             mostrarErro(jaExiste
                 ? "Este e-mail já tem cadastro. Faça login ou volte e use outro e-mail."
                 : e.message);
             botao.disabled = false;
-            botao.textContent = "Salvar e entrar";
+            botao.textContent = "Salvar e confirmar e-mail";
         }
     });
 
@@ -114,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function aplicarLimite(campo, limite, aviso) {
         const excedeuLimite = campo.valueAsNumber > limite;
-        if (excedeuLimite) campo.value = String(limite);
         aviso.style.display = excedeuLimite ? "block" : "none";
     }
 });
