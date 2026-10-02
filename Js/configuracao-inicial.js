@@ -18,8 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Menor de 18: mostra os campos do responsável legal (LGPD art. 14)
     const campoIdade = document.getElementById("idadeInicial");
     const blocoResponsavel = document.getElementById("blocoResponsavel");
+    FormInputs.limitarInteiro(campoIdade, 120, document.getElementById("idadeInicialWarning"));
     campoIdade.addEventListener("input", () => {
-        aplicarLimite(campoIdade, 120, document.getElementById("idadeInicialWarning"));
+
         const idade = Number(campoIdade.value);
         blocoResponsavel.hidden = !(idade >= 1 && idade < 18);
     });
@@ -29,9 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ["hgtAlvoInicial", "hgtAlvoInicialWarning"]
     ].forEach(([id, avisoId]) => {
         const campo = document.getElementById(id);
-        campo.addEventListener("input", () => {
-            aplicarLimite(campo, 600, document.getElementById(avisoId));
-        });
+        FormInputs.limitarInteiro(campo, 600, document.getElementById(avisoId));
     });
 
     document.getElementById("iniciarConfiguracao").addEventListener("click", () => {
@@ -76,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 senha: pendente.senha,
                 tipoDiabetes,
                 idade,
+                celular: pendente.celular || null,
                 fatorSensibilidade: fatorSensibilidade,
                 hgtAlvo,
                 aceitouTermos: pendente.aceitouTermos === true,
@@ -103,10 +103,5 @@ document.addEventListener("DOMContentLoaded", () => {
     function mostrarErro(mensagem) {
         erro.textContent = mensagem;
         erro.hidden = false;
-    }
-
-    function aplicarLimite(campo, limite, aviso) {
-        const excedeuLimite = campo.valueAsNumber > limite;
-        aviso.style.display = excedeuLimite ? "block" : "none";
     }
 });

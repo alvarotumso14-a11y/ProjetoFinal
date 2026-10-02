@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="warning-text" id="idadeWarning" role="status" aria-live="polite">Limite máximo e de 120 anos</span>
                         </label>
                         <label for="editEmail">E-mail<input type="email" id="editEmail" required></label>
-                        <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="numeric" maxlength="11" placeholder="Somente números"></label>
+                        <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="numeric" maxlength="15" placeholder="(11) 99999-9999" autocomplete="tel-national"></label>
                         <label for="editFatorSensibilidade">Fator de sensibilidade
                             <input type="number" id="editFatorSensibilidade" min="1" max="600" step="1" required>
                             <span class="warning-text" id="fatorWarning" role="status" aria-live="polite">Limite máximo e de 600</span>
@@ -222,9 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const celularInput = document.getElementById('editCelular');
     if (celularInput) {
-        celularInput.addEventListener('input', () => {
-            celularInput.value = celularInput.value.replace(/\D/g, '').slice(0, 11);
-        });
+        FormInputs.telefone(celularInput);
     }
 
     [
@@ -234,10 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ].forEach(([inputId, limite, warningId]) => {
         const input = document.getElementById(inputId);
         const warning = document.getElementById(warningId);
-        input.addEventListener('input', () => {
-            const excedeuLimite = input.valueAsNumber > limite;
-            warning.style.display = excedeuLimite ? 'block' : 'none';
-        });
+        FormInputs.limitarInteiro(input, limite, warning);
     });
 }
 
@@ -253,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('editTipo').value = profile.tipo || 'Tipo 1';
         document.getElementById('editIdade').value = calcularIdadeAtual(profile);
         document.getElementById('editEmail').value = profile.email || '';
-        document.getElementById('editCelular').value = profile.celular || '';
+        document.getElementById('editCelular').value = FormInputs.formatarTelefone(profile.celular);
         document.getElementById('editFatorSensibilidade').value = profile.fatorSensibilidade || '';
         document.getElementById('editHgtAlvo').value = profile.hgtAlvo || '';
         document.getElementById('editPhoto').value = '';

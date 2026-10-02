@@ -1,3 +1,4 @@
+FormInputs.telefone(document.getElementById('celular'));
 // Consulta ao sair do campo e novamente ao enviar, sem criar usuário ou enviar e-mail.
 let consultaCadastroEmail = '';
 let consultaCadastroPromise;
@@ -150,6 +151,7 @@ if (form) {
         // Até lá, os dados ficam só nesta aba (sessionStorage some ao fechar a aba).
         sessionStorage.setItem('cadastroPendente', JSON.stringify({
             nome,
+            celular: document.getElementById('celular').value.replace(/\D/g, ''),
             email: email.toLowerCase(),
             senha,
             aceitouTermos: true,
