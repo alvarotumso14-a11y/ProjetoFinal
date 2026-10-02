@@ -10,7 +10,7 @@
 // Depois de publicar a API, troque API_PRODUCAO pela URL do Render.
 // ------------------------------------------------------------
 const API_PRODUCAO = ""; // Configure explicitamente antes de publicar esta copia.
-const API_LOCAL = "http://localhost:5388/api";
+const API_LOCAL = "http://localhost:5288/api";
 
 const API_BASE_URL = (() => {
     const host = window.location.hostname;
