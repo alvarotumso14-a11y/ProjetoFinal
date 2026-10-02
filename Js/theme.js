@@ -73,44 +73,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const focoVisivel = painelAcessibilidade.querySelector('#focoVisivel');
     const botaoLeitura = painelAcessibilidade.querySelector('#leituraEmVozAlta');
     let tamanhoFonte = Math.min(1.3, Math.max(0.8, preferenciasAcessibilidade.tamanhoFonte));
-    let escalaFonteAplicada = 1;
     let tamanhosOriginais = new WeakMap();
     let leituraAtiva = false;
 
     function aplicarTamanhoFonte(recalcular = false) {
         const elementos = document.querySelectorAll('body *:not(svg):not(path)');
+        elementos.forEach((elemento) => {
+            const original = tamanhosOriginais.get(elemento);
+            if (!original) return;
+            if (original.estilo) {
+                elemento.style.setProperty('font-size', original.estilo, original.prioridade);
+            } else {
+                elemento.style.removeProperty('font-size');
+            }
+        });
+
         if (recalcular) {
-            elementos.forEach((elemento) => {
-                const tamanhoOriginal = tamanhosOriginais.get(elemento);
-                if (!tamanhoOriginal) return;
-                if (tamanhoOriginal.estilo) {
-                    elemento.style.setProperty('font-size', tamanhoOriginal.estilo, tamanhoOriginal.prioridade);
-                } else {
-                    elemento.style.removeProperty('font-size');
-                }
-            });
             tamanhosOriginais = new WeakMap();
-            escalaFonteAplicada = 1;
         }
 
         elementos.forEach((elemento) => {
-            let original = tamanhosOriginais.get(elemento);
-            if (!original) {
-                const tamanhoAtual = parseFloat(getComputedStyle(elemento).fontSize);
-                const pai = elemento.parentElement;
-                const tamanhoPai = pai ? parseFloat(getComputedStyle(pai).fontSize) : NaN;
-                const originalDoPai = pai ? tamanhosOriginais.get(pai) : null;
-                const tamanhoBase = pai && Math.abs(tamanhoAtual - tamanhoPai) < 0.05
-                    ? (originalDoPai?.tamanho || tamanhoPai / escalaFonteAplicada)
-                    : tamanhoAtual;
-                original = {
-                    tamanho: tamanhoBase,
+            if (!tamanhosOriginais.has(elemento)) {
+                tamanhosOriginais.set(elemento, {
+                    tamanho: parseFloat(getComputedStyle(elemento).fontSize),
                     estilo: elemento.style.getPropertyValue('font-size'),
                     prioridade: elemento.style.getPropertyPriority('font-size')
-                };
-                tamanhosOriginais.set(elemento, original);
+                });
             }
+        });
 
+        elementos.forEach((elemento) => {
+            const original = tamanhosOriginais.get(elemento);
             if (tamanhoFonte === 1) {
                 if (original.estilo) {
                     elemento.style.setProperty('font-size', original.estilo, original.prioridade);
@@ -121,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 elemento.style.setProperty('font-size', `${original.tamanho * tamanhoFonte}px`);
             }
         });
-        escalaFonteAplicada = tamanhoFonte;
     }
 
     function aplicarPreferenciasAcessibilidade() {

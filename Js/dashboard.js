@@ -5,6 +5,7 @@ let registros = [];
 // indiceEdicao guarda o índice do registro que está sendo editado. Valor -1 indica que não estamos editando.
 let indiceEdicao = -1;
 let salvandoRegistro = false;
+let atualizarLimiteHorarioTimer = null;
 
 // Referência ao objeto Chart (gráfico) para que possamos destruir e recriar quando os dados mudarem.
 let grafico = null;
@@ -21,18 +22,31 @@ function abrirModal() {
         botaoSalvar.textContent = "Salvar registro";
     }
     modal.style.display = "flex";
+    const data = document.getElementById("inputData");
+    if (data && !data.value) {
+        data.value = hojeIso();
+    }
+    if (data) {
+        data.max = hojeIso();
+    }
     const hora = document.getElementById("inputHora");
     if (hora && !hora.value) {
         hora.value = new Date().toTimeString().slice(0, 5);
     }
+    atualizarLimiteHorarioRegistro();
+    clearInterval(atualizarLimiteHorarioTimer);
+    atualizarLimiteHorarioTimer = setInterval(atualizarLimiteHorarioRegistro, 30000);
     setTimeout(() => document.getElementById("inputHora")?.focus(), 0);
 }
 
 function fecharModal() {
     modal.style.display = "none";
+    clearInterval(atualizarLimiteHorarioTimer);
+    atualizarLimiteHorarioTimer = null;
     indiceEdicao = -1;
 
     document.getElementById("inputHora").value = "";
+    document.getElementById("inputData").value = "";
     document.getElementById("inputGlicemia").value = "";
     document.getElementById("inputRefeicao").value = "";
     const inputDose = document.getElementById("inputDose");
@@ -74,15 +88,29 @@ function formatarGlicemia(valor) {
     const numero = Number(valor);
     const textoValor = String(valor).toUpperCase();
 
-    if (textoValor === "HI" || (Number.isFinite(numero) && numero > 600)) {
+    if (textoValor === "HI" || numero === 501 || (Number.isFinite(numero) && numero > 600)) {
         return "HI";
     }
 
-    if (textoValor === "LO" || (Number.isFinite(numero) && numero < 20)) {
+    if (textoValor === "LO" || numero === 19 || (Number.isFinite(numero) && numero < 20)) {
         return "LO";
     }
 
     return `${valor} mg/dL`;
+}
+
+function atualizarLimiteHorarioRegistro() {
+    const data = document.getElementById("inputData");
+    const hora = document.getElementById("inputHora");
+    if (!data || !hora) return;
+
+    data.max = hojeIso();
+    if (data.value === hojeIso()) {
+        const agora = new Date();
+        hora.max = `${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`;
+    } else {
+        hora.removeAttribute("max");
+    }
 }
 
 function escaparHtmlDashboard(valor) {
@@ -203,21 +231,31 @@ async function carregarRegistros() {
 async function salvarRegistro() {
     if (salvandoRegistro) return;
 
-    const glicemia = document.getElementById("inputGlicemia").value;
+    const glicemiaInput = document.getElementById("inputGlicemia");
+    const glicemia = glicemiaInput.value;
     const doseInput = document.getElementById("inputDose").value;
     const dose = doseInput == "" ? 0 : Math.round(Number(doseInput) * 10) / 10;
+    const data = document.getElementById("inputData").value;
     const hora = document.getElementById("inputHora").value;
     const refeicao = document.getElementById("inputRefeicao").value;
     const observacao = document.getElementById("inputObservacao")?.value.trim() || "";
 
-    if (glicemia === "" || hora === "" || refeicao === "") {
-        alert("Preencha todos os campos!");
+    if (glicemia === "" || data === "" || hora === "" || refeicao === "") {
+        alert("Preencha glicemia, data, horário e refeição.");
+        return;
+    }
+    atualizarLimiteHorarioRegistro();
+
+    const valorGlicemia = Number(glicemia);
+    if (!Number.isInteger(valorGlicemia) || valorGlicemia < 19 || valorGlicemia > 501) {
+        alert("Informe uma glicemia entre 19 e 501 mg/dL. Use 19 para LO e 501 para HI.");
+        glicemiaInput.focus();
         return;
     }
 
-    const valorGlicemia = Number(glicemia);
-    if (!Number.isFinite(valorGlicemia) || valorGlicemia < 0) {
-        alert("Informe uma glicemia válida igual ou maior que 0 mg/dL.");
+    if (data > hojeIso() || dataHoraFutura(data, hora)) {
+        alert("A data e o horário da medição não podem estar no futuro.");
+        document.getElementById("inputHora").focus();
         return;
     }
 
@@ -235,12 +273,12 @@ async function salvarRegistro() {
 
     try {
         await RegistroApi.criar({
-            glicemia: valorGlicemia > 600 ? null : valorGlicemia,
-            glicemiaAcimaDoLimite: valorGlicemia > 600,
+            glicemia: valorGlicemia === 501 ? null : valorGlicemia,
+            glicemiaAcimaDoLimite: valorGlicemia === 501,
             dose,
             hora: `${hora}:00`,
             refeicao,
-            data: hojeIso(),
+            data,
             observacao: observacao || null
         });
     } catch (erro) {
@@ -254,6 +292,7 @@ async function salvarRegistro() {
     }
 
     if (botaoSalvar) botaoSalvar.textContent = "Salvo";
+    mostrarNotificacao("Registro salvo com sucesso.");
     fecharModal();
     await carregarRegistros();
 }
@@ -289,8 +328,8 @@ function criarGrafico() {
             datasets: [{
                 label: "Glicemia",
                 data: ultimos.map((registro) => registro.glicemiaAcimaDoLimite
-                    ? 600
-                    : Math.min(Number(registro.glicemia) || 0, 600)),
+                    ? 500
+                    : Math.min(Number(registro.glicemia) || 0, 500)),
                 borderColor: "#c0392b",
                 backgroundColor: "rgba(192, 57, 43, .15)",
                 fill: true,
@@ -300,6 +339,18 @@ function criarGrafico() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 500,
+                    ticks: {
+                        stepSize: 100,
+                        font: {
+                            size: 12 * (Number(localStorage.getItem("acessibilidade-tamanho-fonte")) || 1)
+                        }
+                    }
+                }
+            },
             plugins: {
                 legend: {
                     display: false
@@ -316,6 +367,13 @@ function criarGrafico() {
         }
     });
 }
+
+window.addEventListener("accessibilityfontsizechange", () => {
+    if (!grafico) return;
+    grafico.options.scales.y.ticks.font.size =
+        12 * (Number(localStorage.getItem("acessibilidade-tamanho-fonte")) || 1);
+    grafico.update();
+});
 
 function obterConfiguracaoDose() {
     const profile = JSON.parse(localStorage.getItem("profile") || "null");
@@ -398,4 +456,11 @@ window.addEventListener("load", () => {
         });
     }
 
+    const inputData = document.getElementById("inputData");
+    inputData?.addEventListener("change", atualizarLimiteHorarioRegistro);
+    inputData?.addEventListener("input", atualizarLimiteHorarioRegistro);
+    const inputHora = document.getElementById("inputHora");
+    inputHora?.addEventListener("focus", atualizarLimiteHorarioRegistro);
+    inputHora?.addEventListener("input", atualizarLimiteHorarioRegistro);
+    atualizarLimiteHorarioRegistro();
 });

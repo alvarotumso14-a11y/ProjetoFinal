@@ -5,8 +5,8 @@ function getConfiguracaoDose() {
 
     return {
         hgtAtual: parseFloat(localStorage.getItem('ultimoHGT') || '0'),
-        hgtAlvo: Math.min(Number(config.hgtAlvo ?? 0), 600), // Limita a 600
-        fatorSensibilidade: Math.min(Number(config.fatorSensibilidade ?? 0), 600) // Limita a 600
+        hgtAlvo: Math.min(Number(config.hgtAlvo ?? 0), 501),
+        fatorSensibilidade: Math.min(Number(config.fatorSensibilidade ?? 0), 501)
     };
 }
 
@@ -111,10 +111,10 @@ window.addEventListener('load', () => {
     }
 
     if (inputHgtAtual) {
-        // Limita a digitação do HGT atual a 600 (evita valores fora da faixa e resultado "quebrando" o layout)
+        // Mantém o HGT atual dentro do limite aceito pelo aplicativo.
         inputHgtAtual.addEventListener('input', () => {
-            if (Number(inputHgtAtual.value) > 600) {
-                inputHgtAtual.value = 600;
+            if (Number(inputHgtAtual.value) > 501) {
+                inputHgtAtual.value = 501;
             }
             calcularDoseCorrecaPagina();
         });

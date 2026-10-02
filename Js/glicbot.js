@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!chatForm || !chatInput || !chatMensagens) {
         return;
     }
+    chatMensagens.setAttribute("role", "log");
+    chatMensagens.setAttribute("aria-live", "polite");
+    chatMensagens.setAttribute("aria-relevant", "additions text");
 
     // ENDPOINT DO BACKEND: nunca chame a API do LLM direto daqui. A chave de API
     // ficaria visível pra qualquer pessoa no DevTools do navegador. Este endpoint
@@ -28,6 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
         chatMensagens.scrollTop = chatMensagens.scrollHeight;
         return bolha;
     }
+
+    adicionarMensagem(
+        "Olá! Sou a TiaBete, assistente virtual do GlicHelp. Como posso ajudar? Minhas informações não substituem a orientação de um profissional de saúde.",
+        "bot"
+    );
 
     // MÉTRICA/LOG — ainda sem backend de analytics, então registramos localmente
     // (console + localStorage) pra não perder visibilidade do uso desde o início.

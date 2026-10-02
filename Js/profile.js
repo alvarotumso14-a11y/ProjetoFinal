@@ -14,6 +14,48 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     let salvandoPerfil = false;
 
+    function formatarTelefone(celular) {
+        const numeros = String(celular || "").replace(/\D/g, "").slice(0, 11);
+        if (numeros.length <= 2) return numeros ? `(${numeros}` : "";
+        if (numeros.length <= 6) return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
+        const tamanhoPrefixo = numeros.length > 10 ? 7 : 6;
+        return `(${numeros.slice(0, 2)}) ${numeros.slice(2, tamanhoPrefixo)}-${numeros.slice(tamanhoPrefixo)}`;
+    }
+
+    function garantirMenuConta() {
+        document.querySelectorAll(".user-top").forEach((userTop) => {
+            if (userTop.querySelector(".account-dropdown")) return;
+            const menu = document.createElement("details");
+            menu.className = "account-dropdown";
+            menu.innerHTML = `
+                <summary aria-label="Abrir opções da conta">
+                    <span aria-hidden="true">⌄</span>
+                </summary>
+                <div class="account-dropdown-menu">
+                    <a href="Profile.html">Editar perfil</a>
+                    <button type="button">Sair</button>
+                </div>
+            `;
+            menu.querySelector("button").addEventListener("click", () => window.logout());
+            userTop.appendChild(menu);
+        });
+
+        if (document.documentElement.dataset.accountMenuBound === "true") return;
+        document.documentElement.dataset.accountMenuBound = "true";
+        document.addEventListener("click", (event) => {
+            document.querySelectorAll(".account-dropdown[open]").forEach((menu) => {
+                if (!menu.contains(event.target)) menu.open = false;
+            });
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                document.querySelectorAll(".account-dropdown[open]").forEach((menu) => {
+                    menu.open = false;
+                });
+            }
+        });
+    }
+
     function calcularIdadeAtual(profile) {
         const idadeInicial = Number(profile.idadeInicial ?? profile.idade);
         if (!Number.isFinite(idadeInicial) || idadeInicial < 1) return '';
@@ -116,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = 'Profile.html';
             };
         });
+        garantirMenuConta();
 
         // Atualiza a foto grande na página de perfil (se existir) para usar a mesma imagem selecionada
         const fotoGrandes = document.querySelectorAll('.foto-grande');
@@ -192,14 +235,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="warning-text" id="idadeWarning" role="status" aria-live="polite">Limite máximo e de 120 anos</span>
                         </label>
                         <label for="editEmail">E-mail<input type="email" id="editEmail" required></label>
-                        <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="numeric" maxlength="11" placeholder="Somente números"></label>
+                        <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(11) 91234-5678"></label>
                         <label for="editFatorSensibilidade">Fator de sensibilidade
-                            <input type="number" id="editFatorSensibilidade" min="1" max="600" step="0.1" required>
-                            <span class="warning-text" id="fatorWarning" role="status" aria-live="polite">Limite máximo e de 600</span>
+                            <input type="number" id="editFatorSensibilidade" min="1" max="501" step="0.1" required>
+                            <span class="warning-text" id="fatorWarning" role="status" aria-live="polite">Limite máximo de 501 atingido.</span>
                         </label>
                         <label for="editHgtAlvo">HGT alvo (mg/dL)
-                            <input type="number" id="editHgtAlvo" min="1" max="600" step="0.1" required>
-                            <span class="warning-text" id="hgtWarning" role="status" aria-live="polite">Limite máximo e de 600 mg/dL</span>
+                            <input type="number" id="editHgtAlvo" min="1" max="501" step="0.1" required>
+                            <span class="warning-text" id="hgtWarning" role="status" aria-live="polite">Limite máximo de 501 mg/dL atingido.</span>
                         </label>
                         <label class="full-width" for="editPhoto">Foto do perfil<input type="file" id="editPhoto" accept="image/*"></label>
                     </div>
@@ -223,14 +266,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const celularInput = document.getElementById('editCelular');
     if (celularInput) {
         celularInput.addEventListener('input', () => {
-            celularInput.value = celularInput.value.replace(/\D/g, '').slice(0, 11);
+            celularInput.value = formatarTelefone(celularInput.value);
         });
     }
 
     [
         ['editIdade', 120, 'idadeWarning'],
-        ['editFatorSensibilidade', 600, 'fatorWarning'],
-        ['editHgtAlvo', 600, 'hgtWarning']
+        ['editFatorSensibilidade', 501, 'fatorWarning'],
+        ['editHgtAlvo', 501, 'hgtWarning']
     ].forEach(([inputId, limite, warningId]) => {
         const input = document.getElementById(inputId);
         const warning = document.getElementById(warningId);
@@ -254,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('editTipo').value = profile.tipo || 'Tipo 1';
         document.getElementById('editIdade').value = calcularIdadeAtual(profile);
         document.getElementById('editEmail').value = profile.email || '';
-        document.getElementById('editCelular').value = profile.celular || '';
+        document.getElementById('editCelular').value = formatarTelefone(profile.celular);
         document.getElementById('editFatorSensibilidade').value = profile.fatorSensibilidade || '';
         document.getElementById('editHgtAlvo').value = profile.hgtAlvo || '';
         document.getElementById('editPhoto').value = '';
@@ -292,12 +335,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let fatorSensibilidade = Number(document.getElementById('editFatorSensibilidade').value);
         let hgtAlvo = Number(document.getElementById('editHgtAlvo').value);
     
-        // Limitar os valores a 600
-        if (fatorSensibilidade > 600) fatorSensibilidade = 600;
-        if (hgtAlvo > 600) hgtAlvo = 600;
+        if (fatorSensibilidade > 501) fatorSensibilidade = 501;
+        if (hgtAlvo > 501) hgtAlvo = 501;
     
         if (!email || !Number.isFinite(fatorSensibilidade) || fatorSensibilidade <= 0 || !Number.isFinite(hgtAlvo) || hgtAlvo <= 0) {
-            alert('Informe um e-mail, fator de sensibilidade e HGT alvo válidos. O HGT alvo deve ser no máximo 600.');
+            alert('Informe um e-mail, fator de sensibilidade e HGT alvo válidos entre 1 e 501.');
             return;
         }
 
@@ -307,6 +349,14 @@ document.addEventListener('DOMContentLoaded', () => {
         botaoSalvar.textContent = 'Salvando...';
     
         const celular = document.getElementById('editCelular').value.replace(/\D/g, '').slice(0, 11);
+        if (celular && ![10, 11].includes(celular.length)) {
+            alert('Informe um telefone com DDD e 10 ou 11 dígitos.');
+            salvandoPerfil = false;
+            botaoSalvar.disabled = false;
+            botaoSalvar.textContent = 'Salvar alterações';
+            document.getElementById('editCelular').focus();
+            return;
+        }
         const hgtAlvoInteiro = Math.round(hgtAlvo);
         const fatorArredondado = Math.round(fatorSensibilidade * 10) / 10;
 
@@ -339,6 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 profile.hgtAlvo = hgtAlvoInteiro;
                 if (photo !== undefined) profile.photo = photo; // foto fica só neste navegador
                 saveProfile(profile);
+                mostrarNotificacao('Perfil salvo com sucesso.');
                 botaoSalvar.textContent = 'Salvo';
                 closeModal();
             }).catch((erro) => {

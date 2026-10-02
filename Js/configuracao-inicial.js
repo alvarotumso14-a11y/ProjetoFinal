@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ].forEach(([id, avisoId]) => {
         const campo = document.getElementById(id);
         campo.addEventListener("input", () => {
-            aplicarLimite(campo, 600, document.getElementById(avisoId));
+            aplicarLimite(campo, 501, document.getElementById(avisoId));
         });
     });
 
@@ -50,9 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const hgtAlvo = Math.round(Number(document.getElementById("hgtAlvoInicial").value));
 
         if (!idade || idade < 1 || idade > 120 || !tipoDiabetes
-            || !(fatorSensibilidade >= 1 && fatorSensibilidade <= 600)
-            || !(hgtAlvo >= 1 && hgtAlvo <= 600)) {
-            mostrarErro("Preencha todos os campos com valores válidos (fator e HGT alvo entre 1 e 600).");
+            || !(fatorSensibilidade >= 1 && fatorSensibilidade <= 501)
+            || !(hgtAlvo >= 1 && hgtAlvo <= 501)) {
+            mostrarErro("Preencha todos os campos com valores válidos (fator e HGT alvo entre 1 e 501).");
             return;
         }
 

@@ -53,23 +53,106 @@ function salvarSessao(loginResposta) {
 }
 
 function limparSessao() {
-    [CHAVE_TOKEN, "usuarioId", "profile", "usuario", "registros", "ultimoHGT", "ultimoInsulinaEstimada"]
+    [
+        CHAVE_TOKEN,
+        "usuarioId",
+        "profile",
+        "usuario",
+        "registros",
+        "ultimoHGT",
+        "ultimoInsulinaEstimada",
+        "glicbotLogs"
+    ]
         .forEach((chave) => localStorage.removeItem(chave));
 }
 
-function logout() {
+async function logout() {
+    const confirmou = window.confirm(
+        "Deseja sair da sua conta? Os dados da sessão e o cache local do aplicativo serão apagados."
+    );
+    if (!confirmou) return;
+
     limparSessao();
-    window.location.href = "login.html";
+    sessionStorage.removeItem("cadastroPendente");
+
+    try {
+        if ("caches" in window) {
+            const cachesLocais = await window.caches.keys();
+            const removidos = await Promise.all(cachesLocais.map((nome) => window.caches.delete(nome)));
+            if (removidos.some((removido) => !removido)) {
+                throw new Error("Um ou mais caches não puderam ser excluídos.");
+            }
+        }
+    } catch (erro) {
+        console.error("Não foi possível limpar todo o cache local.", erro);
+        window.alert("A sessão foi encerrada, mas não foi possível limpar todo o cache do navegador.");
+    }
+
+    window.location.replace("login.html");
 }
 
 // Páginas que exigem login: sem token, volta para o login.
-(function protegerPaginas() {
+function protegerPaginaAtual() {
     const protegidas = ["dashboard.html", "historico.html", "profile.html", "calculadora.html", "glicbot.html"];
     const pagina = (window.location.pathname.split("/").pop() || "").toLowerCase();
     if (protegidas.includes(pagina) && !estaLogado()) {
         window.location.replace("login.html");
     }
-})();
+}
+
+protegerPaginaAtual();
+window.addEventListener("pageshow", protegerPaginaAtual);
+
+function dataHoraFutura(data, hora, agora = new Date()) {
+    const partesData = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(data));
+    const partesHora = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(String(hora));
+    if (!partesData || !partesHora) return false;
+
+    const ano = Number(partesData[1]);
+    const mes = Number(partesData[2]);
+    const dia = Number(partesData[3]);
+    const dataHora = new Date(
+        ano,
+        mes - 1,
+        dia,
+        Number(partesHora[1]),
+        Number(partesHora[2])
+    );
+    const agoraNaPrecisaoDoCampo = new Date(
+        agora.getFullYear(),
+        agora.getMonth(),
+        agora.getDate(),
+        agora.getHours(),
+        agora.getMinutes()
+    );
+    if (
+        dataHora.getFullYear() !== ano
+        || dataHora.getMonth() !== mes - 1
+        || dataHora.getDate() !== dia
+    ) {
+        return false;
+    }
+    return dataHora > agoraNaPrecisaoDoCampo;
+}
+
+function mostrarNotificacao(mensagem) {
+    let notificacao = document.getElementById("notificacaoApp");
+    if (!notificacao) {
+        notificacao = document.createElement("div");
+        notificacao.id = "notificacaoApp";
+        notificacao.className = "notificacao-app";
+        notificacao.setAttribute("role", "status");
+        notificacao.setAttribute("aria-live", "polite");
+        document.body.appendChild(notificacao);
+    }
+
+    notificacao.textContent = mensagem;
+    notificacao.classList.add("visivel");
+    clearTimeout(notificacao.timeoutId);
+    notificacao.timeoutId = setTimeout(() => {
+        notificacao.classList.remove("visivel");
+    }, 4000);
+}
 
 // ------------------------------------------------------------
 // Chamada genérica: adiciona o token, trata erros e mensagens da API.

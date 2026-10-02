@@ -1,5 +1,6 @@
 ﻿// Estado do histórico: registros vindos da API (mais recentes primeiro).
 let registros = [];
+let atualizarLimiteHorarioEdicaoTimer = null;
 
 async function carregarHistorico() {
     const lista = document.getElementById("historicoLista");
@@ -22,11 +23,11 @@ function formatarGlicemia(valor) {
     const numero = Number(valor);
     const textoValor = String(valor).toUpperCase();
 
-    if (textoValor === "HI" || (Number.isFinite(numero) && numero > 600)) {
+    if (textoValor === "HI" || numero === 501 || (Number.isFinite(numero) && numero > 600)) {
         return "HI";
     }
 
-    if (textoValor === "LO" || (Number.isFinite(numero) && numero < 20)) {
+    if (textoValor === "LO" || numero === 19 || (Number.isFinite(numero) && numero < 20)) {
         return "LO";
     }
 
@@ -54,6 +55,20 @@ function formatarDataCompleta(dataIso) {
         month: "long",
         year: "numeric"
     }).format(new Date(ano, mes - 1, dia, 12));
+}
+
+function atualizarLimiteHorarioEdicao() {
+    const data = document.getElementById("editRegistroData");
+    const hora = document.getElementById("editRegistroHora");
+    if (!data || !hora) return;
+
+    data.max = hojeIso();
+    if (data.value === hojeIso()) {
+        const agora = new Date();
+        hora.max = `${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`;
+    } else {
+        hora.removeAttribute("max");
+    }
 }
 
 function dataLocalIso(data = new Date()) {
@@ -225,16 +240,19 @@ function editarRegistro(index) {
     }
     indiceRegistroEdicao = index;
     document.getElementById("editRegistroGlicemia").value =
-        registro.glicemiaAcimaDoLimite ? "" : (registro.glicemia ?? "");
+        registro.glicemiaAcimaDoLimite ? "501" : (registro.glicemia ?? "");
     document.getElementById("editRegistroDose").value = registro.dose || "";
     document.getElementById("editRegistroHora").value = registro.hora || "";
     document.getElementById("editRegistroData").value = registro.dataIso || "";
     document.getElementById("editRegistroData").max = hojeIso();
+    atualizarLimiteHorarioEdicao();
     document.getElementById("editRegistroRefeicao").value = registro.refeicao || "Café da Manhã";
     document.getElementById("editRegistroObservacao").value = registro.observacao || "";
     const modal = document.getElementById("modalEdicaoRegistro");
     modal.style.display = "flex";
     modal.setAttribute("aria-hidden", "false");
+    clearInterval(atualizarLimiteHorarioEdicaoTimer);
+    atualizarLimiteHorarioEdicaoTimer = setInterval(atualizarLimiteHorarioEdicao, 30000);
 }
 
 function fecharModalEdicao() {
@@ -243,6 +261,8 @@ function fecharModalEdicao() {
         modal.style.display = "none";
         modal.setAttribute("aria-hidden", "true");
     }
+    clearInterval(atualizarLimiteHorarioEdicaoTimer);
+    atualizarLimiteHorarioEdicaoTimer = null;
     indiceRegistroEdicao = -1;
 }
 
@@ -255,6 +275,7 @@ async function salvarEdicaoRegistro(event) {
     const dose = document.getElementById("editRegistroDose").value;
     const hora = document.getElementById("editRegistroHora").value;
     const data = document.getElementById("editRegistroData").value;
+    atualizarLimiteHorarioEdicao();
     const refeicao = document.getElementById("editRegistroRefeicao").value;
     const observacao = document.getElementById("editRegistroObservacao").value.trim();
 
@@ -264,8 +285,8 @@ async function salvarEdicaoRegistro(event) {
     }
 
     const valorGlicemia = Number(glicemia);
-    if (glicemia !== "" && (!Number.isFinite(valorGlicemia) || valorGlicemia < 0)) {
-        alert("Informe uma glicemia válida igual ou maior que 0 mg/dL.");
+    if (!Number.isInteger(valorGlicemia) || valorGlicemia < 19 || valorGlicemia > 501) {
+        alert("Informe uma glicemia entre 19 e 501 mg/dL. Use 19 para LO e 501 para HI.");
         return;
     }
 
@@ -274,8 +295,9 @@ async function salvarEdicaoRegistro(event) {
         return;
     }
 
-    if (data > hojeIso()) {
-        alert("A data não pode ser no futuro.");
+    if (data > hojeIso() || dataHoraFutura(data, hora)) {
+        alert("A data e o horário do registro não podem estar no futuro.");
+        document.getElementById("editRegistroHora").focus();
         return;
     }
 
@@ -286,8 +308,7 @@ async function salvarEdicaoRegistro(event) {
         botaoSalvar.textContent = "Salvando...";
     }
 
-    const continuaHi = (registro.glicemiaAcimaDoLimite && glicemia === "")
-        || (glicemia !== "" && valorGlicemia > 600);
+    const continuaHi = valorGlicemia === 501;
 
     try {
         await RegistroApi.atualizar(registro.id, {
@@ -310,6 +331,7 @@ async function salvarEdicaoRegistro(event) {
     }
 
     if (botaoSalvar) botaoSalvar.textContent = "Salvo";
+    mostrarNotificacao("Registro atualizado com sucesso.");
     fecharModalEdicao();
     await carregarHistorico();
 }
@@ -454,3 +476,7 @@ window.addEventListener("load", () => {
     }
 });
 document.getElementById("formEdicaoRegistro")?.addEventListener("submit", salvarEdicaoRegistro);
+document.getElementById("editRegistroData")?.addEventListener("input", atualizarLimiteHorarioEdicao);
+document.getElementById("editRegistroData")?.addEventListener("change", atualizarLimiteHorarioEdicao);
+document.getElementById("editRegistroHora")?.addEventListener("focus", atualizarLimiteHorarioEdicao);
+document.getElementById("editRegistroHora")?.addEventListener("input", atualizarLimiteHorarioEdicao);

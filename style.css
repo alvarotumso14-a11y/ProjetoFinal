@@ -2695,6 +2695,185 @@ header button:hover {
     margin-top: 12px;
 }
 
+.campo-ajuda {
+    display: block;
+    margin-top: 5px;
+    color: var(--cinza-suave);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+.dashboard-page .cards {
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-page .cards .card {
+    width: min(100%, 520px);
+    text-align: center;
+    border-left-width: 1px;
+    border-top: 5px solid var(--vermelho);
+}
+
+.dashboard-page .conteudo > header > div {
+    flex: 0 1 auto;
+    margin-inline: auto;
+    text-align: center;
+}
+
+.dashboard-page .conteudo > header {
+    position: relative;
+    justify-content: center;
+}
+
+.dashboard-page .conteudo > header > button {
+    position: absolute;
+    right: 0;
+}
+
+.dashboard-page .atalhos .titulo,
+.dashboard-page .graficos .titulo,
+.dashboard-page .historico .titulo {
+    text-align: center;
+}
+
+.dashboard-page .atalhos-grid .atalho {
+    justify-content: center;
+    text-align: center;
+}
+
+.dashboard-page .atalho-glicbot img {
+    flex-basis: 100px;
+    width: 100px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-page .conteudo > header {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .dashboard-page .conteudo > header > div {
+        flex: 1 1 100%;
+    }
+
+    .dashboard-page .conteudo > header > button {
+        position: static;
+    }
+    .dashboard-page .atalhos-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.account-dropdown {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.account-dropdown > summary {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 50%;
+    background: var(--branco);
+    color: var(--vermelho-escuro);
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+}
+
+.account-dropdown > summary::-webkit-details-marker {
+    display: none;
+}
+
+.account-dropdown > summary:focus-visible,
+.account-dropdown-menu :focus-visible {
+    outline: 3px solid var(--vermelho);
+    outline-offset: 3px;
+}
+
+.account-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 1200;
+    display: grid;
+    min-width: 170px;
+    padding: 8px;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 12px;
+    background: var(--branco);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.account-dropdown-menu a,
+.account-dropdown-menu button {
+    padding: 11px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--cinza-texto);
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.account-dropdown-menu a:hover,
+.account-dropdown-menu button:hover {
+    background: var(--vermelho-claro);
+    color: var(--vermelho-escuro);
+}
+
+.notificacao-app {
+    position: fixed;
+    left: 50%;
+    right: auto;
+    bottom: 24px;
+    z-index: 1300;
+    max-width: min(420px, calc(100vw - 32px));
+    padding: 14px 20px;
+    border: 1px solid #16835f;
+    border-radius: 12px;
+    background: #e9f8f1;
+    color: #125d45;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.notificacao-app.visivel {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+:root[data-theme="dark"] .account-dropdown-menu {
+    border-color: var(--cinza-borda);
+}
+
+:root[data-theme="dark"] .notificacao-app {
+    background: #123b2f;
+    color: #d2f5e5;
+}
+
+html[data-contrast="high"] .account-dropdown > summary,
+html[data-contrast="high"] .account-dropdown-menu,
+html[data-contrast="high"] .account-dropdown-menu a,
+html[data-contrast="high"] .account-dropdown-menu button,
+html[data-contrast="high"] .notificacao-app {
+    border-color: #ffeb3b !important;
+    background: #000 !important;
+    color: #ffeb3b !important;
+}
+
 /* Acessibilidade */
 .accessibility-toggle-float {
     position: fixed;
