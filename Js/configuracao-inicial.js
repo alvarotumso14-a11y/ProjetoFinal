@@ -18,8 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Menor de 18: mostra os campos do responsável legal (LGPD art. 14)
     const campoIdade = document.getElementById("idadeInicial");
     const blocoResponsavel = document.getElementById("blocoResponsavel");
+    FormInputs.limitarInteiro(campoIdade, 120, document.getElementById("idadeInicialWarning"));
     campoIdade.addEventListener("input", () => {
-        aplicarLimite(campoIdade, 120, document.getElementById("idadeInicialWarning"));
+
         const idade = Number(campoIdade.value);
         blocoResponsavel.hidden = !(idade >= 1 && idade < 18);
     });
@@ -29,9 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ["hgtAlvoInicial", "hgtAlvoInicialWarning"]
     ].forEach(([id, avisoId]) => {
         const campo = document.getElementById(id);
-        campo.addEventListener("input", () => {
-            aplicarLimite(campo, 501, document.getElementById(avisoId));
-        });
+        FormInputs.limitarNumero(campo, 501, document.getElementById(avisoId));
     });
 
     document.getElementById("iniciarConfiguracao").addEventListener("click", () => {
@@ -47,12 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const idade = Number(document.getElementById("idadeInicial").value);
         const tipoDiabetes = document.getElementById("tipoDiabetesInicial").value;
         const fatorSensibilidade = Number(document.getElementById("fatorSensibilidadeInicial").value);
-        const hgtAlvo = Math.round(Number(document.getElementById("hgtAlvoInicial").value));
+        const hgtAlvo = Number(document.getElementById("hgtAlvoInicial").value);
 
-        if (!idade || idade < 1 || idade > 120 || !tipoDiabetes
-            || !(fatorSensibilidade >= 1 && fatorSensibilidade <= 501)
-            || !(hgtAlvo >= 1 && hgtAlvo <= 501)) {
-            mostrarErro("Preencha todos os campos com valores válidos (fator e HGT alvo entre 1 e 501).");
+        if (!Number.isInteger(idade) || idade < 1 || idade > 120 || !tipoDiabetes
+            || !Number.isFinite(fatorSensibilidade) || fatorSensibilidade < 1 || fatorSensibilidade > 501
+            || !Number.isFinite(hgtAlvo) || hgtAlvo < 1 || hgtAlvo > 501) {
+            mostrarErro("Informe idade inteira e valores de fator de sensibilidade e HGT alvo entre 1 e 501.");
             return;
         }
 
@@ -70,13 +69,14 @@ document.addEventListener("DOMContentLoaded", () => {
         botao.textContent = "Criando sua conta...";
 
         try {
-            await UsuarioApi.criar({
+            const cadastro = await UsuarioApi.criar({
                 name: pendente.nome,
                 email: pendente.email,
                 senha: pendente.senha,
                 tipoDiabetes,
                 idade,
-                fatorSensibilidade: Math.round(fatorSensibilidade * 10) / 10,
+                celular: pendente.celular || null,
+                fatorSensibilidade: fatorSensibilidade,
                 hgtAlvo,
                 aceitouTermos: pendente.aceitouTermos === true,
                 consentiuDadosSaude: pendente.consentiuDadosSaude === true,
@@ -84,37 +84,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 consentimentoResponsavel: menor ? consentimentoResponsavel : false
             });
 
-            try {
-                const resposta = await UsuarioApi.login({ email: pendente.email, senha: pendente.senha });
-                sessionStorage.removeItem("cadastroPendente");
-                salvarSessao(resposta);
-                window.location.href = "dashboard.html";
-            } catch (erroLogin) {
-                if (erroLogin.status === 403) {
-                    // Conta criada; falta confirmar o e-mail com o código enviado.
-                    window.location.href = "confirmar-email.html";
-                    return;
-                }
-                throw erroLogin;
-            }
+            if (!cadastro?.tentativaId) throw new Error("O servidor não retornou a tentativa de cadastro.");
+            sessionStorage.setItem("cadastroPendente", JSON.stringify({
+                nome: pendente.nome, email: pendente.email, senha: pendente.senha,
+                tentativaId: cadastro.tentativaId
+            }));
+            window.location.href = "confirmar-email.html";
         } catch (e) {
             const jaExiste = /já existe/i.test(e.message);
             mostrarErro(jaExiste
                 ? "Este e-mail já tem cadastro. Faça login ou volte e use outro e-mail."
                 : e.message);
             botao.disabled = false;
-            botao.textContent = "Salvar e entrar";
+            botao.textContent = "Salvar e confirmar e-mail";
         }
     });
 
     function mostrarErro(mensagem) {
         erro.textContent = mensagem;
         erro.hidden = false;
-    }
-
-    function aplicarLimite(campo, limite, aviso) {
-        const excedeuLimite = campo.valueAsNumber > limite;
-        if (excedeuLimite) campo.value = String(limite);
-        aviso.style.display = excedeuLimite ? "block" : "none";
     }
 });

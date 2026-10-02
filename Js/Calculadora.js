@@ -59,6 +59,19 @@ function calcularDoseCorrecaPagina() {
 
     atualizarConfiguracaoPerfilNaTela();
 
+    if (inputHgtAtual?.value && (!Number.isFinite(hgtAtual) || hgtAtual < 19 || hgtAtual > 501)) {
+        const erro = document.getElementById('calcErro');
+        if (erro) erro.textContent = 'Informe um HGT entre 19 e 501 mg/dL. Use 19 para LO e 501 para HI.';
+        const valor = document.getElementById('calcValor');
+        const classificacao = document.getElementById('calcClassificacao');
+        if (valor) valor.textContent = '—';
+        if (classificacao) {
+            classificacao.textContent = '—';
+            classificacao.className = 'classificacao';
+        }
+        return;
+    }
+
     if (!hgtAtual || !hgtAlvo || !fatorSensibilidade) {
         renderizarResultadoDose(null);
         return;
@@ -111,13 +124,7 @@ window.addEventListener('load', () => {
     }
 
     if (inputHgtAtual) {
-        // Mantém o HGT atual dentro do limite aceito pelo aplicativo.
-        inputHgtAtual.addEventListener('input', () => {
-            if (Number(inputHgtAtual.value) > 501) {
-                inputHgtAtual.value = 501;
-            }
-            calcularDoseCorrecaPagina();
-        });
+        inputHgtAtual.addEventListener('input', calcularDoseCorrecaPagina);
     }
 
     atualizarConfiguracaoPerfilNaTela();

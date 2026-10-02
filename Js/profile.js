@@ -14,14 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     let salvandoPerfil = false;
 
-    function formatarTelefone(celular) {
-        const numeros = String(celular || "").replace(/\D/g, "").slice(0, 11);
-        if (numeros.length <= 2) return numeros ? `(${numeros}` : "";
-        if (numeros.length <= 6) return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
-        const tamanhoPrefixo = numeros.length > 10 ? 7 : 6;
-        return `(${numeros.slice(0, 2)}) ${numeros.slice(2, tamanhoPrefixo)}-${numeros.slice(tamanhoPrefixo)}`;
-    }
-
     function garantirMenuConta() {
         document.querySelectorAll(".user-top").forEach((userTop) => {
             if (userTop.querySelector(".account-dropdown")) return;
@@ -265,24 +257,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const celularInput = document.getElementById('editCelular');
     if (celularInput) {
-        celularInput.addEventListener('input', () => {
-            celularInput.value = formatarTelefone(celularInput.value);
-        });
+        FormInputs.telefone(celularInput);
     }
 
-    [
-        ['editIdade', 120, 'idadeWarning'],
-        ['editFatorSensibilidade', 501, 'fatorWarning'],
-        ['editHgtAlvo', 501, 'hgtWarning']
-    ].forEach(([inputId, limite, warningId]) => {
-        const input = document.getElementById(inputId);
-        const warning = document.getElementById(warningId);
-        input.addEventListener('input', () => {
-            const excedeuLimite = input.valueAsNumber > limite;
-            if (excedeuLimite) input.value = String(limite);
-            warning.style.display = excedeuLimite ? 'block' : 'none';
-        });
-    });
+    FormInputs.limitarInteiro(
+        document.getElementById('editIdade'),
+        120,
+        document.getElementById('idadeWarning')
+    );
+    FormInputs.limitarNumero(
+        document.getElementById('editFatorSensibilidade'),
+        501,
+        document.getElementById('fatorWarning')
+    );
+    FormInputs.limitarNumero(
+        document.getElementById('editHgtAlvo'),
+        501,
+        document.getElementById('hgtWarning')
+    );
 }
 
     function openModal() {
@@ -297,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('editTipo').value = profile.tipo || 'Tipo 1';
         document.getElementById('editIdade').value = calcularIdadeAtual(profile);
         document.getElementById('editEmail').value = profile.email || '';
-        document.getElementById('editCelular').value = formatarTelefone(profile.celular);
+        document.getElementById('editCelular').value = FormInputs.formatarTelefone(profile.celular);
         document.getElementById('editFatorSensibilidade').value = profile.fatorSensibilidade || '';
         document.getElementById('editHgtAlvo').value = profile.hgtAlvo || '';
         document.getElementById('editPhoto').value = '';
@@ -332,13 +324,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     
         const email = document.getElementById('editEmail').value.trim();
-        let fatorSensibilidade = Number(document.getElementById('editFatorSensibilidade').value);
-        let hgtAlvo = Number(document.getElementById('editHgtAlvo').value);
-    
-        if (fatorSensibilidade > 501) fatorSensibilidade = 501;
-        if (hgtAlvo > 501) hgtAlvo = 501;
-    
-        if (!email || !Number.isFinite(fatorSensibilidade) || fatorSensibilidade <= 0 || !Number.isFinite(hgtAlvo) || hgtAlvo <= 0) {
+        const fatorSensibilidade = Number(document.getElementById('editFatorSensibilidade').value);
+        const hgtAlvo = Number(document.getElementById('editHgtAlvo').value);
+        const emailAnterior = String(profile.email || '').toLowerCase();
+        const emailNovo = email.toLowerCase();
+
+        if (!email || !Number.isFinite(fatorSensibilidade) || fatorSensibilidade < 1
+            || fatorSensibilidade > 501 || !Number.isFinite(hgtAlvo) || hgtAlvo < 1 || hgtAlvo > 501) {
             alert('Informe um e-mail, fator de sensibilidade e HGT alvo válidos entre 1 e 501.');
             return;
         }
@@ -358,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const hgtAlvoInteiro = Math.round(hgtAlvo);
-        const fatorArredondado = Math.round(fatorSensibilidade * 10) / 10;
+        const fatorArredondado = fatorSensibilidade;
 
         if (fatorArredondado < 1) {
             alert('O fator de sensibilidade deve ser no mínimo 1.');
@@ -368,8 +360,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const concluir = (photo) => {
-            UsuarioApi.atualizarPerfil({
+        const concluir = async (photo) => {
+            try {
+                await UsuarioApi.atualizarPerfil({
                 name: nome,
                 tipoDiabetes,
                 idade,
@@ -377,34 +370,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 celular,
                 fatorSensibilidade: fatorArredondado,
                 hgtAlvo: hgtAlvoInteiro
-            }).then(() => {
+                });
                 profile.nome = nome;
                 profile.tipo = tipoDiabetes;
                 profile.idade = String(idade);
                 delete profile.idadeInicial;
                 delete profile.idadeDataReferencia;
-                profile.email = email.toLowerCase();
+                profile.email = emailNovo === emailAnterior ? emailNovo : emailAnterior;
                 profile.celular = celular;
                 profile.fatorSensibilidade = fatorArredondado;
                 profile.hgtAlvo = hgtAlvoInteiro;
                 if (photo !== undefined) profile.photo = photo; // foto fica só neste navegador
                 saveProfile(profile);
+                closeModal();
+                if (emailNovo !== emailAnterior) {
+                    sessionStorage.setItem('alteracaoEmailPendente', JSON.stringify({ email: emailNovo }));
+                    window.location.href = 'confirmar-email.html';
+                    return;
+                }
                 mostrarNotificacao('Perfil salvo com sucesso.');
                 botaoSalvar.textContent = 'Salvo';
-                closeModal();
-            }).catch((erro) => {
+            } catch (erro) {
                 alert(erro.message);
                 botaoSalvar.disabled = false;
                 botaoSalvar.textContent = 'Salvar alterações';
-            }).finally(() => {
+            } finally {
                 salvandoPerfil = false;
-            });
+            }
         };
 
         const fileInput = document.getElementById('editPhoto');
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const reader = new FileReader();
-            reader.onload = (event) => concluir(event.target.result);
+            reader.onload = (event) => {
+                if (typeof event.target.result !== 'string') {
+                    salvandoPerfil = false;
+                    botaoSalvar.disabled = false;
+                    botaoSalvar.textContent = 'Salvar alterações';
+                    alert('Não foi possível carregar a foto selecionada.');
+                    return;
+                }
+                concluir(event.target.result);
+            };
             reader.onerror = () => {
                 salvandoPerfil = false;
                 botaoSalvar.disabled = false;
@@ -421,28 +428,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // expose editarPerfil to global scope for existing onclick handlers
     window.editarPerfil = openModal;
 
-    // EXCLUSÃO DEFINITIVA DA CONTA (LGPD): apaga a conta e todos os registros no servidor.
+    // Excluir conta desativa o acesso e preserva os dados para reativação.
     window.excluirConta = async function () {
-        const confirmou = confirm(
-            'Excluir sua conta apaga DEFINITIVAMENTE todos os seus dados (perfil e registros de glicemia).\n' +
-            'Isso não pode ser desfeito. Se quiser guardar seu histórico, baixe o PDF antes.\n\nDeseja continuar?'
-        );
-        if (!confirmou) return;
-
-        const senha = prompt('Para confirmar, digite sua senha:');
-        if (!senha) return;
-
+        if (!confirm('Excluir sua conta? Ela será desativada e seus dados ficarão guardados. Você pode reativá-la em Criar conta com seu e-mail e senha atual.')) return;
         try {
-            await UsuarioApi.excluirConta(senha);
-            alert('Sua conta e seus dados foram excluídos.');
+            await UsuarioApi.desativar();
             limparSessao();
-            localStorage.removeItem('profile');
-            window.location.href = 'index.html';
+            sessionStorage.setItem('avisoLogin', 'Conta desativada. Para reativar, clique em Criar conta e informe seu e-mail.');
+            window.location.href = 'login.html';
         } catch (erro) {
             alert(erro.message);
         }
     };
-
     // Initial load: mostra o que está salvo e depois atualiza com os dados da API
     const profile = getProfile();
     updateUI(profile);

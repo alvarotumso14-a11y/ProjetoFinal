@@ -64,7 +64,8 @@
             <section class="calculadora">
                 <div class="card-calc">
                     <label class="calc-label" for="inputHgtAtual">HGT atual (mg/dL)</label>
-                    <input class="calc-input" type="number" id="inputHgtAtual" min="1" max="501" placeholder="Ex: 180">
+                    <input class="calc-input" type="number" id="inputHgtAtual" min="19" max="501" placeholder="Ex: 180" aria-describedby="hgtAtualAjuda">
+                    <p class="campo-ajuda" id="hgtAtualAjuda">Se o aparelho indicar HI, digite 501. Se indicar LO, digite 19.</p>
 
                     <p class="calc-perfil" id="configPerfil">Alvo e fator do perfil: configurar no perfil.</p>
 

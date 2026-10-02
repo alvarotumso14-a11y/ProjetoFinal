@@ -23,7 +23,7 @@ function formatarGlicemia(valor) {
     const numero = Number(valor);
     const textoValor = String(valor).toUpperCase();
 
-    if (textoValor === "HI" || numero === 501 || (Number.isFinite(numero) && numero > 600)) {
+    if (textoValor === "HI" || (Number.isFinite(numero) && numero >= 501)) {
         return "HI";
     }
 
@@ -166,8 +166,8 @@ function atualizarHistorico() {
                     ${registro.observacao ? `
                         <div class="registro-observacao">
                             <span>Observação</span>
-                            <span class="registro-observacao-texto" id="observacao-${index}">${escaparHtml(registro.observacao)}</span>
-                            <button class="registro-observacao-mais" type="button" aria-expanded="false" aria-controls="observacao-${index}" hidden>Ler mais</button>
+                            <span class="registro-observacao-texto" id="observacao-${indice}">${escaparHtml(registro.observacao)}</span>
+                            <button class="registro-observacao-mais" type="button" aria-expanded="false" aria-controls="observacao-${indice}" hidden>Ler mais</button>
                         </div>
                     ` : ""}
                 </div>
@@ -271,7 +271,7 @@ async function salvarEdicaoRegistro(event) {
     if (salvandoEdicaoRegistro || indiceRegistroEdicao < 0) return;
 
     const registro = registros[indiceRegistroEdicao];
-    const glicemia = document.getElementById("editRegistroGlicemia").value;
+    const glicemia = document.getElementById("editRegistroGlicemia").value.trim().toUpperCase();
     const dose = document.getElementById("editRegistroDose").value;
     const hora = document.getElementById("editRegistroHora").value;
     const data = document.getElementById("editRegistroData").value;
@@ -312,11 +312,11 @@ async function salvarEdicaoRegistro(event) {
 
     try {
         await RegistroApi.atualizar(registro.id, {
-            glicemia: continuaHi ? null : valorGlicemia,
+            glicemia: continuaHi ? null : Number(glicemia),
             glicemiaAcimaDoLimite: continuaHi,
             dose: dose === "" ? 0 : Math.round(Number(dose) * 10) / 10,
             hora: `${hora}:00`,
-            refeicao,
+            refeicao: refeicaoParaApi(refeicao),
             data,
             observacao: observacao || null
         });
@@ -462,6 +462,8 @@ async function solicitarPdfAoBackend(dataInicio, dataFim) {
 // Inicialização
 window.addEventListener("load", () => {
     carregarHistorico();
+
+
 
     const doseInput = document.getElementById("editRegistroDose");
     if (doseInput) {

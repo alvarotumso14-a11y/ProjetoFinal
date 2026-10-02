@@ -88,7 +88,7 @@ function formatarGlicemia(valor) {
     const numero = Number(valor);
     const textoValor = String(valor).toUpperCase();
 
-    if (textoValor === "HI" || numero === 501 || (Number.isFinite(numero) && numero > 600)) {
+    if (textoValor === "HI" || (Number.isFinite(numero) && numero >= 501)) {
         return "HI";
     }
 
@@ -218,7 +218,7 @@ async function carregarRegistros() {
         console.error("Não foi possível carregar os registros.", erro);
         const container = document.getElementById("ultimosRegistrosDashboard");
         if (container) {
-            container.innerHTML = `<p class="dashboard-empty">${erro.message}</p>`;
+            container.innerHTML = `<p class="dashboard-empty">${escaparHtmlDashboard(erro.message)}</p>`;
         }
         return;
     }
