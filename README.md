@@ -8,6 +8,19 @@ Requer Node.js moderno. Execute `node dev-server.mjs` e abra http://localhost:51
 
 Defina `window.GLICHELP_API_URL` antes de carregar Js/Api.js para usar outro endereço (inclua /api). Configure a API de produção antes de publicar: a configuração desta versão está vazia para evitar enviar testes ao ambiente publicado anterior. Não coloque chaves JWT, credenciais SMTP ou do banco no frontend.
 
+## GlicBot
+
+O chat usa `https://tiabete-server.onrender.com/api/glicbot` por padrão. Para usar outro endpoint, defina `window.GLICBOT_API_URL` antes de carregar `Js/glicbot.js`, por exemplo:
+
+```html
+<script>
+  window.GLICBOT_API_URL = "https://seu-servidor.example/api/glicbot";
+</script>
+<script src="Js/glicbot.js"></script>
+```
+
+O servidor do GlicBot é o repositório [Tiabete-server](https://github.com/kablumenschein/Tiabete-server), separado deste frontend. No serviço dele no Render, configure a variável `ALLOWED_ORIGINS` com a origem exata do site publicado (somente esquema e domínio, sem caminho ou barra final), por exemplo `https://seu-site.example`. Para permitir mais de uma origem, separe-as por vírgula; em desenvolvimento, inclua também `http://localhost:5173`. Sem essa configuração, o servidor aceita apenas origens locais e o navegador bloqueia a chamada do site publicado.
+
 ## Compatibilidade com o backend incluído
 
 O backend foi comparado com as chamadas feitas pelo frontend. Login, perfil, reativação e operações de registros têm rotas correspondentes; os demais fluxos e formatos abaixo ainda não estão totalmente alinhados:

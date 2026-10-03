@@ -11,11 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
     chatMensagens.setAttribute("aria-live", "polite");
     chatMensagens.setAttribute("aria-relevant", "additions text");
 
-    // ENDPOINT DO BACKEND: nunca chame a API do LLM direto daqui. A chave de API
-    // ficaria visível pra qualquer pessoa no DevTools do navegador. Este endpoint
-    // aponta pro servidor proxy (ver pasta server/) que guarda a chave em segredo.
-    // Troque para a URL de produção quando o proxy estiver hospedado.
-    const GLICBOT_API_URL = "https://tiabete-server.onrender.com/api/glicbot";
+    // Nunca chame a API do LLM direto daqui: a chave ficaria visível no navegador.
+    // Configure window.GLICBOT_API_URL antes deste script para usar outro servidor.
+    const GLICBOT_API_URL =
+        window.GLICBOT_API_URL || "https://tiabete-server.onrender.com/api/glicbot";
 
     // SEGURANÇA: a base de conhecimento (FAQ) mora só no server.js agora, nunca
     // aqui. Antes, este arquivo montava o "contexto" e mandava pro servidor —
