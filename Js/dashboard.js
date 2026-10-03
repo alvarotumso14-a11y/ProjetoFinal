@@ -241,26 +241,26 @@ async function salvarRegistro() {
     const observacao = document.getElementById("inputObservacao")?.value.trim() || "";
 
     if (glicemia === "" || data === "" || hora === "" || refeicao === "") {
-        alert("Preencha glicemia, data, horário e refeição.");
+        mostrarAlerta("Preencha glicemia, data, horário e refeição.");
         return;
     }
     atualizarLimiteHorarioRegistro();
 
     const valorGlicemia = Number(glicemia);
     if (!Number.isInteger(valorGlicemia) || valorGlicemia < 19 || valorGlicemia > 501) {
-        alert("Informe uma glicemia entre 19 e 501 mg/dL. Use 19 para LO e 501 para HI.");
+        mostrarAlerta("Informe uma glicemia entre 19 e 501 mg/dL. Use 19 para LO e 501 para HI.");
         glicemiaInput.focus();
         return;
     }
 
     if (data > hojeIso() || dataHoraFutura(data, hora)) {
-        alert("A data e o horário da medição não podem estar no futuro.");
+        mostrarAlerta("A data e o horário da medição não podem estar no futuro.");
         document.getElementById("inputHora").focus();
         return;
     }
 
     if (dose < 0 || dose > 100) {
-        alert("A dose deve estar entre 0 e 100 unidades.");
+        mostrarAlerta("A dose deve estar entre 0 e 100 unidades.");
         return;
     }
 
@@ -282,7 +282,7 @@ async function salvarRegistro() {
             observacao: observacao || null
         });
     } catch (erro) {
-        alert(erro.message);
+        mostrarAlerta(erro.message);
         salvandoRegistro = false;
         if (botaoSalvar) {
             botaoSalvar.disabled = false;

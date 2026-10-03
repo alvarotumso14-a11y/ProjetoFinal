@@ -2054,6 +2054,27 @@ header button:hover {
     gap: 18px;
 }
 
+.auth-form[hidden],
+.auth-error[hidden],
+.auth-subtitle[hidden] {
+    display: none;
+}
+
+.auth-link-button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--vermelho);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.auth-link-button:disabled {
+    color: var(--cinza-suave);
+    cursor: not-allowed;
+}
+
 .auth-field {
     display: flex;
     flex-direction: column;
@@ -2855,6 +2876,54 @@ header button:hover {
     transform: translate(-50%, 0);
 }
 
+.modal-alerta-app {
+    width: min(440px, calc(100vw - 32px));
+    max-width: none;
+    padding: 0;
+    border: 1px solid var(--cinza-borda);
+    border-radius: 16px;
+    background: var(--branco);
+    color: var(--preto);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+}
+
+.modal-alerta-app::backdrop {
+    background: rgba(0, 0, 0, 0.58);
+}
+
+.modal-alerta-conteudo {
+    display: grid;
+    gap: 16px;
+    padding: 24px;
+}
+
+.modal-alerta-conteudo h2 {
+    font-size: 1.2rem;
+}
+
+.modal-alerta-conteudo p {
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.modal-alerta-ok {
+    justify-self: end;
+    min-width: 88px;
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--vermelho-escuro);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.modal-alerta-ok:focus-visible {
+    outline: 3px solid #1769aa;
+    outline-offset: 3px;
+}
+
 :root[data-theme="dark"] .account-dropdown-menu {
     border-color: var(--cinza-borda);
 }
@@ -2868,7 +2937,9 @@ html[data-contrast="high"] .account-dropdown > summary,
 html[data-contrast="high"] .account-dropdown-menu,
 html[data-contrast="high"] .account-dropdown-menu a,
 html[data-contrast="high"] .account-dropdown-menu button,
-html[data-contrast="high"] .notificacao-app {
+html[data-contrast="high"] .notificacao-app,
+html[data-contrast="high"] .modal-alerta-app,
+html[data-contrast="high"] .modal-alerta-ok {
     border-color: #ffeb3b !important;
     background: #000 !important;
     color: #ffeb3b !important;

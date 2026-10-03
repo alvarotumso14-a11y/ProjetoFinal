@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logos/Favicon.png">
+    <script src="Js/theme.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>GlicHelp — Recuperar senha</title>
+</head>
+<body class="auth-body">
+    <main class="auth-page">
+        <section class="auth-card" aria-labelledby="tituloRecuperacao">
+            <a href="index.html" class="auth-brand" aria-label="Voltar para a página inicial do GlicHelp">
+                <img src="Logos/Favicon.png" alt="GlicHelp" class="auth-logo-img">
+                <span class="auth-brand-name">GlicHelp</span>
+            </a>
+
+            <h1 class="auth-title" id="tituloRecuperacao">Recuperar senha</h1>
+            <p class="auth-subtitle" id="descricaoRecuperacao">Informe seu e-mail para receber um código de recuperação.</p>
+
+            <div id="erroRecuperacao" class="auth-error" role="alert" aria-live="polite" hidden></div>
+            <div id="avisoRecuperacao" class="auth-subtitle" role="status" aria-live="polite" hidden></div>
+
+            <form id="formSolicitarCodigo" class="auth-form" novalidate>
+                <div class="auth-field">
+                    <label for="emailRecuperacao">E-mail</label>
+                    <input id="emailRecuperacao" name="email" type="email" autocomplete="email" maxlength="255" placeholder="seu@email.com" required>
+                </div>
+                <button type="submit" class="btn-verde auth-submit">Enviar código</button>
+            </form>
+
+            <form id="formRedefinirSenha" class="auth-form" novalidate hidden>
+                <div class="auth-field">
+                    <label for="codigoRecuperacao">Código de recuperação</label>
+                    <input id="codigoRecuperacao" name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required>
+                </div>
+                <div class="auth-field">
+                    <label for="novaSenha">Nova senha</label>
+                    <input id="novaSenha" name="novaSenha" type="password" autocomplete="new-password" minlength="8" maxlength="64" placeholder="Mínimo 8 caracteres" required>
+                </div>
+                <div class="auth-field">
+                    <label for="confirmarNovaSenha">Confirme a nova senha</label>
+                    <input id="confirmarNovaSenha" name="confirmarNovaSenha" type="password" autocomplete="new-password" minlength="8" maxlength="64" placeholder="Digite novamente a nova senha" required>
+                </div>
+                <button type="submit" class="btn-verde auth-submit">Alterar senha</button>
+                <p class="auth-footer-text">Não recebeu? <button type="button" id="reenviarCodigoRecuperacao" class="auth-link-button">Enviar outro código</button></p>
+            </form>
+
+            <p class="auth-footer-text"><a href="login.html" class="auth-link">Voltar para o login</a></p>
+        </section>
+    </main>
+    <script src="Js/Api.js"></script>
+    <script src="Js/recuperar-senha.js"></script>
+</body>
+</html>

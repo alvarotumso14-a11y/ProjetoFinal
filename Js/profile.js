@@ -314,12 +314,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const idade = Number(document.getElementById('editIdade').value);
 
         if (!nome) {
-            alert('Informe o nome.');
+            mostrarAlerta('Informe o nome.');
             return;
         }
 
         if (!Number.isInteger(idade) || idade < 1 || idade > 120) {
-            alert('A idade é obrigatória e deve estar entre 1 e 120.');
+            mostrarAlerta('A idade é obrigatória e deve estar entre 1 e 120.');
             return;
         }
     
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!email || !Number.isFinite(fatorSensibilidade) || fatorSensibilidade < 1
             || fatorSensibilidade > 501 || !Number.isFinite(hgtAlvo) || hgtAlvo < 1 || hgtAlvo > 501) {
-            alert('Informe um e-mail, fator de sensibilidade e HGT alvo válidos entre 1 e 501.');
+            mostrarAlerta('Informe um e-mail, fator de sensibilidade e HGT alvo válidos entre 1 e 501.');
             return;
         }
 
@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
         const celular = document.getElementById('editCelular').value.replace(/\D/g, '').slice(0, 11);
         if (celular && ![10, 11].includes(celular.length)) {
-            alert('Informe um telefone com DDD e 10 ou 11 dígitos.');
+            mostrarAlerta('Informe um telefone com DDD e 10 ou 11 dígitos.');
             salvandoPerfil = false;
             botaoSalvar.disabled = false;
             botaoSalvar.textContent = 'Salvar alterações';
@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fatorArredondado = fatorSensibilidade;
 
         if (fatorArredondado < 1) {
-            alert('O fator de sensibilidade deve ser no mínimo 1.');
+            mostrarAlerta('O fator de sensibilidade deve ser no mínimo 1.');
             salvandoPerfil = false;
             botaoSalvar.disabled = false;
             botaoSalvar.textContent = 'Salvar alterações';
@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mostrarNotificacao('Perfil salvo com sucesso.');
                 botaoSalvar.textContent = 'Salvo';
             } catch (erro) {
-                alert(erro.message);
+                mostrarAlerta(erro.message);
                 botaoSalvar.disabled = false;
                 botaoSalvar.textContent = 'Salvar alterações';
             } finally {
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     salvandoPerfil = false;
                     botaoSalvar.disabled = false;
                     botaoSalvar.textContent = 'Salvar alterações';
-                    alert('Não foi possível carregar a foto selecionada.');
+                    mostrarAlerta('Não foi possível carregar a foto selecionada.');
                     return;
                 }
                 concluir(event.target.result);
@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 salvandoPerfil = false;
                 botaoSalvar.disabled = false;
                 botaoSalvar.textContent = 'Salvar alterações';
-                alert('Não foi possível carregar a foto selecionada.');
+                mostrarAlerta('Não foi possível carregar a foto selecionada.');
             };
             reader.readAsDataURL(fileInput.files[0]);
             return;
@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sessionStorage.setItem('avisoLogin', 'Conta desativada. Para reativar, clique em Criar conta e informe seu e-mail.');
             window.location.href = 'login.html';
         } catch (erro) {
-            alert(erro.message);
+            mostrarAlerta(erro.message);
         }
     };
     // Initial load: mostra o que está salvo e depois atualiza com os dados da API

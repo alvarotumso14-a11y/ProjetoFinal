@@ -280,23 +280,23 @@ async function salvarEdicaoRegistro(event) {
     const observacao = document.getElementById("editRegistroObservacao").value.trim();
 
     if (!hora || !data || !refeicao || (glicemia === "" && !registro.glicemiaAcimaDoLimite)) {
-        alert("Preencha glicemia, data, horário e refeição.");
+        mostrarAlerta("Preencha glicemia, data, horário e refeição.");
         return;
     }
 
     const valorGlicemia = Number(glicemia);
     if (!Number.isInteger(valorGlicemia) || valorGlicemia < 19 || valorGlicemia > 501) {
-        alert("Informe uma glicemia entre 19 e 501 mg/dL. Use 19 para LO e 501 para HI.");
+        mostrarAlerta("Informe uma glicemia entre 19 e 501 mg/dL. Use 19 para LO e 501 para HI.");
         return;
     }
 
     if (dose !== "" && (Number(dose) < 0 || Number(dose) > 100)) {
-        alert("A dose deve estar entre 0 e 100 unidades.");
+        mostrarAlerta("A dose deve estar entre 0 e 100 unidades.");
         return;
     }
 
     if (data > hojeIso() || dataHoraFutura(data, hora)) {
-        alert("A data e o horário do registro não podem estar no futuro.");
+        mostrarAlerta("A data e o horário do registro não podem estar no futuro.");
         document.getElementById("editRegistroHora").focus();
         return;
     }
@@ -321,7 +321,7 @@ async function salvarEdicaoRegistro(event) {
             observacao: observacao || null
         });
     } catch (erro) {
-        alert(erro.message);
+        mostrarAlerta(erro.message);
         salvandoEdicaoRegistro = false;
         if (botaoSalvar) {
             botaoSalvar.disabled = false;

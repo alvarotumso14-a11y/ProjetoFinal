@@ -69,6 +69,63 @@ function limparSessao() {
         .forEach((chave) => localStorage.removeItem(chave));
 }
 
+let filaAlertas = [];
+let alertaAberto = false;
+let modalAlerta;
+let mensagemAlerta;
+
+function mostrarAlerta(mensagem) {
+    return new Promise((resolver) => {
+        filaAlertas.push({ mensagem: String(mensagem), resolver });
+        mostrarProximoAlerta();
+    });
+}
+
+function mostrarProximoAlerta() {
+    if (alertaAberto || filaAlertas.length === 0) return;
+
+    if (!modalAlerta) {
+        modalAlerta = document.createElement("dialog");
+        modalAlerta.className = "modal-alerta-app";
+        modalAlerta.setAttribute("role", "alertdialog");
+        modalAlerta.setAttribute("aria-labelledby", "tituloAlertaApp");
+        modalAlerta.setAttribute("aria-describedby", "mensagemAlertaApp");
+        modalAlerta.setAttribute("aria-modal", "true");
+
+        const conteudo = document.createElement("div");
+        conteudo.className = "modal-alerta-conteudo";
+
+        const titulo = document.createElement("h2");
+        titulo.id = "tituloAlertaApp";
+        titulo.textContent = "Atenção";
+
+        mensagemAlerta = document.createElement("p");
+        mensagemAlerta.id = "mensagemAlertaApp";
+
+        const botaoOk = document.createElement("button");
+        botaoOk.type = "button";
+        botaoOk.className = "modal-alerta-ok";
+        botaoOk.textContent = "OK";
+        botaoOk.addEventListener("click", () => modalAlerta.close());
+
+        conteudo.append(titulo, mensagemAlerta, botaoOk);
+        modalAlerta.appendChild(conteudo);
+        modalAlerta.addEventListener("close", () => {
+            const atual = filaAlertas.shift();
+            alertaAberto = false;
+            atual?.resolver();
+            mostrarProximoAlerta();
+        });
+        document.body.appendChild(modalAlerta);
+    }
+
+    const atual = filaAlertas[0];
+    mensagemAlerta.textContent = atual.mensagem;
+    alertaAberto = true;
+    modalAlerta.showModal();
+    modalAlerta.querySelector("button").focus();
+}
+
 async function logout() {
     const confirmou = window.confirm(
         "Deseja sair da sua conta? Os dados da sessão e o cache local do aplicativo serão apagados."
@@ -88,7 +145,7 @@ async function logout() {
         }
     } catch (erro) {
         console.error("Não foi possível limpar todo o cache local.", erro);
-        window.alert("A sessão foi encerrada, mas não foi possível limpar todo o cache do navegador.");
+        await mostrarAlerta("A sessão foi encerrada, mas não foi possível limpar todo o cache do navegador.");
     }
 
     window.location.replace("login.html");
@@ -283,6 +340,20 @@ const UsuarioApi = {
 
     reativar(dto) {
         return apiFetch("/usuario/reativar", { method: "POST", body: JSON.stringify(dto) });
+    },
+
+    solicitarRecuperacaoSenha(email) {
+        return apiFetch("/usuario/recuperar-senha", {
+            method: "POST",
+            body: JSON.stringify({ email })
+        });
+    },
+
+    redefinirSenha(dto) {
+        return apiFetch("/usuario/redefinir-senha", {
+            method: "POST",
+            body: JSON.stringify(dto)
+        });
     }
 };
 

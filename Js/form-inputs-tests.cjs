@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const {formatarTelefone, telefone, limitarInteiro, limitarNumero} = require('./Js/form-inputs.js');
+const {formatarTelefone, telefone, limitarInteiro, limitarNumero} = require('./form-inputs.js');
 function campo(valor = '') {
     const handlers = {};
     return {value: valor, selectionStart: valor.length,
