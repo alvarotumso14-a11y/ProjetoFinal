@@ -88,7 +88,7 @@ namespace Tests
             var usuarioService = new Mock<IUsuarioService>();
             usuarioService
                 .Setup(service => service.LoginAsync(It.IsAny<LoginDto>()))
-                .ReturnsAsync((LoginResponseDto?)null);
+                .ReturnsAsync(new LoginResultDto());
 
             return new WebApplicationFactory<Program>()
                 .WithWebHostBuilder(builder =>
@@ -107,6 +107,10 @@ namespace Tests
 
                         services.RemoveAll<IUsuarioService>();
                         services.AddScoped(_ => usuarioService.Object);
+                        services.RemoveAll<IEmailService>();
+                        services.AddSingleton<FakeEmailService>();
+                        services.AddSingleton<IEmailService>(
+                            provider => provider.GetRequiredService<FakeEmailService>());
                     });
                 });
         }

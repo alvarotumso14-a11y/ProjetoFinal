@@ -15,6 +15,8 @@ namespace Domain.Interfaces
         Task<List<Usuario>> GetAllAsync ();
         Task SaveChangesAsync ();
         Task<Usuario?> GetByEmailAsync(string email);
+        Task<Usuario?> GetByEmailOuEmailPendenteAsync(string email);
+        Task<bool> EmailUsadoPorOutroAsync(string email, int usuarioId);
 
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
+using Domain.Exceptions;
 
 namespace Presentation.Controllers
 {
@@ -20,9 +21,33 @@ namespace Presentation.Controllers
         }
 
         [HttpPost]
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> Create(UsuarioCreateDto dto)
         {
-            var resultado = await _service.CreateAsync(dto);
+            if (!dto.AceitouTermos || !dto.ConsentiuDadosSaude)
+            {
+                return BadRequest("É necessário aceitar os termos e consentir com o tratamento dos dados de saúde.");
+            }
+
+            if (dto.Idade < 18
+                && (string.IsNullOrWhiteSpace(dto.ResponsavelNome) || !dto.ConsentimentoResponsavel))
+            {
+                return BadRequest("Para menores de 18 anos, informe o nome do responsável legal e marque a autorização.");
+            }
+
+            (ResultadoCriacaoUsuario Resultado, CadastroPendenteDto? Cadastro) resultado;
+            try
+            {
+                resultado = await _service.CreateAsync(dto);
+            }
+            catch (IntervaloReenvioException ex)
+            {
+                return StatusCode(StatusCodes.Status429TooManyRequests, ex.Message);
+            }
+            catch (EmailDeliveryException ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+            }
 
             if (resultado.Resultado == ResultadoCriacaoUsuario.EmailJaExiste)
             {
@@ -30,7 +55,15 @@ namespace Presentation.Controllers
                     "Já existe um usuário cadastrado com este e-mail.");
             }
 
-            return StatusCode(201, resultado.Usuario);
+            return StatusCode(201, resultado.Cadastro);
+        }
+
+        [HttpPost("consultar-cadastro")]
+        [EnableRateLimiting("verification")]
+        public async Task<IActionResult> ConsultarCadastro(ConsultarCadastroDto dto)
+        {
+            var resultado = await _service.ConsultarCadastroAsync(dto);
+            return Ok(resultado);
         }
 
         [HttpPost("login")]
@@ -39,12 +72,104 @@ namespace Presentation.Controllers
         {
             var usuario = await _service.LoginAsync(dto);
 
-            if (usuario == null)
+            if (usuario.EmailNaoConfirmado)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, "E-mail ainda não confirmado.");
+            }
+
+            if (usuario.Resposta == null)
             {
                 return Unauthorized("Email ou senha inválidos.");
             }
 
-            return Ok(usuario);
+            return Ok(usuario.Resposta);
+        }
+
+        [HttpPost("confirmar-email")]
+        [EnableRateLimiting("verification")]
+        public async Task<IActionResult> ConfirmarEmail(ConfirmarEmailDto dto)
+        {
+            try
+            {
+                await _service.ConfirmarEmailAsync(dto);
+                return Ok(new { mensagem = "E-mail confirmado com sucesso." });
+            }
+            catch (CodigoVerificacaoException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("reenviar-codigo")]
+        [EnableRateLimiting("verification")]
+        public async Task<IActionResult> ReenviarCodigo(ReenviarCodigoDto dto)
+        {
+            try
+            {
+                await _service.ReenviarCodigoAsync(dto);
+                return Ok(new { mensagem = "Se houver um cadastro pendente, um novo código será enviado." });
+            }
+            catch (IntervaloReenvioException ex)
+            {
+                return StatusCode(StatusCodes.Status429TooManyRequests, ex.Message);
+            }
+            catch (EmailDeliveryException ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+            }
+        }
+
+        [HttpPost("confirmar-novo-email")]
+        [Authorize]
+        public async Task<IActionResult> ConfirmarNovoEmail(ConfirmarNovoEmailDto dto)
+        {
+            var usuarioIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (usuarioIdClaim == null || !int.TryParse(usuarioIdClaim.Value, out var usuarioId))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await _service.ConfirmarNovoEmailAsync(usuarioId, dto);
+                return Ok(new { mensagem = "E-mail atualizado com sucesso." });
+            }
+            catch (CodigoVerificacaoException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("recuperar-senha")]
+        [EnableRateLimiting("verification")]
+        public async Task<IActionResult> RecuperarSenha(RecuperarSenhaDto dto)
+        {
+            try
+            {
+                await _service.SolicitarRecuperacaoSenhaAsync(dto);
+            }
+            catch (EmailDeliveryException)
+            {
+                // The SMTP failure is logged by EmailService; keep this endpoint's
+                // response generic so account existence cannot be inferred.
+            }
+
+            return Ok(new { mensagem = "Se houver uma conta ativa para este e-mail, enviaremos um código." });
+        }
+
+        [HttpPost("redefinir-senha")]
+        [EnableRateLimiting("verification")]
+        public async Task<IActionResult> RedefinirSenha(RedefinirSenhaDto dto)
+        {
+            try
+            {
+                await _service.RedefinirSenhaAsync(dto);
+                return Ok(new { mensagem = "Senha alterada com sucesso." });
+            }
+            catch (CodigoVerificacaoException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("reativar")]
@@ -89,15 +214,24 @@ namespace Presentation.Controllers
         public async Task<IActionResult> PatchPerfil(UsuarioPatchDto dto)
         {
             var usuarioIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (usuarioIdClaim == null)
+            if (usuarioIdClaim == null || !int.TryParse(usuarioIdClaim.Value, out var usuarioId))
             {
                 return Unauthorized();
             }
 
-            var usuarioId = int.Parse(usuarioIdClaim.Value);
-
-            var resultado = await _service.PatchAsync(usuarioId, dto);
+            ResultadoPatchUsuario resultado;
+            try
+            {
+                resultado = await _service.PatchAsync(usuarioId, dto);
+            }
+            catch (IntervaloReenvioException ex)
+            {
+                return StatusCode(StatusCodes.Status429TooManyRequests, ex.Message);
+            }
+            catch (EmailDeliveryException ex)
+            {
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, ex.Message);
+            }
 
             if (resultado == ResultadoPatchUsuario.UsuarioNaoEncontrado)
             {

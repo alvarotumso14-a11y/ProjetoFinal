@@ -8,6 +8,20 @@ Requer Node.js moderno. Execute `node dev-server.mjs` e abra http://localhost:51
 
 Defina `window.GLICHELP_API_URL` antes de carregar Js/Api.js para usar outro endereço (inclua /api). Configure a API de produção antes de publicar: a configuração desta versão está vazia para evitar enviar testes ao ambiente publicado anterior. Não coloque chaves JWT, credenciais SMTP ou do banco no frontend.
 
+### Segredos locais do backend
+
+O arquivo `BackEnd/Presentation/appsettings.json` mantém vazios `ConnectionStrings:DefaultConnection` e `Jwt:Key`. Configure os valores locais com User Secrets (o nome do banco local é `glichelpdb`):
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Database=glichelpdb;User=SEU_USUARIO;Password=SUA_SENHA" --project BackEnd/Presentation/Presentation.csproj
+dotnet user-secrets set "Jwt:Key" "SUA_CHAVE_ALEATORIA_COM_PELO_MENOS_32_BYTES" --project BackEnd/Presentation/Presentation.csproj
+dotnet user-secrets set "Smtp:Password" "COLE_A_SENHA_DE_APP_SOMENTE_NO_SEU_TERMINAL" --project BackEnd/Presentation/Presentation.csproj
+```
+
+Para Gmail, a pessoa responsável pela conta `glichelpgh@gmail.com` precisa ativar a verificação em duas etapas e gerar uma senha de app em https://myaccount.google.com/apppasswords. O host, remetente e usuário `glichelpgh@gmail.com` já estão configurados em `BackEnd/Presentation/appsettings.json`; a senha de app deve ficar somente em User Secrets no desenvolvimento ou na variável `Smtp__Password` em produção. Nunca a coloque em arquivo versionado nem a envie pelo chat. Se uma senha de app for exposta, revogue-a no Google e gere outra.
+
+Em Development, sem senha configurada, o código aparece somente no console local para permitir testes; fora de Development, a API não inicia sem `Smtp__Password`. O envio usa StartTLS e timeout de 15 segundos. Se falhar no cadastro, reenvio ou troca de e-mail, a API retorna 503; a recuperação de senha mantém uma resposta genérica. O intervalo mínimo entre reenvios é de 60 segundos.
+
 ## GlicBot
 
 O chat usa `https://tiabete-server.onrender.com/api/glicbot` por padrão. Para usar outro endpoint, defina `window.GLICBOT_API_URL` antes de carregar `Js/glicbot.js`, por exemplo:
@@ -23,14 +37,13 @@ O servidor do GlicBot é o repositório [Tiabete-server](https://github.com/kabl
 
 ## Compatibilidade com o backend incluído
 
-O backend foi comparado com as chamadas feitas pelo frontend. Login, perfil, reativação e operações de registros têm rotas correspondentes; os demais fluxos e formatos abaixo ainda não estão totalmente alinhados:
+O backend foi comparado com as chamadas feitas pelo frontend. Login, perfil, reativação, confirmação de e-mail, recuperação de senha e operações de registros têm rotas correspondentes; há diferenças de formatos e validações:
 
-- `POST /usuario` cria a conta imediatamente e retorna 201 com o usuário. O frontend espera uma tentativa de cadastro, confirmação por código e posterior login.
-- O backend não implementa `POST /usuario/consultar-cadastro`, `/usuario/confirmar-email`, `/usuario/reenviar-codigo` nem `/usuario/confirmar-novo-email`. A alteração de e-mail via `PATCH /usuario/perfil` é imediata (204).
-- O backend não implementa `POST /usuario/recuperar-senha` nem `/usuario/redefinir-senha`; a tela de recuperação existe no frontend, mas depende desses endpoints.
+- `POST /usuario` salva os dados ainda não confirmados em `CadastrosPendentes`; o registro em `Usuarios` só é criado depois que o código de seis dígitos enviado por e-mail é validado.
+- O backend implementa `POST /usuario/consultar-cadastro`, `/usuario/confirmar-email`, `/usuario/reenviar-codigo`, `/usuario/confirmar-novo-email`, `/usuario/recuperar-senha` e `/usuario/redefinir-senha`.
 - O backend devolve 201 ao criar um registro e 204 ao atualizar/excluir; o frontend aceita respostas sem corpo. HI usa `glicemiaAcimaDoLimite=true` e `glicemia=null` em ambos.
 - O backend usa `int` para fator de sensibilidade, HGT alvo e dose, enquanto o frontend permite casas decimais em fator e dose. O backend permite fator/HGT alvo até 600, embora o frontend limite a 501. A validação do backend também não impõe todas as faixas de HGT/data do frontend.
-- A observação aceita até 500 caracteres no backend, mas a interface limita a 200. Aceite dos termos, consentimento de saúde e responsável legal enviados pelo frontend não aparecem no DTO/modelo do backend e não são persistidos.
+- A observação aceita até 500 caracteres no backend, mas a interface limita a 200.
 
 ## Verificação
 
@@ -38,4 +51,4 @@ Execute `node regression-tests.cjs` e `node Js/form-inputs-tests.cjs`. As fixtur
 
 ## Limites conhecidos
 
-Para ativar cadastro/alteração de e-mail com confirmação e recuperação de senha, é necessário implementar os endpoints e o envio de códigos no backend. Também é necessário alinhar os tipos/faixas numéricos e persistir os consentimentos antes de usar esses fluxos com dados reais. GlicBot usa o serviço externo existente, fora do escopo desta integração. A fórmula da calculadora não passou por validação clínica.
+Antes de usar o fluxo de confirmação, aplique as migrations do backend para criar a tabela `CadastrosPendentes`. Ainda é necessário alinhar os tipos/faixas numéricos entre frontend e backend. GlicBot usa o serviço externo existente, fora do escopo desta integração. A fórmula da calculadora não passou por validação clínica.

@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
 using QuestPDF.Fluent;
+using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace Infrastructure.Services
@@ -30,13 +31,15 @@ namespace Infrastructure.Services
             {
                 container.Page(page =>
                 {
+                    page.Size(PageSizes.A4.Landscape());
                     page.Margin(35);
 
                     page.Header().Column(column =>
                     {
                         column.Item()
-                            .Text("TiaBete")
+                            .Text("GlicHelp")
                             .FontSize(24)
+                            .FontColor("#d32f2f")
                             .Bold();
 
                         column.Item()
@@ -131,12 +134,12 @@ namespace Infrastructure.Services
                             {
                                 table.ColumnsDefinition(columns =>
                                 {
+                                    columns.ConstantColumn(82);
+                                    columns.ConstantColumn(70);
+                                    columns.ConstantColumn(75);
+                                    columns.ConstantColumn(55);
+                                    columns.ConstantColumn(120);
                                     columns.RelativeColumn();
-                                    columns.RelativeColumn();
-                                    columns.RelativeColumn();
-                                    columns.RelativeColumn();
-                                    columns.RelativeColumn(1.3f);
-                                    columns.RelativeColumn(2f);
                                 });
 
                                 table.Header(header =>
@@ -229,7 +232,7 @@ namespace Infrastructure.Services
                         .AlignCenter()
                         .Text(text =>
                         {
-                            text.Span("TiaBete • Página ");
+                            text.Span("GlicHelp • Página ");
                             text.CurrentPageNumber();
                         });
                 });

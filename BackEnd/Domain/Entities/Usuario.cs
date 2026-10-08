@@ -19,6 +19,13 @@ namespace Domain.Entities
         public string? Celular { get; set; }
         public string Role {  get; set; } = "Usuario";
         public bool Ativo { get; set; } = true;
+        public bool EmailConfirmado { get; set; }
+        public string? EmailPendente { get; set; }
+        public bool AceitouTermos { get; set; }
+        public bool ConsentiuDadosSaude { get; set; }
+        public DateTime? DataConsentimento { get; set; }
+        public string? ResponsavelNome { get; set; }
+        public bool ConsentimentoResponsavel { get; set; }
         public List<RegistroGlicemia> RegistroGlicemia { get; set; } = new ();
     }
 }

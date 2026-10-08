@@ -194,6 +194,14 @@ dotnet user-secrets set "Jwt:Issuer" "TiaBete" --project Presentation
 dotnet user-secrets set "Jwt:Audience" "TiaBete" --project Presentation
 ```
 
+The default SMTP settings use Gmail (`smtp.gmail.com:587`) and the authorized sender `glichelpgh@gmail.com`. The account owner must enable two-step verification and generate a Google App Password. Store it only in User Secrets locally:
+
+```powershell
+dotnet user-secrets set "Smtp:Password" "PASTE_THE_APP_PASSWORD_IN_YOUR_TERMINAL" --project Presentation
+```
+
+For production, set the `Smtp__Password` environment variable. Never commit or share the App Password. Without it, Development logs verification codes locally; outside Development, the API fails to start. Email delivery uses StartTLS with a 15-second timeout.
+
 ---
 
 ## 🗄 Database
@@ -205,6 +213,7 @@ dotnet ef database update --project Infrastructure --startup-project Presentatio
 ```
 
 The project uses EF Core migrations to create and update the database structure.
+New sign-ups remain in `CadastrosPendentes` until the emailed verification code is validated; only then is a row created in `Usuarios`.
 
 ---
 

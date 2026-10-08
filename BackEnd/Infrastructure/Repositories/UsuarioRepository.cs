@@ -55,5 +55,17 @@ namespace Infrastructure.Repositories
             return await _context.Usuarios
                 .FirstOrDefaultAsync(p => p.Email == email);
         }
+
+        public async Task<Usuario?> GetByEmailOuEmailPendenteAsync(string email)
+        {
+            return await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == email || u.EmailPendente == email);
+        }
+
+        public Task<bool> EmailUsadoPorOutroAsync(string email, int usuarioId)
+        {
+            return _context.Usuarios.AnyAsync(
+                u => u.Id != usuarioId && (u.Email == email || u.EmailPendente == email));
+        }
     }
 }

@@ -452,7 +452,7 @@ async function solicitarPdfAoBackend(dataInicio, dataFim) {
     const [ai, mi, di] = dataInicio.split("-");
     const [af, mf, df] = dataFim.split("-");
     link.href = url;
-    link.download = `historico-glicemia-${di}-${mi}-${ai}-a-${df}-${mf}-${af}.pdf`;
+    link.download = `GlicHelp-${di}-${mi}-${ai}-a-${df}-${mf}-${af}.pdf`;
     document.body.appendChild(link);
     link.click();
     link.remove();

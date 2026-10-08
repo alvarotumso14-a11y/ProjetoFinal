@@ -9,6 +9,7 @@
     const aviso = document.getElementById("avisoRecuperacao");
     const descricao = document.getElementById("descricaoRecuperacao");
     const botaoReenviar = document.getElementById("reenviarCodigoRecuperacao");
+    const intervaloReenvioSegundos = 60;
 
     if (!formSolicitar || !formRedefinir || !campoEmail || !campoCodigo || !campoSenha || !campoConfirmacao) return;
 
@@ -62,9 +63,9 @@
     }
 
     function iniciarEsperaReenvio() {
-        let segundos = 30;
+        let segundos = intervaloReenvioSegundos;
         botaoReenviar.disabled = true;
-        botaoReenviar.textContent = `Enviar outro código (${segundos}s)`;
+        botaoReenviar.textContent = `Aguarde ${segundos}s para reenviar`;
         clearInterval(reenviarTimer);
         reenviarTimer = setInterval(() => {
             segundos -= 1;
@@ -74,7 +75,7 @@
                 botaoReenviar.textContent = "Enviar outro código";
                 return;
             }
-            botaoReenviar.textContent = `Enviar outro código (${segundos}s)`;
+            botaoReenviar.textContent = `Aguarde ${segundos}s para reenviar`;
         }, 1000);
     }
 

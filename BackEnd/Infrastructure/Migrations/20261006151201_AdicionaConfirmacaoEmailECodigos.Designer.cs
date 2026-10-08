@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261006151201_AdicionaConfirmacaoEmailECodigos")]
+    partial class AdicionaConfirmacaoEmailECodigos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,79 +24,6 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("Domain.Entities.CadastroPendente", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<bool>("AceitouTermos")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("ConsentimentoResponsavel")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("ConsentiuDadosSaude")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("CodigoHash")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
-
-                    b.Property<DateTime>("CriadoEm")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("DataConsentimento")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("ExpiraEm")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("FatorSensibilidade")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HgtAlvo")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Idade")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ResponsavelNome")
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
-
-                    b.Property<string>("SenhaHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("Tentativas")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TipoDiabetes")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Celular")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.ToTable("CadastrosPendentes");
-                });
 
             modelBuilder.Entity("Domain.Entities.CodigoVerificacao", b =>
                 {

@@ -13,6 +13,8 @@
     const erro = document.getElementById("erroConfirmacao");
     const aviso = document.getElementById("avisoConfirmacao");
     const reenviar = document.getElementById("reenviarCodigo");
+    const intervaloReenvioSegundos = 60;
+    let timerReenvio;
     document.getElementById("emailDestino").textContent = pendente.email;
     const voltar = document.querySelector('a[href="login.html"]');
     if (alteracao) {
@@ -23,6 +25,25 @@
     campo.addEventListener("input", () => { campo.value = campo.value.replace(/\D/g, "").slice(0,6); });
     function limparMensagens() { erro.style.display = "none"; aviso.style.display = "none"; }
     function falhou(e) { erro.textContent = e.message; erro.style.display = "block"; }
+    function iniciarEsperaReenvio() {
+        let segundos = intervaloReenvioSegundos;
+        clearInterval(timerReenvio);
+        reenviar.setAttribute("aria-disabled", "true");
+        reenviar.style.pointerEvents = "none";
+        reenviar.textContent = `Enviar novo código (${segundos}s)`;
+        timerReenvio = window.setInterval(() => {
+            segundos -= 1;
+            if (segundos <= 0) {
+                clearInterval(timerReenvio);
+                reenviar.removeAttribute("aria-disabled");
+                reenviar.style.pointerEvents = "";
+                reenviar.textContent = "Enviar novo código";
+                return;
+            }
+            reenviar.textContent = `Enviar novo código (${segundos}s)`;
+        }, 1000);
+    }
+    iniciarEsperaReenvio();
     form.addEventListener("submit", async event => {
         event.preventDefault(); limparMensagens();
         const codigo = campo.value.trim();
@@ -53,12 +74,12 @@
         event.preventDefault();
         if (reenviar.getAttribute("aria-disabled") === "true") return;
         limparMensagens(); reenviar.setAttribute("aria-disabled", "true"); reenviar.style.pointerEvents = "none";
+        iniciarEsperaReenvio();
         try {
             if (alteracao) await UsuarioApi.atualizarPerfil({ email: alteracao.email });
             else await UsuarioApi.reenviarCodigo(cadastro.email);
             aviso.textContent = "Novo código enviado. O anterior deixou de valer."; aviso.style.display = "block";
             campo.value = ""; campo.focus();
         } catch (e) { falhou(e); }
-        finally { setTimeout(() => { reenviar.style.pointerEvents = ""; reenviar.removeAttribute("aria-disabled"); },30000); }
     });
 })();

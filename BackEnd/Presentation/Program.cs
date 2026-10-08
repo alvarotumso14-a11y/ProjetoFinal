@@ -7,6 +7,7 @@ using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Presentation;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
@@ -32,6 +33,26 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<ICodigoVerificacaoRepository, CodigoVerificacaoRepository>();
+builder.Services.AddScoped<ICadastroPendenteRepository, CadastroPendenteRepository>();
+var smtpSection = builder.Configuration.GetSection(SmtpOptions.SectionName);
+var smtpOptions = smtpSection.Get<SmtpOptions>() ?? new SmtpOptions();
+builder.Services.Configure<SmtpOptions>(smtpSection);
+EmailStartup.ValidarConfiguracao(builder.Environment.IsDevelopment(), smtpOptions);
+if (string.IsNullOrWhiteSpace(smtpOptions.Password))
+{
+    builder.Services.AddScoped<IEmailService, LogEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+}
+builder.Services.AddSingleton(new CodigoVerificacaoOpcoes
+{
+    ChaveHash = jwtKey,
+    IntervaloReenvioSegundos =
+        builder.Configuration.GetValue("Codigo:IntervaloReenvioSegundos", 60)
+});
 
 builder.Services.AddScoped<
     IRegistroGlicemiaRepository,
@@ -226,6 +247,24 @@ builder.Services.AddRateLimiter(options =>
 
                             QueueLimit = 0,
 
+                            AutoReplenishment = true
+                        });
+        });
+
+    options.AddPolicy(
+        "verification",
+        httpContext =>
+        {
+            var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "desconhecido";
+            var caminho = httpContext.Request.Path.Value ?? string.Empty;
+
+            return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: $"{ip}:{caminho}",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 0,
                             AutoReplenishment = true
                         });
         });

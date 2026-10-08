@@ -18,7 +18,7 @@ namespace Application.DTOs
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        [MinLength(8)]
+        [SenhaValida]
         public string Senha { get; set; } = string.Empty;
 
         [Required]
@@ -39,5 +39,11 @@ namespace Application.DTOs
 
         [Range(1, 600)]
         public int HgtAlvo { get; set; }
+
+        public bool AceitouTermos { get; set; }
+        public bool ConsentiuDadosSaude { get; set; }
+        [MaxLength(150)]
+        public string? ResponsavelNome { get; set; }
+        public bool ConsentimentoResponsavel { get; set; }
     }
 }

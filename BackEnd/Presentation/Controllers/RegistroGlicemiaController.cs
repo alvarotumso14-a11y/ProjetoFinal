@@ -126,7 +126,7 @@ namespace Presentation.Controllers
             return File(
                 pdf,
                 "application/pdf",
-                $"historico-glicemia-{dataInicial:dd-MM-yyyy}-a-{dataFinal:dd-MM-yyyy}.pdf"
+                $"GlicHelp-{dataInicial:dd-MM-yyyy}-a-{dataFinal:dd-MM-yyyy}.pdf"
             );
         }
 
