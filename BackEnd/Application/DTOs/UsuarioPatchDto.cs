@@ -24,6 +24,9 @@ namespace Application.DTOs
         [Range(1, 120)]
         public int? Idade { get; set; }
 
+        [MaxLength(150)]
+        public string? ResponsavelNome { get; set; }
+
         public string? Celular { get; set; }
 
         [Range(1, 600)]

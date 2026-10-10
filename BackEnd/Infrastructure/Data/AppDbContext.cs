@@ -39,6 +39,10 @@ namespace Infrastructure.Data
                 .Property(u => u.ResponsavelNome)
                 .HasMaxLength(150);
 
+            modelBuilder.Entity<RegistroGlicemia>()
+                .Property(r => r.Dose)
+                .HasPrecision(5, 1);
+
             modelBuilder.Entity<CadastroPendente>(entity =>
             {
                 entity.HasKey(c => c.Id);

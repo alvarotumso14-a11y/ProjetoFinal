@@ -13,6 +13,8 @@ namespace Application.DTOs
         public string Email { get; set; } = string.Empty;
         public string TipoDiabetes { get; set; } = string.Empty;
         public int? Idade { get; set; }
+        public bool MenorDeIdade { get; set; }
+        public string? ResponsavelNome { get; set; }
         public string? Celular { get; set; }
         public int FatorSensibilidade { get; set; }
         public int HgtAlvo { get; set; }

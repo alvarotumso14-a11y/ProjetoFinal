@@ -2877,6 +2877,10 @@ header button:hover {
 }
 
 .modal-alerta-app {
+    position: fixed;
+    inset: 50% auto auto 50%;
+    margin: 0;
+    transform: translate(-50%, -50%);
     width: min(440px, calc(100vw - 32px));
     max-width: none;
     padding: 0;
@@ -2895,6 +2899,7 @@ header button:hover {
     display: grid;
     gap: 16px;
     padding: 24px;
+    text-align: center;
 }
 
 .modal-alerta-conteudo h2 {
@@ -2907,7 +2912,7 @@ header button:hover {
 }
 
 .modal-alerta-ok {
-    justify-self: end;
+    justify-self: center;
     min-width: 88px;
     padding: 10px 20px;
     border: 0;
@@ -2922,6 +2927,10 @@ header button:hover {
 .modal-alerta-ok:focus-visible {
     outline: 3px solid #1769aa;
     outline-offset: 3px;
+}
+
+#responsavelField[hidden] {
+    display: none;
 }
 
 :root[data-theme="dark"] .account-dropdown-menu {

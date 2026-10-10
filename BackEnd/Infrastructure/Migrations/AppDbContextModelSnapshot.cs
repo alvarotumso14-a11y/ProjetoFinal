@@ -25,21 +25,25 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.CadastroPendente", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
                     b.Property<bool>("AceitouTermos")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Celular")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CodigoHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<bool>("ConsentimentoResponsavel")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("ConsentiuDadosSaude")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("CodigoHash")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
 
                     b.Property<DateTime>("CriadoEm")
                         .HasColumnType("datetime(6)");
@@ -82,9 +86,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("TipoDiabetes")
                         .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Celular")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -153,8 +154,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateOnly>("Data")
                         .HasColumnType("date");
 
-                    b.Property<int>("Dose")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Dose")
+                        .HasPrecision(5, 1)
+                        .HasColumnType("decimal(5,1)");
 
                     b.Property<int?>("Glicemia")
                         .HasColumnType("int");
@@ -228,6 +230,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<int?>("Idade")
                         .HasColumnType("int");
+
+                    b.Property<bool>("MenorDeIdade")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()

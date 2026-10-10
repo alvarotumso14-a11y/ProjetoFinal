@@ -9,7 +9,7 @@ namespace Application.DTOs
         public bool GlicemiaAcimaDoLimite { get; set; }
 
         [Range(0, 100)]
-        public int Dose { get; set; }
+        public decimal Dose { get; set; }
 
         public TimeSpan Hora { get; set; }
 
@@ -26,6 +26,14 @@ namespace Application.DTOs
         public IEnumerable<ValidationResult> Validate(
             ValidationContext validationContext)
         {
+            if (Dose != decimal.Round(Dose, 1))
+            {
+                yield return new ValidationResult(
+                    "A dose deve ter no máximo uma casa decimal.",
+                    new[] { nameof(Dose) }
+                );
+            }
+
             if (Data == default)
             {
                 yield return new ValidationResult(

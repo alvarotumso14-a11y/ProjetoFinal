@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
         nome: 'Usuário',
         tipo: 'Tipo de Diabetes',
         idade: '',
+        menorDeIdade: false,
+        responsavelNome: '',
         email: '',
         celular: '',
         photo: '',
@@ -226,6 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <input type="number" id="editIdade" min="1" max="120" step="1" required>
                             <span class="warning-text" id="idadeWarning" role="status" aria-live="polite">Limite máximo e de 120 anos</span>
                         </label>
+                        <label class="full-width" id="responsavelField" for="editResponsavelNome" hidden>Nome do pai, da mãe ou do responsável legal
+                            <input type="text" id="editResponsavelNome" maxlength="150" autocomplete="name">
+                        </label>
                         <label for="editEmail">E-mail<input type="email" id="editEmail" required></label>
                         <label for="editCelular">Celular<input type="tel" id="editCelular" inputmode="tel" autocomplete="tel" maxlength="15" placeholder="(11) 91234-5678"></label>
                         <label for="editFatorSensibilidade">Fator de sensibilidade
@@ -265,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         120,
         document.getElementById('idadeWarning')
     );
+    document.getElementById('editIdade').addEventListener('input', atualizarCampoResponsavel);
     FormInputs.limitarNumero(
         document.getElementById('editFatorSensibilidade'),
         501,
@@ -287,7 +293,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const profile = getProfile();
         document.getElementById('editNome').value = profile.nome || '';
         document.getElementById('editTipo').value = profile.tipo || 'Tipo 1';
-        document.getElementById('editIdade').value = calcularIdadeAtual(profile);
+        const idadeInput = document.getElementById('editIdade');
+        idadeInput.value = calcularIdadeAtual(profile);
+        const perfilEhMenor = profile.menorDeIdade ?? (Number(idadeInput.value) < 18);
+        idadeInput.min = perfilEhMenor ? '1' : '18';
+        document.getElementById('editResponsavelNome').value = profile.responsavelNome || '';
+        atualizarCampoResponsavel();
         document.getElementById('editEmail').value = profile.email || '';
         document.getElementById('editCelular').value = FormInputs.formatarTelefone(profile.celular);
         document.getElementById('editFatorSensibilidade').value = profile.fatorSensibilidade || '';
@@ -302,6 +313,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) modal.style.display = 'none';
     }
 
+    function atualizarCampoResponsavel() {
+        const idade = Number(document.getElementById('editIdade').value);
+        const campo = document.getElementById('responsavelField');
+        const input = document.getElementById('editResponsavelNome');
+        const visivel = Number.isInteger(idade) && idade >= 1 && idade < 18;
+        campo.hidden = !visivel;
+        input.required = visivel;
+    }
+
     // SALVAR DO MODAL: coleta os valores do formulário, converte a imagem (se houver)
     // para dataURL usando FileReader e persiste tudo em localStorage via saveProfile().
     // Fecha o modal após salvar.
@@ -312,6 +332,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const nome = document.getElementById('editNome').value.trim();
         const tipoDiabetes = document.getElementById('editTipo').value;
         const idade = Number(document.getElementById('editIdade').value);
+        const menorDeIdade = idade < 18;
+        const perfilEhMenor = profile.menorDeIdade ?? (Number(calcularIdadeAtual(profile)) < 18);
+        const responsavelNome = document.getElementById('editResponsavelNome').value.trim();
 
         if (!nome) {
             mostrarAlerta('Informe o nome.');
@@ -320,6 +343,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!Number.isInteger(idade) || idade < 1 || idade > 120) {
             mostrarAlerta('A idade é obrigatória e deve estar entre 1 e 120.');
+            return;
+        }
+        if (!perfilEhMenor && menorDeIdade) {
+            mostrarAlerta('A idade de uma conta adulta não pode ser alterada para menos de 18 anos.');
+            return;
+        }
+        if (menorDeIdade && !responsavelNome) {
+            mostrarAlerta('Informe o nome do pai, da mãe ou do responsável legal.');
+            document.getElementById('editResponsavelNome').focus();
             return;
         }
     
@@ -366,6 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 name: nome,
                 tipoDiabetes,
                 idade,
+                responsavelNome: menorDeIdade ? responsavelNome : null,
                 email,
                 celular,
                 fatorSensibilidade: fatorArredondado,
@@ -374,6 +407,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 profile.nome = nome;
                 profile.tipo = tipoDiabetes;
                 profile.idade = String(idade);
+                profile.menorDeIdade = menorDeIdade;
+                profile.responsavelNome = menorDeIdade ? responsavelNome : '';
                 delete profile.idadeInicial;
                 delete profile.idadeDataReferencia;
                 profile.email = emailNovo === emailAnterior ? emailNovo : emailAnterior;

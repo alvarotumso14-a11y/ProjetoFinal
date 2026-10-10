@@ -290,8 +290,14 @@ async function salvarEdicaoRegistro(event) {
         return;
     }
 
-    if (dose !== "" && (Number(dose) < 0 || Number(dose) > 100)) {
+    const doseNumero = dose === "" ? 0 : Number(dose);
+    if (doseNumero < 0 || doseNumero > 100) {
         mostrarAlerta("A dose deve estar entre 0 e 100 unidades.");
+        return;
+    }
+    if (doseNumero * 2 !== Math.trunc(doseNumero * 2)) {
+        mostrarAlerta("A dose deve avançar em intervalos de 0,5 unidade.");
+        document.getElementById("editRegistroDose").focus();
         return;
     }
 
@@ -314,7 +320,7 @@ async function salvarEdicaoRegistro(event) {
         await RegistroApi.atualizar(registro.id, {
             glicemia: continuaHi ? null : Number(glicemia),
             glicemiaAcimaDoLimite: continuaHi,
-            dose: dose === "" ? 0 : Math.round(Number(dose) * 10) / 10,
+            dose: doseNumero,
             hora: `${hora}:00`,
             refeicao: refeicaoParaApi(refeicao),
             data,

@@ -21,6 +21,7 @@ namespace Domain.Entities
         public bool Ativo { get; set; } = true;
         public bool EmailConfirmado { get; set; }
         public string? EmailPendente { get; set; }
+        public bool MenorDeIdade { get; set; }
         public bool AceitouTermos { get; set; }
         public bool ConsentiuDadosSaude { get; set; }
         public DateTime? DataConsentimento { get; set; }

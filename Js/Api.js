@@ -25,8 +25,43 @@ const API_BASE_URL = (() => {
 // ------------------------------------------------------------
 const CHAVE_TOKEN = "authToken";
 
+// Tokens gravados por versões antigas ficavam ativos após fechar o navegador.
+const haviaTokenPersistido = localStorage.getItem(CHAVE_TOKEN) !== null;
+localStorage.removeItem(CHAVE_TOKEN);
+
+function limparCacheConta(limparPerfil = false) {
+    [
+        "usuarioId",
+        "usuario",
+        "registros",
+        "ultimoHGT",
+        "ultimoInsulinaEstimada",
+        "glicbotLogs"
+    ].forEach((chave) => localStorage.removeItem(chave));
+    if (limparPerfil) localStorage.removeItem("profile");
+}
+if (haviaTokenPersistido) limparCacheConta(true);
+
 function obterToken() {
-    return localStorage.getItem(CHAVE_TOKEN);
+    const token = sessionStorage.getItem(CHAVE_TOKEN);
+    if (!token) return null;
+
+    try {
+        const partePayload = token.split(".")[1];
+        if (!partePayload) throw new Error("Token JWT inválido.");
+        const payload = JSON.parse(atob(
+            partePayload.replace(/-/g, "+").replace(/_/g, "/")
+                .padEnd(Math.ceil(partePayload.length / 4) * 4, "=")
+        ));
+        if (!Number.isFinite(payload.exp) || payload.exp * 1000 <= Date.now()) {
+            throw new Error("Token JWT expirado.");
+        }
+        return token;
+    } catch {
+        sessionStorage.removeItem(CHAVE_TOKEN);
+        limparCacheConta(true);
+        return null;
+    }
 }
 
 function estaLogado() {
@@ -40,6 +75,8 @@ function salvarPerfilLocal(usuario) {
         nome: usuario.name,
         tipo: usuario.tipoDiabetes,
         idade: usuario.idade ?? "",
+        menorDeIdade: usuario.menorDeIdade ?? (Number(usuario.idade) < 18),
+        responsavelNome: usuario.responsavelNome ?? anterior.responsavelNome ?? "",
         email: usuario.email,
         celular: usuario.celular ?? "",
         fatorSensibilidade: usuario.fatorSensibilidade,
@@ -50,23 +87,16 @@ function salvarPerfilLocal(usuario) {
 }
 
 function salvarSessao(loginResposta) {
-    localStorage.setItem(CHAVE_TOKEN, loginResposta.token);
+    limparCacheConta();
+    sessionStorage.setItem(CHAVE_TOKEN, loginResposta.token);
     salvarPerfilLocal(loginResposta.usuario);
 }
 
 function limparSessao() {
     sessionStorage.removeItem("alteracaoEmailPendente");
-    [
-        CHAVE_TOKEN,
-        "usuarioId",
-        "profile",
-        "usuario",
-        "registros",
-        "ultimoHGT",
-        "ultimoInsulinaEstimada",
-        "glicbotLogs"
-    ]
-        .forEach((chave) => localStorage.removeItem(chave));
+    sessionStorage.removeItem(CHAVE_TOKEN);
+    localStorage.removeItem(CHAVE_TOKEN);
+    limparCacheConta(true);
 }
 
 let filaAlertas = [];

@@ -174,11 +174,13 @@ namespace Tests
                 Email = "NOVO@email.com",
                 Senha = "senha-valida-123",
                 TipoDiabetes = "Tipo 1",
-                Idade = 20,
+                Idade = 17,
                 FatorSensibilidade = 50,
                 HgtAlvo = 100,
                 AceitouTermos = true,
-                ConsentiuDadosSaude = true
+                ConsentiuDadosSaude = true,
+                ResponsavelNome = "Responsável legal",
+                ConsentimentoResponsavel = true
             });
 
             Assert.Equal(ResultadoCriacaoUsuario.Sucesso, resultado.Resultado);
@@ -188,6 +190,7 @@ namespace Tests
             Assert.NotNull(cadastroCriado);
             Assert.True(cadastroCriado!.AceitouTermos);
             Assert.True(cadastroCriado.ConsentiuDadosSaude);
+            Assert.Equal("Responsável legal", cadastroCriado.ResponsavelNome);
             Assert.Equal(resultado.Cadastro.TentativaId, cadastroCriado.Id);
             var envio = Assert.Single(emailService.Envios);
             var codigoEnviado = envio.Codigo;
@@ -208,6 +211,8 @@ namespace Tests
             });
             Assert.NotNull(usuarioCriado);
             Assert.True(usuarioCriado!.EmailConfirmado);
+            Assert.True(usuarioCriado.MenorDeIdade);
+            Assert.Equal("Responsável legal", usuarioCriado.ResponsavelNome);
             Assert.Equal("novo@email.com", usuarioCriado.Email);
             Assert.True(cadastroRemovido);
             usuarioRepository.Verify(r => r.AddAsync(It.IsAny<Usuario>()), Times.Once);
@@ -451,6 +456,58 @@ namespace Tests
             Assert.Equal(usuario.Name, envio.Nome);
             Assert.Equal(TipoCodigoEmail.RecuperacaoSenha, envio.Tipo);
             Assert.Matches(@"^\d{6}$", envio.Codigo);
+        }
+
+        [Fact]
+        public async Task PatchAsync_DeveImpedirQueAdultoAltereIdadeParaMenosDe18()
+        {
+            var usuarioRepository = new Mock<IUsuarioRepository>();
+            usuarioRepository
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(new Usuario
+                {
+                    Id = 1,
+                    Idade = 25,
+                    MenorDeIdade = false
+                });
+            var service = new UsuarioService(
+                usuarioRepository.Object,
+                Mock.Of<ICodigoVerificacaoRepository>(),
+                Mock.Of<ICadastroPendenteRepository>(),
+                Mock.Of<ITokenService>(),
+                Mock.Of<IEmailService>(),
+                new CodigoVerificacaoOpcoes { ChaveHash = new string('k', 32) });
+
+            var resultado = await service.PatchAsync(1, new UsuarioPatchDto { Idade = 17 });
+
+            Assert.Equal(ResultadoPatchUsuario.IdadeMenorDe18Proibida, resultado);
+            usuarioRepository.Verify(r => r.SaveChangesAsync(), Times.Never);
+        }
+
+        [Fact]
+        public async Task PatchAsync_DeveExigirResponsavelParaPerfilDeMenor()
+        {
+            var usuarioRepository = new Mock<IUsuarioRepository>();
+            usuarioRepository
+                .Setup(r => r.GetByIdAsync(1))
+                .ReturnsAsync(new Usuario
+                {
+                    Id = 1,
+                    Idade = 16,
+                    MenorDeIdade = true
+                });
+            var service = new UsuarioService(
+                usuarioRepository.Object,
+                Mock.Of<ICodigoVerificacaoRepository>(),
+                Mock.Of<ICadastroPendenteRepository>(),
+                Mock.Of<ITokenService>(),
+                Mock.Of<IEmailService>(),
+                new CodigoVerificacaoOpcoes { ChaveHash = new string('k', 32) });
+
+            var resultado = await service.PatchAsync(1, new UsuarioPatchDto { Name = "Atualizado" });
+
+            Assert.Equal(ResultadoPatchUsuario.ResponsavelLegalObrigatorio, resultado);
+            usuarioRepository.Verify(r => r.SaveChangesAsync(), Times.Never);
         }
     }
 }

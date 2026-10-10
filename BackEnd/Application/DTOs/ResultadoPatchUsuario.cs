@@ -10,6 +10,8 @@ namespace Application.DTOs
     {
         Sucesso,
         UsuarioNaoEncontrado,
-        EmailJaExiste
+        EmailJaExiste,
+        IdadeMenorDe18Proibida,
+        ResponsavelLegalObrigatorio
     }
 }

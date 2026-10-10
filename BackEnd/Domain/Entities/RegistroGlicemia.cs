@@ -13,7 +13,7 @@ namespace Domain.Entities
         public int Id { get; set; }
         public int? Glicemia { get; set; }
         public bool GlicemiaAcimaDoLimite { get; set; }
-        public int Dose { get; set; }
+        public decimal Dose { get; set; }
         public TimeSpan Hora { get; set; }
         public string Refeicao { get; set; } = string.Empty;
         public DateOnly Data { get; set; }

@@ -234,7 +234,7 @@ async function salvarRegistro() {
     const glicemiaInput = document.getElementById("inputGlicemia");
     const glicemia = glicemiaInput.value;
     const doseInput = document.getElementById("inputDose").value;
-    const dose = doseInput == "" ? 0 : Math.round(Number(doseInput) * 10) / 10;
+    const dose = doseInput == "" ? 0 : Number(doseInput);
     const data = document.getElementById("inputData").value;
     const hora = document.getElementById("inputHora").value;
     const refeicao = document.getElementById("inputRefeicao").value;
@@ -261,6 +261,11 @@ async function salvarRegistro() {
 
     if (dose < 0 || dose > 100) {
         mostrarAlerta("A dose deve estar entre 0 e 100 unidades.");
+        return;
+    }
+    if (dose * 2 !== Math.trunc(dose * 2)) {
+        mostrarAlerta("A dose deve avançar em intervalos de 0,5 unidade.");
+        document.getElementById("inputDose").focus();
         return;
     }
 
@@ -410,7 +415,7 @@ function calcularDoseCorrecao(hgtAtual = null) {
     localStorage.setItem('ultimoHGT', String(valorHgt));
 
     const dose = (valorHgt - hgtAlvo) / fatorSensibilidade;
-    const doseFinal = dose <= 0 ? 0 : Number(dose.toFixed(1));
+    const doseFinal = dose <= 0 ? 0 : Math.round(dose * 2) / 2;
 
     resultadoEl.innerText = `Dose de correção: ${doseFinal} U`;
     resultadoEl.style.color = "#0d9e6e";

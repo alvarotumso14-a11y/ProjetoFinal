@@ -243,6 +243,16 @@ namespace Presentation.Controllers
                 return Conflict("Já existe um usuário cadastrado com este e-mail.");
             }
 
+            if (resultado == ResultadoPatchUsuario.IdadeMenorDe18Proibida)
+            {
+                return BadRequest("A idade não pode ser alterada para menos de 18 anos nesta conta.");
+            }
+
+            if (resultado == ResultadoPatchUsuario.ResponsavelLegalObrigatorio)
+            {
+                return BadRequest("Informe o nome do pai, da mãe ou do responsável legal para uma pessoa menor de 18 anos.");
+            }
+
             return NoContent();
         }
 

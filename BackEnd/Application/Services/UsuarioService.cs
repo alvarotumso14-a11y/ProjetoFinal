@@ -189,6 +189,7 @@ public class UsuarioService : IUsuarioService
                 HgtAlvo = cadastro.HgtAlvo,
                 Role = "Usuario",
                 EmailConfirmado = true,
+                MenorDeIdade = cadastro.Idade < 18,
                 AceitouTermos = cadastro.AceitouTermos,
                 ConsentiuDadosSaude = cadastro.ConsentiuDadosSaude,
                 DataConsentimento = cadastro.DataConsentimento,
@@ -405,9 +406,27 @@ public class UsuarioService : IUsuarioService
             return ResultadoPatchUsuario.UsuarioNaoEncontrado;
         }
 
+        var idadeAtualizada = dto.Idade ?? usuario.Idade;
+        if (!usuario.MenorDeIdade && idadeAtualizada < 18)
+        {
+            return ResultadoPatchUsuario.IdadeMenorDe18Proibida;
+        }
+
+        var responsavelNome = dto.ResponsavelNome?.Trim();
+        if (idadeAtualizada < 18
+            && string.IsNullOrWhiteSpace(responsavelNome ?? usuario.ResponsavelNome))
+        {
+            return ResultadoPatchUsuario.ResponsavelLegalObrigatorio;
+        }
+
         if (dto.Name != null) usuario.Name = dto.Name;
         if (dto.TipoDiabetes != null) usuario.TipoDiabetes = dto.TipoDiabetes;
-        if (dto.Idade != null) usuario.Idade = dto.Idade;
+        if (dto.Idade != null)
+        {
+            usuario.Idade = dto.Idade;
+            usuario.MenorDeIdade = dto.Idade < 18;
+        }
+        if (dto.ResponsavelNome != null) usuario.ResponsavelNome = responsavelNome;
         if (dto.Celular != null) usuario.Celular = dto.Celular;
         if (dto.FatorSensibilidade != null) usuario.FatorSensibilidade = dto.FatorSensibilidade.Value;
         if (dto.HgtAlvo != null) usuario.HgtAlvo = dto.HgtAlvo.Value;
@@ -666,6 +685,8 @@ public class UsuarioService : IUsuarioService
             Email = usuario.Email,
             TipoDiabetes = usuario.TipoDiabetes,
             Idade = usuario.Idade,
+            MenorDeIdade = usuario.MenorDeIdade,
+            ResponsavelNome = usuario.ResponsavelNome,
             Celular = usuario.Celular,
             FatorSensibilidade = usuario.FatorSensibilidade,
             HgtAlvo = usuario.HgtAlvo

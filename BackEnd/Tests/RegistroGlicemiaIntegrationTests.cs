@@ -69,7 +69,7 @@ namespace Tests
             {
                 Glicemia = 120,
                 GlicemiaAcimaDoLimite = false,
-                Dose = 5,
+                Dose = 0.5m,
                 Hora = new TimeSpan(12, 0, 0),
                 Refeicao = "Almoço",
                 Data = DateOnly.FromDateTime(DateTime.Today),
@@ -140,6 +140,12 @@ namespace Tests
                 quantidade429 > 0,
                 "O rate limiting deveria bloquear parte das requisições."
             );
+            Assert.True(quantidade200 + quantidade201 > 0);
+            serviceMock.Verify(
+                s => s.CreateAsync(
+                    It.Is<RegistroGlicemiaCreateDto>(registro => registro.Dose == 0.5m),
+                    It.IsAny<int>()),
+                Times.AtLeastOnce);
         }
     }
 }
